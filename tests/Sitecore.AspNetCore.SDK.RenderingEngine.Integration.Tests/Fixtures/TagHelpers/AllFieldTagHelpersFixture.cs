@@ -7,6 +7,7 @@ using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.TestData;
+using Sitecore.AspNetCore.SDK.ExperienceEditor.Extensions;
 using Xunit;
 
 // ReSharper disable StringLiteralTypo
@@ -34,7 +35,8 @@ public class AllFieldTagHelpersFixture : IDisposable
                     options
                         .AddModelBoundView<ComponentModels.ComponentWithAllFieldTypes>("Component-With-All-Field-Types", "ComponentWithAllFieldTypes")
                         .AddDefaultComponentRenderer();
-                });
+                })
+                .WithExperienceEditor();
             })
             .Configure(app =>
             {

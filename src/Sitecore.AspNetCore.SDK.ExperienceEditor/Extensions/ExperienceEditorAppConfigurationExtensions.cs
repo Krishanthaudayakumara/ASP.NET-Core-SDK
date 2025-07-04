@@ -46,6 +46,7 @@ public static class ExperienceEditorAppConfigurationExtensions
             return serviceBuilder;
         }
 
+        services.AddTransient<Sitecore.AspNetCore.SDK.ExperienceEditor.TagHelpers.RichTextTagHelper>();
         services.AddSingleton<IChromeDataSerializer, ChromeDataSerializer>();
         services.AddSingleton<IChromeDataBuilder, ChromeDataBuilder>();
         services.AddSingleton<ExperienceEditorMarkerService>();

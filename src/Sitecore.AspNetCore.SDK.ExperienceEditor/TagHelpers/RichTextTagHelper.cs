@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Fields;
+using Sitecore.AspNetCore.SDK.RenderingEngine;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Rendering;
 
-namespace Sitecore.AspNetCore.SDK.RenderingEngine.TagHelpers.Fields;
+namespace Sitecore.AspNetCore.SDK.ExperienceEditor.TagHelpers;
 
 /// <summary>
 /// Tag helper that renders HTML text for a Sitecore <see cref="RichTextField"/>.
