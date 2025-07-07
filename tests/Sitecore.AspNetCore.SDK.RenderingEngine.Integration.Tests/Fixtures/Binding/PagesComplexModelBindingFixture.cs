@@ -2,8 +2,8 @@
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
-using Sitecore.AspNetCore.SDK.ExperienceEditor.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
+using Sitecore.AspNetCore.SDK.Pages.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.TestData;
 using System.Net;
@@ -11,13 +11,13 @@ using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
-public class ComplexModelBindingFixture : IDisposable
+public class PagesComplexModelBindingFixture : IDisposable
 {
     private readonly TestServer _server;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public ComplexModelBindingFixture()
+    public PagesComplexModelBindingFixture()
     {
         TestServerBuilder testHostBuilder = new();
         _mockClientHandler = new MockHttpMessageHandler();
@@ -33,7 +33,8 @@ public class ComplexModelBindingFixture : IDisposable
                     options
                         .AddModelBoundView<ComponentModels.ComplexComponent>(name => name.Equals("Complex-Component", StringComparison.OrdinalIgnoreCase), "ComplexComponent")
                         .AddDefaultComponentRenderer();
-                });
+                })
+                .WithSitecorePages(Guid.NewGuid().ToString());
             })
             .Configure(app =>
             {
@@ -43,7 +44,6 @@ public class ComplexModelBindingFixture : IDisposable
                 {
                     endpoints.MapDefaultControllerRoute();
                 });
-                app.UseSitecoreExperienceEditor();
             });
 
         _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
