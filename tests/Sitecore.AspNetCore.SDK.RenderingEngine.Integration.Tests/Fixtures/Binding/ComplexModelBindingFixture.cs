@@ -1,11 +1,12 @@
-﻿using System.Net;
-using FluentAssertions;
+﻿using FluentAssertions;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
+using Sitecore.AspNetCore.SDK.ExperienceEditor.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.TestData;
+using System.Net;
 using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
@@ -42,6 +43,7 @@ public class ComplexModelBindingFixture : IDisposable
                 {
                     endpoints.MapDefaultControllerRoute();
                 });
+                app.UseSitecoreExperienceEditor();
             });
 
         _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
