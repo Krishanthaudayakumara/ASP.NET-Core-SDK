@@ -8,6 +8,7 @@ using Sitecore.AspNetCore.SDK.LayoutService.Client.Request;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response;
 using Sitecore.AspNetCore.SDK.Pages.Configuration;
 using Sitecore.AspNetCore.SDK.Pages.Properties;
+using Sitecore.AspNetCore.SDK.Pages.Services;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Interfaces;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Rendering;
@@ -25,13 +26,16 @@ namespace Sitecore.AspNetCore.SDK.Pages.Middleware;
 /// <param name="options">The Sitecore Pages configuration options.</param>
 /// <param name="requestMapper">The <see cref="ISitecoreLayoutRequestMapper"/> to map the HttpRequest to a Layout Service request.</param>
 /// <param name="layoutService">The layout service client.</param>
-public class PagesRenderMiddleware(RequestDelegate next, IOptions<PagesOptions> options, ISitecoreLayoutRequestMapper requestMapper, ISitecoreLayoutClient layoutService)
+/// <param name="contentStylesService">The content styles service.</param>
+public class PagesRenderMiddleware(RequestDelegate next, IOptions<PagesOptions> options, ISitecoreLayoutRequestMapper requestMapper, ISitecoreLayoutClient layoutService, IContentStylesService contentStylesService)
 {
     private readonly RequestDelegate _next = next ?? throw new ArgumentNullException(nameof(next));
 
     private readonly PagesOptions _options = options != null ? options.Value : throw new ArgumentNullException(nameof(options));
 
     private readonly ISitecoreLayoutClient _layoutService = layoutService ?? throw new ArgumentNullException(nameof(layoutService));
+
+    private readonly IContentStylesService _contentStylesService = contentStylesService ?? throw new ArgumentNullException(nameof(contentStylesService));
 
     /// <summary>
     /// The middleware Invoke method.
@@ -56,6 +60,15 @@ public class PagesRenderMiddleware(RequestDelegate next, IOptions<PagesOptions> 
             if (httpContext.GetSitecoreRenderingContext() == null)
             {
                 SitecoreLayoutResponse response = await GetSitecoreLayoutResponse(httpContext).ConfigureAwait(false);
+
+                if (_options.EnableNewRteEditor)
+                {
+                    string? styles = _contentStylesService.GetContentStylesheetLink(response.Content);
+                    if (!string.IsNullOrEmpty(styles))
+                    {
+                        httpContext.Items[Constants.HttpContextItems.RteStyles] = styles;
+                    }
+                }
 
                 SitecoreRenderingContext scContext = new()
                 {

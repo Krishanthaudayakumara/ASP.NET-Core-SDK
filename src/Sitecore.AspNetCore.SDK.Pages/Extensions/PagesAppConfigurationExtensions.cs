@@ -1,6 +1,7 @@
 ﻿using GraphQL.Client.Abstractions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -14,6 +15,7 @@ using Sitecore.AspNetCore.SDK.Pages.Services;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Configuration;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Sitecore.AspNetCore.SDK.Pages.Extensions;
 
@@ -76,6 +78,8 @@ public static class PagesAppConfigurationExtensions
 
         services.AddSingleton<PagesMarkerService>();
         services.AddSingleton<IDictionaryService, DictionaryService>();
+        services.AddSingleton<IContentStylesService, ContentStylesService>();
+        services.AddTransient<Sitecore.AspNetCore.SDK.Pages.TagHelpers.RichTextTagHelper>();
 
         if (options != null)
         {
@@ -97,6 +101,24 @@ public static class PagesAppConfigurationExtensions
                 MapRequest(httpRequest, layoutRequest, Constants.QueryStringKeys.Route);
             });
         }));
+
+        IConfiguration? configuration = services.BuildServiceProvider().GetService<IConfiguration>();
+        if (configuration != null)
+        {
+            services.AddOptions<PagesOptions>()
+                .Bind(configuration.GetSection("Sitecore:Pages"))
+                .Bind(configuration.GetSection("Sitecore"))
+                .Bind(configuration.GetSection("PAGES"));
+        }
+
+        services.PostConfigure<PagesOptions>(pagesOptions =>
+        {
+            pagesOptions.ContextId = contextId;
+            if (options != null)
+            {
+                options(pagesOptions);
+            }
+        });
 
         return serviceBuilder;
     }

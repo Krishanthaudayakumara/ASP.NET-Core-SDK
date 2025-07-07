@@ -49,4 +49,20 @@ public class PagesOptions
     /// Gets or sets the number of entries per page in a dictionary. The default value is set to 1000.
     /// </summary>
     public int DictionaryPageSize { get; set; } = 1000;
+
+    /// <summary>
+    /// Gets or sets the URL for the Pages asset server.
+    /// </summary>
+    public string PagesAssetServerUrl { get; set; } = "https://pages.sitecorecloud.io";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to enable the new XM Cloud Rich Text Editor styles.
+    /// This is typically controlled by the PAGES_ENABLE_NEW_RTE_EDITOR environment variable.
+    /// </summary>
+    public bool EnableNewRteEditor { get; set; }
+
+    /// <summary>
+    /// Gets or sets the ContextId for the environment being used.
+    /// </summary>
+    public string? ContextId { get; set; }
 }

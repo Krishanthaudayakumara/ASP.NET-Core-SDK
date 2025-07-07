@@ -82,5 +82,16 @@
             /// </summary>
             public const string EditMode = "sc_editmode";
         }
+
+        /// <summary>
+        /// Class used to hold HttpContext item keys.
+        /// </summary>
+        public static class HttpContextItems
+        {
+            /// <summary>
+            /// Key for the RTE styles.
+            /// </summary>
+            public const string RteStyles = "sc_rte_styles";
+        }
     }
 }
