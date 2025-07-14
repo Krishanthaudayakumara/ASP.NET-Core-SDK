@@ -41,27 +41,27 @@ public static partial class SitecoreFieldExtensions
         {
             // Parse existing query parameters from the original URL
             var originalParams = ParseUrlParameters(url);
-            
+
             // Split URL to get base path
             string[] urlParts = url.Split('?');
             string baseUrl = urlParts[0];
-            
+
             // Merge original parameters with new ones (new ones take precedence)
             RouteValueDictionary newParameters = new(imageParams);
-            
+
             // Start with original parameters
             RouteValueDictionary mergedParams = new();
             foreach (var kvp in originalParams)
             {
                 mergedParams[kvp.Key] = kvp.Value;
             }
-            
+
             // Add/override with new parameters
             foreach (string key in newParameters.Keys)
             {
                 mergedParams[key] = newParameters[key];
             }
-            
+
             // Rebuild URL with merged parameters
             url = baseUrl;
             foreach (string key in mergedParams.Keys)
@@ -91,21 +91,21 @@ public static partial class SitecoreFieldExtensions
     private static Dictionary<string, object> ParseUrlParameters(string url)
     {
         var parameters = new Dictionary<string, object>();
-        
+
         if (string.IsNullOrEmpty(url))
         {
             return parameters;
         }
-        
+
         var queryIndex = url.IndexOf('?');
         if (queryIndex == -1)
         {
             return parameters;
         }
-        
+
         var queryString = url.Substring(queryIndex + 1);
         var parsedQuery = QueryHelpers.ParseQuery(queryString);
-        
+
         foreach (var kvp in parsedQuery)
         {
             if (kvp.Value.Count > 0)
@@ -113,7 +113,7 @@ public static partial class SitecoreFieldExtensions
                 parameters[kvp.Key] = kvp.Value.First() ?? string.Empty;
             }
         }
-        
+
         return parameters;
     }
 

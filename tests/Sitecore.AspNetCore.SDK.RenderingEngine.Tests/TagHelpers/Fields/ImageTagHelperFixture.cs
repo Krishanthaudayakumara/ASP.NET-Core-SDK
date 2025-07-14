@@ -779,7 +779,7 @@ public class ImageTagHelperFixture
         content.Should().Contain("1000w"); // From 'w' parameter (priority over mw)
         content.Should().Contain("250w");  // From 'mw' parameter
         content.Should().Contain("quality=80"); // Base imageParams should be merged
-        
+
         // Verify Content SDK behavior: w parameter takes precedence over mw
         content.Should().Contain("w=1000"); // First entry should use 'w' parameter
         content.Should().Contain("mw=250"); // Second entry should use 'mw' parameter
@@ -935,19 +935,19 @@ public class ImageTagHelperFixture
         // Assert
         string content = tagHelperOutput.Content.GetContent();
         content.Should().Contain("srcset=");
-        
+
         // Verify that original cache-busting parameters are preserved in srcset URLs
         content.Should().Contain("ttc=63888067993", "cache timestamp should be preserved");
         content.Should().Contain("tt=79223DA7F3AE658CE8F43731B252D6BC", "cache token should be preserved");
         content.Should().Contain("hash=6CD37A62DE0B8CB9DC4EE19936C2D41E", "hash should be preserved");
         content.Should().Contain("iar=0", "ignore aspect ratio should be preserved");
-        
+
         // Verify that new parameters are added
         content.Should().Contain("w=800", "new width parameter should be added");
         content.Should().Contain("h=400", "new height parameter should be added");
         content.Should().Contain("mw=400", "new max width parameter should be added");
         content.Should().Contain("q=75", "image params should be merged");
-        
+
         // Verify srcset descriptors are correct
         content.Should().Contain("800w", "first srcset entry should have width descriptor");
         content.Should().Contain("400w", "second srcset entry should have width descriptor");

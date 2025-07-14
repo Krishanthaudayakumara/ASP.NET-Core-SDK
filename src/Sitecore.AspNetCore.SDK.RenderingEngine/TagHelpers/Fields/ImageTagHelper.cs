@@ -37,7 +37,7 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
     private static string GetWidthDescriptor(object parameters)
     {
         string? width = null;
-        
+
         // Handle Dictionary<string, object>
         if (parameters is Dictionary<string, object> dictionary)
         {
@@ -63,7 +63,7 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
         {
             // Handle anonymous objects via reflection
             var type = parameters.GetType();
-            
+
             // Priority: w > mw > width > maxWidth (matching Content SDK behavior and supporting legacy parameters)
             var wProperty = type.GetProperty("w");
             if (wProperty != null)
@@ -102,7 +102,7 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
     private static object MergeParameters(object? imageParams, object srcSetParams)
     {
         var mergedDict = new Dictionary<string, object?>();
-        
+
         // Add base imageParams first
         if (imageParams != null)
         {
@@ -115,7 +115,7 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
                 }
             }
         }
-        
+
         // Add srcSet parameters (these take precedence)
         var srcParams = new RouteValueDictionary(srcSetParams);
         foreach (var kvp in srcParams)
@@ -439,10 +439,10 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
         {
             // Merge ImageParams with srcSet parameters (Content SDK behavior)
             var mergedParams = MergeParameters(ImageParams, srcSetItem);
-            
+
             // Get the width descriptor from the original srcSet item (not merged params)
             string descriptor = GetWidthDescriptor(srcSetItem);
-            
+
             // Only include entries that have a valid width descriptor
             if (!string.IsNullOrEmpty(descriptor))
             {
