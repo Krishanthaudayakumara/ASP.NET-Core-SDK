@@ -37,19 +37,39 @@ public static partial class SitecoreFieldExtensions
     /// <returns>Media item URL.</returns>
     private static string GetSitecoreMediaUri(string url, object? imageParams)
     {
-        // TODO What's the reason we strip away existing querystring?
         if (imageParams != null)
         {
+            // Parse existing query parameters from the original URL
+            var originalParams = ParseUrlParameters(url);
+            
+            // Split URL to get base path
             string[] urlParts = url.Split('?');
-            if (urlParts.Length > 1)
+            string baseUrl = urlParts[0];
+            
+            // Merge original parameters with new ones (new ones take precedence)
+            RouteValueDictionary newParameters = new(imageParams);
+            
+            // Start with original parameters
+            RouteValueDictionary mergedParams = new();
+            foreach (var kvp in originalParams)
             {
-                url = urlParts[0];
+                mergedParams[kvp.Key] = kvp.Value;
             }
-
-            RouteValueDictionary parameters = new(imageParams);
-            foreach (string key in parameters.Keys)
+            
+            // Add/override with new parameters
+            foreach (string key in newParameters.Keys)
             {
-                url = QueryHelpers.AddQueryString(url, key, parameters[key]?.ToString() ?? string.Empty);
+                mergedParams[key] = newParameters[key];
+            }
+            
+            // Rebuild URL with merged parameters
+            url = baseUrl;
+            foreach (string key in mergedParams.Keys)
+            {
+                if (mergedParams[key] != null)
+                {
+                    url = QueryHelpers.AddQueryString(url, key, mergedParams[key]?.ToString() ?? string.Empty);
+                }
             }
         }
 
@@ -61,6 +81,40 @@ public static partial class SitecoreFieldExtensions
         }
 
         return url;
+    }
+
+    /// <summary>
+    /// Parses query parameters from a URL into a dictionary.
+    /// </summary>
+    /// <param name="url">The URL to parse.</param>
+    /// <returns>Dictionary of query parameters.</returns>
+    private static Dictionary<string, object> ParseUrlParameters(string url)
+    {
+        var parameters = new Dictionary<string, object>();
+        
+        if (string.IsNullOrEmpty(url))
+        {
+            return parameters;
+        }
+        
+        var queryIndex = url.IndexOf('?');
+        if (queryIndex == -1)
+        {
+            return parameters;
+        }
+        
+        var queryString = url.Substring(queryIndex + 1);
+        var parsedQuery = QueryHelpers.ParseQuery(queryString);
+        
+        foreach (var kvp in parsedQuery)
+        {
+            if (kvp.Value.Count > 0)
+            {
+                parameters[kvp.Key] = kvp.Value.First() ?? string.Empty;
+            }
+        }
+        
+        return parameters;
     }
 
     [GeneratedRegex("/([-~]{1})/media/")]

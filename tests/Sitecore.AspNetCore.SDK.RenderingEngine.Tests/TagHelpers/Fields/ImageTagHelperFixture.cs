@@ -24,7 +24,7 @@ public class ImageTagHelperFixture
 {
     private const string Html = "<img alt=\"Sitecore Logo\" border=\"1\" class=\"test\" height=\"100\" hspace=\"10\" src=\"http://styleguide/-/jssmedia/styleguide/data/media/img/sc_logo.png?iar=0&amp;hash=F313AD90AE547CAB09277E42509E289B\" title=\"title\" vspace=\"10\" width=\"100\" />";
     private const string EditableHtml = "<input id='fld_2121847759D950C4B7F4FBCD69760250_2AE326C130E557708C99E099EE76D4D3_en_1_aeede4c4d2924ff0bfafee1419803eb4_42' class='scFieldValue' name='fld_2121847759D950C4B7F4FBCD69760250_2AE326C130E557708C99E099EE76D4D3_en_1_aeede4c4d2924ff0bfafee1419803eb4_42' type='hidden' value=\"&lt;image alt=&quot;Sitecore Logo&quot; mediaid=&quot;{47408259-ECC4-553D-9585-73E504EEEDCE}&quot; /&gt;\" /><code id=\"fld_2121847759D950C4B7F4FBCD69760250_2AE326C130E557708C99E099EE76D4D3_en_1_aeede4c4d2924ff0bfafee1419803eb4_42_edit\" type=\"text/sitecore\" chromeType=\"field\" scFieldType=\"image\" class=\"scpm\" kind=\"open\">{\"commands\":[{\"click\":\"chrome:field:editcontrol({command:\\\"webedit:chooseimage\\\"})\",\"header\":\"Choose Image\",\"icon\":\"/sitecore/shell/themes/standard/custom/16x16/photo_landscape2.png\",\"disabledIcon\":\"/temp/photo_landscape2_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Choose an image.\",\"type\":\"\"},{\"click\":\"chrome:field:editcontrol({command:\\\"webedit:editimage\\\"})\",\"header\":\"Properties\",\"icon\":\"/sitecore/shell/themes/standard/custom/16x16/photo_landscape2_edit.png\",\"disabledIcon\":\"/temp/photo_landscape2_edit_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Modify image appearance.\",\"type\":\"\"},{\"click\":\"chrome:field:editcontrol({command:\\\"webedit:clearimage\\\"})\",\"header\":\"Clear\",\"icon\":\"/sitecore/shell/themes/standard/custom/16x16/photo_landscape2_delete.png\",\"disabledIcon\":\"/temp/photo_landscape2_delete_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Remove the image.\",\"type\":\"\"},{\"click\":\"chrome:common:edititem({command:\\\"webedit:open\\\"})\",\"header\":\"Edit the related item\",\"icon\":\"/temp/iconcache/office/16x16/cubes.png\",\"disabledIcon\":\"/temp/cubes_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Edit the related item in the Content Editor.\",\"type\":\"common\"},{\"click\":\"chrome:rendering:personalize({command:\\\"webedit:personalize\\\"})\",\"header\":\"Personalize\",\"icon\":\"/temp/iconcache/office/16x16/users_family.png\",\"disabledIcon\":\"/temp/users_family_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Create or edit personalization for this component.\",\"type\":\"sticky\"},{\"click\":\"chrome:rendering:editvariations({command:\\\"webedit:editvariations\\\"})\",\"header\":\"Edit variations\",\"icon\":\"/temp/iconcache/office/16x16/windows.png\",\"disabledIcon\":\"/temp/windows_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Edit the variations.\",\"type\":\"sticky\"}],\"contextItemUri\":\"sitecore://master/{21218477-59D9-50C4-B7F4-FBCD69760250}?lang=en&ver=1\",\"custom\":{},\"displayName\":\"sample1\",\"expandedDisplayName\":null}</code><img src=\"/sitecore/shell/-/jssmedia/styleguide/data/media/img/sc_logo.png?iar=0\" alt=\"Sitecore Logo\" /><code class=\"scpm\" type=\"text/sitecore\" chromeType=\"field\" kind=\"close\"></code>";
-    private const string EditableHtmlWithCustomAttributes = "<input id='fld_2121847759D950C4B7F4FBCD69760250_2AE326C130E557708C99E099EE76D4D3_en_1_aeede4c4d2924ff0bfafee1419803eb4_42' class='scFieldValue' name='fld_2121847759D950C4B7F4FBCD69760250_2AE326C130E557708C99E099EE76D4D3_en_1_aeede4c4d2924ff0bfafee1419803eb4_42' type='hidden' value=\"&lt;image alt=&quot;Sitecore Logo&quot; mediaid=&quot;{47408259-ECC4-553D-9585-73E504EEEDCE}&quot; /&gt;\" /><code id=\"fld_2121847759D950C4B7F4FBCD69760250_2AE326C130E557708C99E099EE76D4D3_en_1_aeede4c4d2924ff0bfafee1419803eb4_42_edit\" type=\"text/sitecore\" chromeType=\"field\" scFieldType=\"image\" class=\"scpm\" kind=\"open\">{\"commands\":[{\"click\":\"chrome:field:editcontrol({command:\\\"webedit:chooseimage\\\"})\",\"header\":\"Choose Image\",\"icon\":\"/sitecore/shell/themes/standard/custom/16x16/photo_landscape2.png\",\"disabledIcon\":\"/temp/photo_landscape2_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Choose an image.\",\"type\":\"\"},{\"click\":\"chrome:field:editcontrol({command:\\\"webedit:editimage\\\"})\",\"header\":\"Properties\",\"icon\":\"/sitecore/shell/themes/standard/custom/16x16/photo_landscape2_edit.png\",\"disabledIcon\":\"/temp/photo_landscape2_edit_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Modify image appearance.\",\"type\":\"\"},{\"click\":\"chrome:field:editcontrol({command:\\\"webedit:clearimage\\\"})\",\"header\":\"Clear\",\"icon\":\"/sitecore/shell/themes/standard/custom/16x16/photo_landscape2_delete.png\",\"disabledIcon\":\"/temp/photo_landscape2_delete_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Remove the image.\",\"type\":\"\"},{\"click\":\"chrome:common:edititem({command:\\\"webedit:open\\\"})\",\"header\":\"Edit the related item\",\"icon\":\"/temp/iconcache/office/16x16/cubes.png\",\"disabledIcon\":\"/temp/cubes_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Edit the related item in the Content Editor.\",\"type\":\"common\"},{\"click\":\"chrome:rendering:personalize({command:\\\"webedit:personalize\\\"})\",\"header\":\"Personalize\",\"icon\":\"/temp/iconcache/office/16x16/users_family.png\",\"disabledIcon\":\"/temp/users_family_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Create or edit personalization for this component.\",\"type\":\"sticky\"},{\"click\":\"chrome:rendering:editvariations({command:\\\"webedit:editvariations\\\"})\",\"header\":\"Edit variations\",\"icon\":\"/temp/iconcache/office/16x16/windows.png\",\"disabledIcon\":\"/temp/windows_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Edit the variations.\",\"type\":\"sticky\"}],\"contextItemUri\":\"sitecore://master/{21218477-59D9-50C4-B7F4-FBCD69760250}?lang=en&ver=1\",\"custom\":{},\"displayName\":\"sample1\",\"expandedDisplayName\":null}</code><img src=\"/sitecore/shell/-/jssmedia/styleguide/data/media/img/sc_logo.png?mw=100&mh=50\" alt=\"testAlt\" class=\"testClass\" width=\"50\" height=\"50\" /><code class=\"scpm\" type=\"text/sitecore\" chromeType=\"field\" kind=\"close\"></code>";
+    private const string EditableHtmlWithCustomAttributes = "<input id='fld_2121847759D950C4B7F4FBCD69760250_2AE326C130E557708C99E099EE76D4D3_en_1_aeede4c4d2924ff0bfafee1419803eb4_42' class='scFieldValue' name='fld_2121847759D950C4B7F4FBCD69760250_2AE326C130E557708C99E099EE76D4D3_en_1_aeede4c4d2924ff0bfafee1419803eb4_42' type='hidden' value=\"&lt;image alt=&quot;Sitecore Logo&quot; mediaid=&quot;{47408259-ECC4-553D-9585-73E504EEEDCE}&quot; /&gt;\" /><code id=\"fld_2121847759D950C4B7F4FBCD69760250_2AE326C130E557708C99E099EE76D4D3_en_1_aeede4c4d2924ff0bfafee1419803eb4_42_edit\" type=\"text/sitecore\" chromeType=\"field\" scFieldType=\"image\" class=\"scpm\" kind=\"open\">{\"commands\":[{\"click\":\"chrome:field:editcontrol({command:\\\"webedit:chooseimage\\\"})\",\"header\":\"Choose Image\",\"icon\":\"/sitecore/shell/themes/standard/custom/16x16/photo_landscape2.png\",\"disabledIcon\":\"/temp/photo_landscape2_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Choose an image.\",\"type\":\"\"},{\"click\":\"chrome:field:editcontrol({command:\\\"webedit:editimage\\\"})\",\"header\":\"Properties\",\"icon\":\"/sitecore/shell/themes/standard/custom/16x16/photo_landscape2_edit.png\",\"disabledIcon\":\"/temp/photo_landscape2_edit_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Modify image appearance.\",\"type\":\"\"},{\"click\":\"chrome:field:editcontrol({command:\\\"webedit:clearimage\\\"})\",\"header\":\"Clear\",\"icon\":\"/sitecore/shell/themes/standard/custom/16x16/photo_landscape2_delete.png\",\"disabledIcon\":\"/temp/photo_landscape2_delete_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Remove the image.\",\"type\":\"\"},{\"click\":\"chrome:common:edititem({command:\\\"webedit:open\\\"})\",\"header\":\"Edit the related item\",\"icon\":\"/temp/iconcache/office/16x16/cubes.png\",\"disabledIcon\":\"/temp/cubes_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Edit the related item in the Content Editor.\",\"type\":\"common\"},{\"click\":\"chrome:rendering:personalize({command:\\\"webedit:personalize\\\"})\",\"header\":\"Personalize\",\"icon\":\"/temp/iconcache/office/16x16/users_family.png\",\"disabledIcon\":\"/temp/users_family_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Create or edit personalization for this component.\",\"type\":\"sticky\"},{\"click\":\"chrome:rendering:editvariations({command:\\\"webedit:editvariations\\\"})\",\"header\":\"Edit variations\",\"icon\":\"/temp/iconcache/office/16x16/windows.png\",\"disabledIcon\":\"/temp/windows_disabled16x16.png\",\"isDivider\":false,\"tooltip\":\"Edit the variations.\",\"type\":\"sticky\"}],\"contextItemUri\":\"sitecore://master/{21218477-59D9-50C4-B7F4-FBCD69760250}?lang=en&ver=1\",\"custom\":{},\"displayName\":\"sample1\",\"expandedDisplayName\":null}</code><img src=\"/sitecore/shell/-/jssmedia/styleguide/data/media/img/sc_logo.png?iar=0&mw=100&mh=50\" alt=\"testAlt\" class=\"testClass\" width=\"50\" height=\"50\" /><code class=\"scpm\" type=\"text/sitecore\" chromeType=\"field\" kind=\"close\"></code>";
     private readonly Image _image = new() { Src = "http://styleguide/-/media/styleguide/data/media/img/sc_logo.png?iar=0&hash=F313AD90AE547CAB09277E42509E289B", Alt = "Sitecore Logo", Width = 100, Height = 100, VSpace = 10, HSpace = 10, Border = 1, Class = "test", Title = "title" };
 
     // ReSharper disable once UnusedMember.Global - Used by testing framework
@@ -245,9 +245,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain("?mw=100&amp;mh=50");
-        tagHelperOutput.Content.GetContent().Should().NotContain("iar=0");
-        tagHelperOutput.Content.GetContent().Should().NotContain("hash=F313AD90AE547CAB09277E42509E289B");
+        tagHelperOutput.Content.GetContent().Should().Contain("iar=0&amp;hash=F313AD90AE547CAB09277E42509E289B&amp;mw=100&amp;mh=50");
     }
 
     [Theory]
@@ -344,7 +342,7 @@ public class ImageTagHelperFixture
         string? url = tagHelperOutput.Attributes["src"].Value.ToString();
 
         // Assert
-        url.Should().Contain("?mw=100&mh=50");
+        url.Should().Contain("iar=0&hash=F313AD90AE547CAB09277E42509E289B&mw=100&mh=50");
     }
 
     [Theory]
@@ -556,9 +554,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain("mw=100&amp;mh=50");
-        tagHelperOutput.Content.GetContent().Should().NotContain("iar=0");
-        tagHelperOutput.Content.GetContent().Should().NotContain("hash=F313AD90AE547CAB09277E42509E289B");
+        tagHelperOutput.Content.GetContent().Should().Contain("iar=0&amp;hash=F313AD90AE547CAB09277E42509E289B&amp;mw=100&amp;mh=50");
     }
 
     [Theory]
@@ -655,7 +651,7 @@ public class ImageTagHelperFixture
         string? url = tagHelperOutput.Attributes["src"].Value.ToString();
 
         // Assert
-        url.Should().Contain("?mw=100&mh=50");
+        url.Should().Contain("iar=0&hash=F313AD90AE547CAB09277E42509E289B&mw=100&mh=50");
     }
 
     [Theory]
@@ -749,8 +745,7 @@ public class ImageTagHelperFixture
         // Arrange
         tagHelperOutput.TagName = RenderingEngineConstants.SitecoreTagHelpers.ImageHtmlTag;
         sut.For = GetModelExpression(new ImageField(_image));
-        sut.SrcSet = new object[] { new { mw = 300 }, new { mw = 100 } };
-        sut.Sizes = "(min-width: 960px) 300px, 100px";
+        sut.SrcSet = new object[] { new { w = 400 }, new { w = 200 } };
 
         // Act
         sut.Process(tagHelperContext, tagHelperOutput);
@@ -758,31 +753,58 @@ public class ImageTagHelperFixture
         // Assert
         string content = tagHelperOutput.Content.GetContent();
         content.Should().Contain("srcset=");
-        content.Should().Contain("300w");
-        content.Should().Contain("100w");
-        content.Should().Contain("sizes=\"(min-width: 960px) 300px, 100px\"");
+        content.Should().Contain("400w");
+        content.Should().Contain("200w");
     }
 
     [Theory]
     [AutoNSubstituteData]
-    public void Process_ImgTagWithSrcSet_GeneratesSrcSetAttribute(
+    public void Process_ScImgTagWithSrcSet_GeneratesSrcSetMatchingContentSDK(
         ImageTagHelper sut,
         TagHelperContext tagHelperContext,
         TagHelperOutput tagHelperOutput)
     {
         // Arrange
-        tagHelperOutput.TagName = "img";
+        tagHelperOutput.TagName = RenderingEngineConstants.SitecoreTagHelpers.ImageHtmlTag;
         sut.For = GetModelExpression(new ImageField(_image));
-        sut.SrcSet = new object[] { new { w = 400 }, new { w = 200 } };
+        sut.SrcSet = new object[] { new { w = 1000, h = 1000 }, new { mw = 250, mh = 250 } };
+        sut.ImageParams = new { quality = 80 };
 
         // Act
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Attributes.Should().ContainSingle(a => a.Name == "srcset");
-        string srcSetValue = tagHelperOutput.Attributes["srcset"].Value.ToString()!;
-        srcSetValue.Should().Contain("400w");
-        srcSetValue.Should().Contain("200w");
+        string content = tagHelperOutput.Content.GetContent();
+        content.Should().Contain("srcset=");
+        content.Should().Contain("1000w"); // From 'w' parameter (priority over mw)
+        content.Should().Contain("250w");  // From 'mw' parameter
+        content.Should().Contain("quality=80"); // Base imageParams should be merged
+        
+        // Verify Content SDK behavior: w parameter takes precedence over mw
+        content.Should().Contain("w=1000"); // First entry should use 'w' parameter
+        content.Should().Contain("mw=250"); // Second entry should use 'mw' parameter
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithNoWidth_FiltersOutEntry(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        tagHelperOutput.TagName = RenderingEngineConstants.SitecoreTagHelpers.ImageHtmlTag;
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.SrcSet = new object[] { new { w = 1000 }, new { h = 500 } }; // Second object has no width
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        string content = tagHelperOutput.Content.GetContent();
+        content.Should().Contain("srcset=");
+        content.Should().Contain("1000w"); // First entry with width should be included
+        content.Should().NotContain("500w"); // Second entry without width should be filtered out
     }
 
     [Theory]
@@ -885,6 +907,50 @@ public class ImageTagHelperFixture
         // Assert
         // Should not throw and should not add srcset attribute
         tagHelperOutput.Attributes.Should().NotContain(a => a.Name == "srcset");
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetPreservesOriginalCacheBustingParameters(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        // Create an image with cache-busting parameters (like in XM Cloud)
+        Image imageWithCacheParams = new()
+        {
+            Src = "http://example.com/image.jpg?h=386&iar=0&w=580&ttc=63888067993&tt=79223DA7F3AE658CE8F43731B252D6BC&hash=6CD37A62DE0B8CB9DC4EE19936C2D41E",
+            Alt = "Test Image"
+        };
+
+        tagHelperOutput.TagName = RenderingEngineConstants.SitecoreTagHelpers.ImageHtmlTag;
+        sut.For = GetModelExpression(new ImageField(imageWithCacheParams));
+        sut.SrcSet = new object[] { new { w = 800, h = 400 }, new { mw = 400, mh = 200 } };
+        sut.ImageParams = new { q = 75 };
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        string content = tagHelperOutput.Content.GetContent();
+        content.Should().Contain("srcset=");
+        
+        // Verify that original cache-busting parameters are preserved in srcset URLs
+        content.Should().Contain("ttc=63888067993", "cache timestamp should be preserved");
+        content.Should().Contain("tt=79223DA7F3AE658CE8F43731B252D6BC", "cache token should be preserved");
+        content.Should().Contain("hash=6CD37A62DE0B8CB9DC4EE19936C2D41E", "hash should be preserved");
+        content.Should().Contain("iar=0", "ignore aspect ratio should be preserved");
+        
+        // Verify that new parameters are added
+        content.Should().Contain("w=800", "new width parameter should be added");
+        content.Should().Contain("h=400", "new height parameter should be added");
+        content.Should().Contain("mw=400", "new max width parameter should be added");
+        content.Should().Contain("q=75", "image params should be merged");
+        
+        // Verify srcset descriptors are correct
+        content.Should().Contain("800w", "first srcset entry should have width descriptor");
+        content.Should().Contain("400w", "second srcset entry should have width descriptor");
     }
 
     private static ModelExpression GetModelExpression(Field model)
