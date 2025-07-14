@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.Routing;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Fields;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Properties;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -35,64 +36,114 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
 
     private static string GetWidthDescriptor(object parameters)
     {
+        string? width = null;
+
         // Handle Dictionary<string, object>
         if (parameters is Dictionary<string, object> dictionary)
         {
-            foreach (var kvp in dictionary)
+            // Priority: w > mw > width > maxWidth (matching Content SDK behavior and supporting legacy parameters)
+            if (dictionary.TryGetValue("w", out object? wValue) && wValue != null)
             {
-                if (kvp.Key.Equals("mw", StringComparison.OrdinalIgnoreCase) ||
-                    kvp.Key.Equals("maxWidth", StringComparison.OrdinalIgnoreCase))
-                {
-                    return $"{kvp.Value}w";
-                }
-
-                if (kvp.Key.Equals("w", StringComparison.OrdinalIgnoreCase) ||
-                    kvp.Key.Equals("width", StringComparison.OrdinalIgnoreCase))
-                {
-                    return $"{kvp.Value}w";
-                }
+                width = wValue.ToString();
+            }
+            else if (dictionary.TryGetValue("mw", out object? mwValue) && mwValue != null)
+            {
+                width = mwValue.ToString();
+            }
+            else if (dictionary.TryGetValue("width", out object? widthValue) && widthValue != null)
+            {
+                width = widthValue.ToString();
+            }
+            else if (dictionary.TryGetValue("maxWidth", out object? maxWidthValue) && maxWidthValue != null)
+            {
+                width = maxWidthValue.ToString();
             }
         }
         else
         {
             // Handle anonymous objects via reflection
-            var properties = parameters.GetType().GetProperties();
+            var type = parameters.GetType();
 
-            foreach (var prop in properties)
+            // Priority: w > mw > width > maxWidth (matching Content SDK behavior and supporting legacy parameters)
+            var wProperty = type.GetProperty("w");
+            if (wProperty != null)
             {
-                if (prop.Name.Equals("mw", StringComparison.OrdinalIgnoreCase) ||
-                    prop.Name.Equals("maxWidth", StringComparison.OrdinalIgnoreCase))
+                width = wProperty.GetValue(parameters)?.ToString();
+            }
+            else
+            {
+                var mwProperty = type.GetProperty("mw");
+                if (mwProperty != null)
                 {
-                    return $"{prop.GetValue(parameters)}w";
+                    width = mwProperty.GetValue(parameters)?.ToString();
                 }
-
-                if (prop.Name.Equals("w", StringComparison.OrdinalIgnoreCase) ||
-                    prop.Name.Equals("width", StringComparison.OrdinalIgnoreCase))
+                else
                 {
-                    return $"{prop.GetValue(parameters)}w";
+                    var widthProperty = type.GetProperty("width");
+                    if (widthProperty != null)
+                    {
+                        width = widthProperty.GetValue(parameters)?.ToString();
+                    }
+                    else
+                    {
+                        var maxWidthProperty = type.GetProperty("maxWidth");
+                        if (maxWidthProperty != null)
+                        {
+                            width = maxWidthProperty.GetValue(parameters)?.ToString();
+                        }
+                    }
                 }
             }
         }
 
-        // If no width found, use 1x as fallback
-        return "1x";
+        return !string.IsNullOrEmpty(width) ? $"{width}w" : string.Empty;
     }
 
-    private static object[]? ParseSrcSet(object? srcSetValue)
+    private static object MergeParameters(object? imageParams, object srcSetParams)
     {
-        if (srcSetValue == null)
+        var mergedDict = new Dictionary<string, object?>();
+
+        // Add base imageParams first
+        if (imageParams != null)
+        {
+            var baseParams = new RouteValueDictionary(imageParams);
+            foreach (var kvp in baseParams)
+            {
+                if (kvp.Value != null)
+                {
+                    mergedDict[kvp.Key] = kvp.Value;
+                }
+            }
+        }
+
+        // Add srcSet parameters (these take precedence)
+        var srcParams = new RouteValueDictionary(srcSetParams);
+        foreach (var kvp in srcParams)
+        {
+            if (kvp.Value != null)
+            {
+                mergedDict[kvp.Key] = kvp.Value;
+            }
+        }
+
+        return mergedDict;
+    }
+
+    private static object[]? ParseSrcSet(object? srcSet)
+    {
+        if (srcSet == null)
         {
             return null;
         }
 
-        // If already an object array, use as-is
-        if (srcSetValue is object[] objectArray)
+        // Handle object array (most common case)
+        if (srcSet is object[] objectArray)
         {
             return objectArray;
         }
 
-        // If it's a JSON string, parse it
-        if (srcSetValue is string jsonString)
+        // Handle JSON string
+        if (srcSet is string jsonString)
         {
             try
             {
@@ -101,13 +152,12 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
             }
             catch
             {
-                // If JSON parsing fails, return null to skip srcset generation
                 return null;
             }
         }
 
-        // Single object - wrap in array
-        return new[] { srcSetValue };
+        // Handle single object
+        return new[] { srcSet };
     }
 
     /// <summary>
@@ -387,12 +437,20 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
 
         foreach (object srcSetItem in parsedSrcSet)
         {
-            string? mediaUrl = imageField.GetMediaLink(srcSetItem);
-            if (!string.IsNullOrEmpty(mediaUrl))
+            // Merge ImageParams with srcSet parameters (Content SDK behavior)
+            var mergedParams = MergeParameters(ImageParams, srcSetItem);
+
+            // Get the width descriptor from the original srcSet item (not merged params)
+            string descriptor = GetWidthDescriptor(srcSetItem);
+
+            // Only include entries that have a valid width descriptor
+            if (!string.IsNullOrEmpty(descriptor))
             {
-                // Extract width from parameters to create the descriptor
-                string descriptor = GetWidthDescriptor(srcSetItem);
-                srcSetEntries.Add($"{mediaUrl} {descriptor}");
+                string? mediaUrl = imageField.GetMediaLink(mergedParams);
+                if (!string.IsNullOrEmpty(mediaUrl))
+                {
+                    srcSetEntries.Add($"{mediaUrl} {descriptor}");
+                }
             }
         }
 
