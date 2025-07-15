@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using System.Reflection;
+using HtmlAgilityPack;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -29,7 +30,180 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
     private const string VSpaceAttribute = "vspace";
     private const string TitleAttribute = "title";
     private const string BorderAttribute = "border";
+    private const string SrcSetAttribute = "srcset";
+    private const string SizesAttribute = "sizes";
     private readonly IEditableChromeRenderer _chromeRenderer = chromeRenderer ?? throw new ArgumentNullException(nameof(chromeRenderer));
+
+    private static Dictionary<string, string>? ConvertParametersToStringDictionary(object? obj)
+    {
+        if (obj == null)
+        {
+            return null;
+        }
+
+        Dictionary<string, string> result = new Dictionary<string, string>();
+
+        if (obj is Dictionary<string, object> dict)
+        {
+            foreach (KeyValuePair<string, object> kvp in dict)
+            {
+                result[kvp.Key] = kvp.Value?.ToString() ?? string.Empty;
+            }
+        }
+        else
+        {
+            PropertyInfo[] props = obj.GetType().GetProperties();
+            foreach (PropertyInfo prop in props)
+            {
+                object? value = prop.GetValue(obj);
+                result[prop.Name] = value?.ToString() ?? string.Empty;
+            }
+        }
+
+        return result;
+    }
+
+    private static string? GetWidthDescriptor(object parameters)
+    {
+        string? width = null;
+
+        // Handle Dictionary<string, object>
+        if (parameters is Dictionary<string, object> dictionary)
+        {
+            // Priority: w > mw > width > maxWidth (matching Content SDK behavior + legacy support)
+            if (dictionary.TryGetValue("w", out object? wValue))
+            {
+                width = wValue?.ToString();
+            }
+            else if (dictionary.TryGetValue("mw", out object? mwValue))
+            {
+                width = mwValue?.ToString();
+            }
+            else if (dictionary.TryGetValue("width", out object? widthValue))
+            {
+                width = widthValue?.ToString();
+            }
+            else if (dictionary.TryGetValue("maxWidth", out object? maxWidthValue))
+            {
+                width = maxWidthValue?.ToString();
+            }
+        }
+        else
+        {
+            // Handle anonymous objects via reflection
+            PropertyInfo[] properties = parameters.GetType().GetProperties();
+
+            // Priority: w > mw > width > maxWidth (matching Content SDK behavior + legacy support)
+            PropertyInfo? wProp = properties.FirstOrDefault(p => p.Name.Equals("w", StringComparison.OrdinalIgnoreCase));
+            if (wProp != null)
+            {
+                width = wProp.GetValue(parameters)?.ToString();
+            }
+            else
+            {
+                PropertyInfo? mwProp = properties.FirstOrDefault(p => p.Name.Equals("mw", StringComparison.OrdinalIgnoreCase));
+                if (mwProp != null)
+                {
+                    width = mwProp.GetValue(parameters)?.ToString();
+                }
+                else
+                {
+                    PropertyInfo? widthProp = properties.FirstOrDefault(p => p.Name.Equals("width", StringComparison.OrdinalIgnoreCase));
+                    if (widthProp != null)
+                    {
+                        width = widthProp.GetValue(parameters)?.ToString();
+                    }
+                    else
+                    {
+                        PropertyInfo? maxWidthProp = properties.FirstOrDefault(p => p.Name.Equals("maxWidth", StringComparison.OrdinalIgnoreCase));
+                        if (maxWidthProp != null)
+                        {
+                            width = maxWidthProp.GetValue(parameters)?.ToString();
+                        }
+                    }
+                }
+            }
+        }
+
+        return width != null ? $"{width}w" : null;
+    }
+
+    private static Dictionary<string, object?> MergeParameters(object? baseParams, object? overrideParams)
+    {
+        Dictionary<string, object?> result = new Dictionary<string, object?>();
+
+        if (baseParams != null)
+        {
+            if (baseParams is Dictionary<string, object> baseDict)
+            {
+                foreach (KeyValuePair<string, object> kvp in baseDict)
+                {
+                    result[kvp.Key] = kvp.Value;
+                }
+            }
+            else
+            {
+                PropertyInfo[] baseProps = baseParams.GetType().GetProperties();
+                foreach (PropertyInfo prop in baseProps)
+                {
+                    result[prop.Name] = prop.GetValue(baseParams);
+                }
+            }
+        }
+
+        if (overrideParams != null)
+        {
+            if (overrideParams is Dictionary<string, object> overrideDict)
+            {
+                foreach (KeyValuePair<string, object> kvp in overrideDict)
+                {
+                    result[kvp.Key] = kvp.Value;
+                }
+            }
+            else
+            {
+                PropertyInfo[] overrideProps = overrideParams.GetType().GetProperties();
+                foreach (PropertyInfo prop in overrideProps)
+                {
+                    result[prop.Name] = prop.GetValue(overrideParams);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static object[]? ParseSrcSet(object? srcSetValue)
+    {
+        if (srcSetValue == null)
+        {
+            return null;
+        }
+
+        // If already an object array, use as-is
+        if (srcSetValue is object[] objectArray)
+        {
+            return objectArray;
+        }
+
+        // If it's a JSON string, parse it
+        if (srcSetValue is string jsonString)
+        {
+            try
+            {
+                Dictionary<string, object>[]? parsed = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>[]>(jsonString);
+                return parsed?.Cast<object>().ToArray();
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                // If JSON parsing fails, return null to skip srcset generation
+                return null;
+            }
+        }
+
+        // Single object - wrap in array
+        return new[] { srcSetValue };
+    }
 
     /// <summary>
     /// Gets or sets the model value.
@@ -52,6 +226,25 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
     /// Gets or sets parameters that are passed to Sitecore to perform server-side resizing of the image.
     /// </summary>
     public object? ImageParams { get; set; }
+
+    /// <summary>
+    /// Gets or sets the srcset configurations for responsive images.
+    /// Supports: object[] (anonymous objects), Dictionary arrays, or JSON string.
+    /// Each item should contain width parameters like { mw = 300 }, { w = 100 }.
+    /// </summary>
+    public object? SrcSet { get; set; }
+
+    /// <summary>
+    /// Gets or sets the sizes attribute for responsive images.
+    /// Example: "(min-width: 960px) 300px, 100px".
+    /// </summary>
+    public string? Sizes { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to use image optimization service.
+    /// When true, generates Next.js-style optimization URLs (/_sitecore/image) instead of direct Sitecore media URLs.
+    /// </summary>
+    public bool UseImageOptimization { get; set; } = false;
 
     /// <inheritdoc/>
     public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -97,6 +290,22 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
             else
             {
                 output.Attributes.Add(ScrAttribute, field.GetMediaLink(ImageParams));
+
+                // Add srcset if configured
+                if (SrcSet != null)
+                {
+                    string srcSetValue = GenerateSrcSetAttribute(field);
+                    if (!string.IsNullOrEmpty(srcSetValue))
+                    {
+                        output.Attributes.Add(SrcSetAttribute, srcSetValue);
+                    }
+                }
+
+                // Add sizes if provided
+                if (!string.IsNullOrEmpty(Sizes))
+                {
+                    output.Attributes.Add(SizesAttribute, Sizes);
+                }
 
                 if (!string.IsNullOrWhiteSpace(field.Value.Alt))
                 {
@@ -152,6 +361,22 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
         if (!string.IsNullOrWhiteSpace(image.Src))
         {
             tagBuilder.Attributes.Add(ScrAttribute, imageField.GetMediaLink(ImageParams));
+
+            // Add srcset if configured
+            if (SrcSet != null)
+            {
+                string srcSetValue = GenerateSrcSetAttribute(imageField);
+                if (!string.IsNullOrEmpty(srcSetValue))
+                {
+                    tagBuilder.Attributes.Add(SrcSetAttribute, srcSetValue);
+                }
+            }
+
+            // Add sizes if provided
+            if (!string.IsNullOrEmpty(Sizes))
+            {
+                tagBuilder.Attributes.Add(SizesAttribute, Sizes);
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(image.Alt))
@@ -230,8 +455,94 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
             }
 
             imageNode.SetAttributeValue(ScrAttribute, imageField.GetMediaLink(ImageParams));
+
+            // Add srcset for editable content
+            if (SrcSet != null)
+            {
+                string srcSetValue = GenerateSrcSetAttribute(imageField);
+                if (!string.IsNullOrEmpty(srcSetValue))
+                {
+                    imageNode.SetAttributeValue(SrcSetAttribute, srcSetValue);
+                }
+            }
+
+            // Add sizes for editable content
+            if (!string.IsNullOrEmpty(Sizes))
+            {
+                imageNode.SetAttributeValue(SizesAttribute, Sizes);
+            }
         }
 
         return new HtmlString(doc.DocumentNode.OuterHtml);
+    }
+
+    private string GenerateOptimizedImageUrl(string baseUrl, object parameters)
+    {
+        if (!UseImageOptimization)
+        {
+            return baseUrl;
+        }
+
+        // Convert parameters to dictionary for easier access
+        Dictionary<string, string>? paramDict = ConvertParametersToStringDictionary(parameters);
+        if (paramDict == null)
+        {
+            return baseUrl;
+        }
+
+        // Extract width and quality
+        string width = paramDict.GetValueOrDefault("w") ??
+                    paramDict.GetValueOrDefault("mw") ??
+                    paramDict.GetValueOrDefault("width") ??
+                    paramDict.GetValueOrDefault("maxWidth") ?? "0";
+
+        string quality = paramDict.GetValueOrDefault("quality") ?? "75";
+        string format = paramDict.GetValueOrDefault("format") ?? "jpeg";
+
+        // Generate Next.js style optimization URL
+        string encodedUrl = Uri.EscapeDataString(baseUrl);
+        return $"/_sitecore/image?url={encodedUrl}&w={width}&q={quality}&format={format}";
+    }
+
+    private string GenerateSrcSetAttribute(ImageField imageField)
+    {
+        object[]? parsedSrcSet = ParseSrcSet(SrcSet);
+        if (parsedSrcSet == null || parsedSrcSet.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        List<string> srcSetEntries = new();
+
+        foreach (object srcSetItem in parsedSrcSet)
+        {
+            // Get width descriptor first to check if this entry should be included
+            string? descriptor = GetWidthDescriptor(srcSetItem);
+            if (descriptor == null)
+            {
+                // Skip entries without valid width parameters (matching Content SDK behavior)
+                continue;
+            }
+
+            string? mediaUrl;
+            if (UseImageOptimization)
+            {
+                // Create merged parameters object for optimization
+                Dictionary<string, object?> mergedParams = MergeParameters(ImageParams, srcSetItem);
+                mediaUrl = GenerateOptimizedImageUrl(imageField.Value.Src ?? string.Empty, mergedParams);
+            }
+            else
+            {
+                // Use GetMediaLinkForSrcSet to preserve existing URL parameters (like ttc, tt, hash, quality, format)
+                mediaUrl = imageField.GetMediaLinkForSrcSet(ImageParams, srcSetItem);
+            }
+
+            if (!string.IsNullOrEmpty(mediaUrl))
+            {
+                srcSetEntries.Add($"{mediaUrl} {descriptor}");
+            }
+        }
+
+        return string.Join(", ", srcSetEntries);
     }
 }
