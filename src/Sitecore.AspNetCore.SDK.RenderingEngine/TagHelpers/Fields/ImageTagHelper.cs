@@ -34,6 +34,35 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
     private const string SizesAttribute = "sizes";
     private readonly IEditableChromeRenderer _chromeRenderer = chromeRenderer ?? throw new ArgumentNullException(nameof(chromeRenderer));
 
+    private static Dictionary<string, string>? ConvertParametersToStringDictionary(object? obj)
+    {
+        if (obj == null)
+        {
+            return null;
+        }
+
+        Dictionary<string, string> result = new Dictionary<string, string>();
+
+        if (obj is Dictionary<string, object> dict)
+        {
+            foreach (KeyValuePair<string, object> kvp in dict)
+            {
+                result[kvp.Key] = kvp.Value?.ToString() ?? string.Empty;
+            }
+        }
+        else
+        {
+            PropertyInfo[] props = obj.GetType().GetProperties();
+            foreach (PropertyInfo prop in props)
+            {
+                object? value = prop.GetValue(obj);
+                result[prop.Name] = value?.ToString() ?? string.Empty;
+            }
+        }
+
+        return result;
+    }
+
     private static string? GetWidthDescriptor(object parameters)
     {
         string? width = null;
@@ -97,6 +126,51 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
         }
 
         return width != null ? $"{width}w" : null;
+    }
+
+    private static Dictionary<string, object?> MergeParameters(object? baseParams, object? overrideParams)
+    {
+        Dictionary<string, object?> result = new Dictionary<string, object?>();
+
+        if (baseParams != null)
+        {
+            if (baseParams is Dictionary<string, object> baseDict)
+            {
+                foreach (KeyValuePair<string, object> kvp in baseDict)
+                {
+                    result[kvp.Key] = kvp.Value;
+                }
+            }
+            else
+            {
+                PropertyInfo[] baseProps = baseParams.GetType().GetProperties();
+                foreach (PropertyInfo prop in baseProps)
+                {
+                    result[prop.Name] = prop.GetValue(baseParams);
+                }
+            }
+        }
+
+        if (overrideParams != null)
+        {
+            if (overrideParams is Dictionary<string, object> overrideDict)
+            {
+                foreach (KeyValuePair<string, object> kvp in overrideDict)
+                {
+                    result[kvp.Key] = kvp.Value;
+                }
+            }
+            else
+            {
+                PropertyInfo[] overrideProps = overrideParams.GetType().GetProperties();
+                foreach (PropertyInfo prop in overrideProps)
+                {
+                    result[prop.Name] = prop.GetValue(overrideParams);
+                }
+            }
+        }
+
+        return result;
     }
 
     private static object[]? ParseSrcSet(object? srcSetValue)
@@ -165,6 +239,12 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
     /// Example: "(min-width: 960px) 300px, 100px".
     /// </summary>
     public string? Sizes { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to use image optimization service.
+    /// When true, generates Next.js-style optimization URLs (/_sitecore/image) instead of direct Sitecore media URLs.
+    /// </summary>
+    public bool UseImageOptimization { get; set; } = false;
 
     /// <inheritdoc/>
     public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -396,6 +476,34 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
         return new HtmlString(doc.DocumentNode.OuterHtml);
     }
 
+    private string GenerateOptimizedImageUrl(string baseUrl, object parameters)
+    {
+        if (!UseImageOptimization)
+        {
+            return baseUrl;
+        }
+
+        // Convert parameters to dictionary for easier access
+        Dictionary<string, string>? paramDict = ConvertParametersToStringDictionary(parameters);
+        if (paramDict == null)
+        {
+            return baseUrl;
+        }
+
+        // Extract width and quality
+        string width = paramDict.GetValueOrDefault("w") ??
+                    paramDict.GetValueOrDefault("mw") ??
+                    paramDict.GetValueOrDefault("width") ??
+                    paramDict.GetValueOrDefault("maxWidth") ?? "0";
+
+        string quality = paramDict.GetValueOrDefault("quality") ?? "75";
+        string format = paramDict.GetValueOrDefault("format") ?? "jpeg";
+
+        // Generate Next.js style optimization URL
+        string encodedUrl = Uri.EscapeDataString(baseUrl);
+        return $"/_sitecore/image?url={encodedUrl}&w={width}&q={quality}&format={format}";
+    }
+
     private string GenerateSrcSetAttribute(ImageField imageField)
     {
         object[]? parsedSrcSet = ParseSrcSet(SrcSet);
@@ -416,8 +524,19 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
                 continue;
             }
 
-            // Use GetMediaLinkForSrcSet to preserve existing URL parameters (like ttc, tt, hash, quality, format)
-            string? mediaUrl = imageField.GetMediaLinkForSrcSet(ImageParams, srcSetItem);
+            string? mediaUrl;
+            if (UseImageOptimization)
+            {
+                // Create merged parameters object for optimization
+                Dictionary<string, object?> mergedParams = MergeParameters(ImageParams, srcSetItem);
+                mediaUrl = GenerateOptimizedImageUrl(imageField.Value.Src ?? string.Empty, mergedParams);
+            }
+            else
+            {
+                // Use GetMediaLinkForSrcSet to preserve existing URL parameters (like ttc, tt, hash, quality, format)
+                mediaUrl = imageField.GetMediaLinkForSrcSet(ImageParams, srcSetItem);
+            }
+
             if (!string.IsNullOrEmpty(mediaUrl))
             {
                 srcSetEntries.Add($"{mediaUrl} {descriptor}");
