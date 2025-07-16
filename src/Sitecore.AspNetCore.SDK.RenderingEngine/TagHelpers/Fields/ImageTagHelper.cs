@@ -417,7 +417,7 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
             }
 
             // Use GetMediaLinkForSrcSet to preserve existing URL parameters (like ttc, tt, hash, quality, format)
-            string? mediaUrl = imageField.GetMediaLinkForSrcSet(ImageParams, srcSetItem);
+            string? mediaUrl = imageField.GetMediaLink(ImageParams, srcSetItem);
             if (!string.IsNullOrEmpty(mediaUrl))
             {
                 srcSetEntries.Add($"{mediaUrl} {descriptor}");

@@ -49,7 +49,7 @@ public static partial class SitecoreFieldExtensions
         }
 
         Dictionary<string, object?> mergedParams = MergeParameters(imageParams, srcSetParams);
-        return GetSitecoreMediaUriWithPreservation(urlStr, mergedParams);
+        return GetSitecoreMediaUri(urlStr, mergedParams);
     }
 
     /// <summary>
