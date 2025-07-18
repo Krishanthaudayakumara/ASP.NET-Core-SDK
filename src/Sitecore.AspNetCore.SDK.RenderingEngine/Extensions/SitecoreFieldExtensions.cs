@@ -1,8 +1,10 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Web;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Fields;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -12,6 +14,8 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 /// </summary>
 public static partial class SitecoreFieldExtensions
 {
+    private static readonly ConcurrentDictionary<Type, PropertyInfo[]> _propertyCache = new();
+
     /// <summary>
     /// Gets modified URL string to Sitecore media item.
     /// </summary>
@@ -42,9 +46,9 @@ public static partial class SitecoreFieldExtensions
     public static string? GetMediaLinkForSrcSet(this ImageField imageField, object? imageParams, object? srcSetParams)
     {
         ArgumentNullException.ThrowIfNull(imageField);
-        string? urlStr = imageField.Value.Src;
+        string? urlStr = imageField.Value?.Src;
 
-        if (urlStr == null)
+        if (string.IsNullOrEmpty(urlStr))
         {
             return null;
         }
@@ -63,47 +67,46 @@ public static partial class SitecoreFieldExtensions
     {
         Dictionary<string, object?> result = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
 
-        // Add base parameters first
-        if (baseParams != null)
-        {
-            if (baseParams is Dictionary<string, object> baseDict)
-            {
-                foreach (KeyValuePair<string, object> kvp in baseDict)
-                {
-                    result[kvp.Key] = kvp.Value;
-                }
-            }
-            else
-            {
-                PropertyInfo[] baseProps = baseParams.GetType().GetProperties();
-                foreach (PropertyInfo prop in baseProps)
-                {
-                    result[prop.Name] = prop.GetValue(baseParams);
-                }
-            }
-        }
-
-        // Override with srcSet parameters
-        if (overrideParams != null)
-        {
-            if (overrideParams is Dictionary<string, object> overrideDict)
-            {
-                foreach (KeyValuePair<string, object> kvp in overrideDict)
-                {
-                    result[kvp.Key] = kvp.Value;
-                }
-            }
-            else
-            {
-                PropertyInfo[] overrideProps = overrideParams.GetType().GetProperties();
-                foreach (PropertyInfo prop in overrideProps)
-                {
-                    result[prop.Name] = prop.GetValue(overrideParams);
-                }
-            }
-        }
+        AddParametersToResult(result, baseParams);
+        AddParametersToResult(result, overrideParams);
 
         return result;
+    }
+
+    /// <summary>
+    /// Adds parameters from an object to the result dictionary.
+    /// </summary>
+    /// <param name="result">The result dictionary to add parameters to.</param>
+    /// <param name="parameters">The parameters object to extract values from.</param>
+    private static void AddParametersToResult(Dictionary<string, object?> result, object? parameters)
+    {
+        if (parameters == null)
+        {
+            return;
+        }
+
+        if (parameters is Dictionary<string, object> dict)
+        {
+            foreach (KeyValuePair<string, object> kvp in dict)
+            {
+                result[kvp.Key] = kvp.Value;
+            }
+        }
+        else
+        {
+            PropertyInfo[] properties = _propertyCache.GetOrAdd(
+                parameters.GetType(),
+                type => type.GetProperties());
+
+            foreach (PropertyInfo prop in properties)
+            {
+                object? value = prop.GetValue(parameters);
+                if (value != null)
+                {
+                    result[prop.Name] = value;
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -117,10 +120,10 @@ public static partial class SitecoreFieldExtensions
         // TODO What's the reason we strip away existing querystring?
         if (imageParams != null)
         {
-            string[] urlParts = url.Split('?');
-            if (urlParts.Length > 1)
+            int queryIndex = url.IndexOf('?');
+            if (queryIndex >= 0)
             {
-                url = urlParts[0];
+                url = url.Substring(0, queryIndex);
             }
 
             RouteValueDictionary parameters = new(imageParams);
@@ -147,54 +150,29 @@ public static partial class SitecoreFieldExtensions
             return urlStr;
         }
 
-        string url = urlStr;
-
-        // Parse existing query parameters and build merged parameters dictionary
+        // Parse existing query parameters using built-in methods
         Dictionary<string, object?> mergedParams = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
-        if (url.Contains('?'))
+        string baseUrl = urlStr;
+
+        if (urlStr.Contains('?'))
         {
-            string[] parts = url.Split('?', 2);
-            url = parts[0];
+            string[] parts = urlStr.Split('?', 2);
+            baseUrl = parts[0];
             string queryString = parts[1];
 
-            string[] paramPairs = queryString.Split('&');
-            foreach (string paramPair in paramPairs)
+            // Use QueryHelpers for parsing existing parameters
+            Dictionary<string, StringValues> existingParams = QueryHelpers.ParseQuery(queryString);
+            foreach (KeyValuePair<string, StringValues> kvp in existingParams)
             {
-                string[] keyValue = paramPair.Split('=', 2);
-                if (keyValue.Length == 2)
-                {
-                    string key = HttpUtility.UrlDecode(keyValue[0]);
-                    string value = HttpUtility.UrlDecode(keyValue[1]);
-                    mergedParams[key] = value;
-                }
+                mergedParams[kvp.Key] = kvp.Value.ToString();
             }
         }
 
         // Add new parameters (these will override existing ones)
-        if (parameters != null)
-        {
-            if (parameters is Dictionary<string, object> paramDict)
-            {
-                foreach (KeyValuePair<string, object> kvp in paramDict)
-                {
-                    mergedParams[kvp.Key] = kvp.Value;
-                }
-            }
-            else
-            {
-                PropertyInfo[] properties = parameters.GetType().GetProperties();
-                foreach (PropertyInfo prop in properties)
-                {
-                    object? value = prop.GetValue(parameters);
-                    if (value != null)
-                    {
-                        mergedParams[prop.Name] = value;
-                    }
-                }
-            }
-        }
+        AddParametersToResult(mergedParams, parameters);
 
-        // Add query parameters
+        // Build final URL
+        string url = baseUrl;
         foreach (KeyValuePair<string, object?> kvp in mergedParams)
         {
             if (kvp.Value != null)
