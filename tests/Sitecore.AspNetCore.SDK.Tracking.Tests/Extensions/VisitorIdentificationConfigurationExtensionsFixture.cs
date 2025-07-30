@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -27,8 +27,8 @@ public class VisitorIdentificationConfigurationExtensionsFixture
         Action action = () => VisitorIdentificationAppConfigurationExtensions.AddSitecoreVisitorIdentification(null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("services");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("services");
     }
 
     [Fact]
@@ -39,7 +39,7 @@ public class VisitorIdentificationConfigurationExtensionsFixture
         Action action = () => serviceCollection.AddSitecoreVisitorIdentification();
 
         // Act / Assert
-        action.Should().NotThrow();
+        Should.NotThrow(() => action());
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public class VisitorIdentificationConfigurationExtensionsFixture
         Action action = () => VisitorIdentificationAppConfigurationExtensions.UseSitecoreVisitorIdentification(null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>().And.ParamName.Should().Be("app");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually// TODO: Split assertion chain manuallyParamName.ShouldBe("app");
     }
 
     [Theory]

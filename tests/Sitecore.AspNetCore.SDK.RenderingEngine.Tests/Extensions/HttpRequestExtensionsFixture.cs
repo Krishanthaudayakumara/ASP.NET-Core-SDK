@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using NSubstitute;
@@ -25,7 +25,7 @@ public class HttpRequestExtensionsFixture
 
         string? result = sut.GetValueFromQueryOrCookies(key);
 
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 
     [Theory]
@@ -37,7 +37,7 @@ public class HttpRequestExtensionsFixture
 
         string? result = sut.GetValueFromQueryOrCookies(key);
 
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 
     [Theory]
@@ -49,7 +49,7 @@ public class HttpRequestExtensionsFixture
 
         string? result = sut.GetValueFromQueryOrCookies(key);
 
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -67,8 +67,8 @@ public class HttpRequestExtensionsFixture
 
         bool result = sut.TryGetValueFromQueryOrCookies(key, out string? value);
 
-        result.Should().BeTrue();
-        value.Should().Be(requestValue);
+        result.ShouldBeTrue();
+        value.ShouldBe(requestValue);
     }
 
     [Theory]
@@ -80,8 +80,8 @@ public class HttpRequestExtensionsFixture
 
         bool result = sut.TryGetValueFromQueryOrCookies(key, out string? value);
 
-        result.Should().BeTrue();
-        value.Should().Be(requestValue);
+        result.ShouldBeTrue();
+        value.ShouldBe(requestValue);
     }
 
     [Theory]
@@ -93,7 +93,7 @@ public class HttpRequestExtensionsFixture
 
         bool result = sut.TryGetValueFromQueryOrCookies(key, out string? value);
 
-        result.Should().BeFalse();
-        value.Should().BeNull();
+        result.ShouldBeFalse();
+        value.ShouldBeNull();
     }
 }

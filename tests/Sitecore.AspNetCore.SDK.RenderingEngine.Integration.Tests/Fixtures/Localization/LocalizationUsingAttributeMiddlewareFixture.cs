@@ -1,7 +1,7 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -78,7 +78,7 @@ public class LocalizationUsingAttributeMiddlewareFixture : IDisposable
         await client.GetStringAsync(new Uri($"/{routeLanguage}/UsingAttribute/UseLocalizeWithAttribute", UriKind.Relative));
 
         // Assert
-        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.Should().Contain($"sc_lang={mappedLanguage}");
+        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.ShouldContain($"sc_lang={mappedLanguage}");
     }
 
     [Theory]
@@ -107,7 +107,7 @@ public class LocalizationUsingAttributeMiddlewareFixture : IDisposable
         await client.GetStringAsync(new Uri("/UsingAttribute/UseLocalizeWithAttribute", UriKind.Relative));
 
         // Assert
-        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.Should().Contain($"sc_lang={mappedLanguage}");
+        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.ShouldContain($"sc_lang={mappedLanguage}");
     }
 
     [Theory]
@@ -137,7 +137,7 @@ public class LocalizationUsingAttributeMiddlewareFixture : IDisposable
         await client.GetStringAsync(new Uri($"{routeLanguage}/UsingAttribute/UseLocalizeWithAttribute", UriKind.Relative));
 
         // Assert
-        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.Should().Contain($"sc_lang={mappedLanguage}");
+        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.ShouldContain($"sc_lang={mappedLanguage}");
     }
 
     public void Dispose()

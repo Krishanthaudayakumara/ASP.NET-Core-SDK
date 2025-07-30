@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.Design;
+using System.ComponentModel.Design;
 using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using NSubstitute;
@@ -44,11 +44,11 @@ public class PartialViewComponentRendererFixture
         ComponentRendererDescriptor descriptor = PartialViewComponentRenderer.Describe(_ => true, Locator);
 
         // Assert
-        descriptor.Should().NotBeNull();
+        descriptor.ShouldNotBeNull();
 
         IComponentRenderer renderer = descriptor.GetOrCreate(services);
-        renderer.Should().NotBeNull();
-        renderer.Should().BeOfType(typeof(PartialViewComponentRenderer));
+        renderer.ShouldNotBeNull();
+        renderer.ShouldBeOfType<PartialViewComponentRenderer>();
     }
 
     [Theory]

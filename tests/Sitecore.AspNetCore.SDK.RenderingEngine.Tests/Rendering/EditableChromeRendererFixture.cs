@@ -1,5 +1,5 @@
-﻿using System.Text;
-using FluentAssertions;
+using System.Text;
+using Shouldly;
 using Microsoft.AspNetCore.Html;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
@@ -24,8 +24,8 @@ public class EditableChromeRendererFixture
             () => sut.Render(chrome);
 
         // Act / Assert
-        actNull.Should().Throw<ArgumentNullException>();
-        actChrome.Should().Throw<ArgumentException>();
+        var ex = Should.Throw<ArgumentNullException>(() => actNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentException>(() => actChrome()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -39,7 +39,7 @@ public class EditableChromeRendererFixture
         string expectedHtml = BuildChromeHtml(chrome);
 
         // Assert
-        result.ToString().Should().Be(expectedHtml);
+        result.ToString().ShouldBe(expectedHtml);
     }
 
     [Theory]
@@ -56,7 +56,7 @@ public class EditableChromeRendererFixture
         string expectedHtml = BuildChromeHtml(chrome);
 
         // Assert
-        result.ToString().Should().Be(expectedHtml);
+        result.ToString().ShouldBe(expectedHtml);
     }
 
     private static string BuildChromeHtml(EditableChrome chrome)

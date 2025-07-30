@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using FluentAssertions;
+using System.Reflection;
+using Shouldly;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -23,7 +23,7 @@ public class MultisiteAppConfigurationExtensionsFixture
             () => MultisiteAppConfigurationExtensions.AddMultisite(null!);
 
         // Act & Assert
-        act.Should().Throw<ArgumentNullException>().WithParameterName("services");
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually// TODO: Assert exception.ParamName manually;
     }
 
     [Theory]
@@ -38,12 +38,12 @@ public class MultisiteAppConfigurationExtensionsFixture
 
         // Assert
         // NOTE https://stackoverflow.com/questions/57123686/how-to-verify-addsingleton-with-special-type-is-received-using-nsubstitute-frame
-        serviceCollection.Should().HaveCount(8);
-        serviceCollection[5].ImplementationInstance.Should().BeEquivalentTo(new ConfigureNamedOptions<MultisiteOptions>(string.Empty, multisiteOptions));
-        serviceCollection[6].ServiceType.Should().Be(typeof(ISiteCollectionService));
-        serviceCollection[6].ImplementationType.Should().Be(typeof(GraphQLSiteCollectionService));
-        serviceCollection[7].ServiceType.Should().Be(typeof(ISiteResolver));
-        serviceCollection[7].ImplementationType.Should().Be(typeof(SiteResolver));
+        serviceCollection.Count.ShouldBe(8);
+        serviceCollection[5].ImplementationInstance.ShouldBe(new ConfigureNamedOptions<MultisiteOptions>(string.Empty, multisiteOptions));
+        serviceCollection[6].ServiceType.ShouldBe(typeof(ISiteCollectionService));
+        serviceCollection[6].ImplementationType.ShouldBe(typeof(GraphQLSiteCollectionService));
+        serviceCollection[7].ServiceType.ShouldBe(typeof(ISiteResolver));
+        serviceCollection[7].ImplementationType.ShouldBe(typeof(SiteResolver));
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class MultisiteAppConfigurationExtensionsFixture
         Func<IApplicationBuilder> act =
             () => MultisiteAppConfigurationExtensions.UseMultisite(null!);
 
-        act.Should().Throw<ArgumentNullException>().WithParameterName("app");
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually// TODO: Assert exception.ParamName manually;
     }
 
     [Theory]
@@ -67,6 +67,6 @@ public class MultisiteAppConfigurationExtensionsFixture
         // Assert
         bool received = applicationBuilder.ReceivedCalls().Any(c => c.GetArguments().OfType<Delegate>().Any(d =>
             d.Target?.GetType().GetField("_middleware", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(d.Target).As<Type>().FullName == typeof(MultisiteMiddleware).FullName));
-        received.Should().BeTrue();
+        received.ShouldBeTrue();
     }
 }

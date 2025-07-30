@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Binding.Attributes;
 using Xunit;
@@ -12,6 +12,6 @@ public class SitecoreContextAttributeFixture
     public void Attribute_BindingSource_ShouldNotBeNull(SitecoreContextAttribute sut)
     {
         // Assert
-        sut.BindingSource.Should().NotBeNull();
+        sut.BindingSource.ShouldNotBeNull();
     }
 }

@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Xunit;
 
@@ -20,17 +20,17 @@ public class RouteFixture : FieldsReaderFixture<Route>
         Route sut = new();
 
         // Assert
-        sut.DatabaseName.Should().BeNull();
-        sut.DeviceId.Should().BeNull();
-        sut.ItemId.Should().BeNull();
-        sut.ItemLanguage.Should().BeNull();
-        sut.ItemVersion.Should().BeNull();
-        sut.LayoutId.Should().BeNull();
-        sut.TemplateId.Should().BeNull();
-        sut.TemplateName.Should().BeNull();
-        sut.Name.Should().BeNull();
-        sut.DisplayName.Should().BeNull();
-        sut.Placeholders.Should().BeEmpty();
-        sut.Fields.Should().BeEmpty();
+        sut.DatabaseName.ShouldBeNull();
+        sut.DeviceId.ShouldBeNull();
+        sut.ItemId.ShouldBeNull();
+        sut.ItemLanguage.ShouldBeNull();
+        sut.ItemVersion.ShouldBeNull();
+        sut.LayoutId.ShouldBeNull();
+        sut.TemplateId.ShouldBeNull();
+        sut.TemplateName.ShouldBeNull();
+        sut.Name.ShouldBeNull();
+        sut.DisplayName.ShouldBeNull();
+        sut.Placeholders.ShouldBeEmpty();
+        sut.Fields.ShouldBeEmpty();
     }
 }

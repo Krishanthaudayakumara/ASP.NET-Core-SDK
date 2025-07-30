@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -89,7 +89,7 @@ namespace Sitecore.AspNetCore.SDK.Pages.Tests.Controllers
 
             // Assert
             logger.Received().Log(LogLevel.Error, Arg.Any<EventId>(), Arg.Is<object>(o => o.ToString() == "Invalid Pages Editing Secret Value"), null, Arg.Any<Func<object, Exception?, string>>());
-            response.Result.Should().BeOfType<BadRequestResult>();
+            response.Result.ShouldBeOfType<BadRequestResult>();
         }
 
         [Theory]
@@ -113,7 +113,7 @@ namespace Sitecore.AspNetCore.SDK.Pages.Tests.Controllers
 
             // Assert
             logger.Received().Log(LogLevel.Error, Arg.Any<EventId>(), Arg.Is<object>(o => o.ToString() == "Invalid Pages Editing Origin"), null, Arg.Any<Func<object, Exception?, string>>());
-            response.Result.Should().BeOfType<BadRequestResult>();
+            response.Result.ShouldBeOfType<BadRequestResult>();
         }
 
         [Theory]
@@ -137,18 +137,18 @@ namespace Sitecore.AspNetCore.SDK.Pages.Tests.Controllers
 
             // Assert
             logger.Received().Log(LogLevel.Debug, Arg.Any<EventId>(), Arg.Is<object>(o => o.ToString() == "Processing valid Pages Config request"), null, Arg.Any<Func<object, Exception?, string>>());
-            httpContext.Response.Headers.ContentSecurityPolicy.Should().Equal($"frame-ancestors 'self' {ValidOrigins} {ValidEditingOrigin}");
-            httpContext.Response.Headers.AccessControlAllowOrigin.Should().Equal(ValidEditingOrigin);
-            httpContext.Response.Headers.AccessControlAllowMethods.Should().Equal("GET, POST, OPTIONS, PUT, PATCH, DELETE");
-            httpContext.Response.Headers.AccessControlAllowHeaders.Should().Equal("Authorization");
-            httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            httpContext.Response.ContentType.Should().Be("application/json");
-            response.Result.Should().BeOfType<OkObjectResult>();
-            response.Result.As<OkObjectResult>().Value.Should().NotBeNull();
-            response.Result.As<OkObjectResult>().Value.As<PagesConfigResponse>().Should().NotBeNull();
-            response.Result.As<OkObjectResult>().Value.As<PagesConfigResponse>().EditMode.Should().Be("metadata");
-            response.Result.As<OkObjectResult>().Value.As<PagesConfigResponse>().Components.Count.Should().Be(1);
-            response.Result.As<OkObjectResult>().Value.As<PagesConfigResponse>().Components[0].Should().Be("TestComponent");
+            httpContext.Response.Headers.ContentSecurityPolicy.ShouldBe($"frame-ancestors 'self' {ValidOrigins} {ValidEditingOrigin}");
+            httpContext.Response.Headers.AccessControlAllowOrigin.ShouldBe(ValidEditingOrigin);
+            httpContext.Response.Headers.AccessControlAllowMethods.ShouldBe("GET, POST, OPTIONS, PUT, PATCH, DELETE");
+            httpContext.Response.Headers.AccessControlAllowHeaders.ShouldBe("Authorization");
+            httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status200OK);
+            httpContext.Response.ContentType.ShouldBe("application/json");
+            response.Result.ShouldBeOfType<OkObjectResult>();
+            response.Result.As<OkObjectResult>().Value.ShouldNotBeNull();
+            response.Result.As<OkObjectResult>().Value.As<PagesConfigResponse>().ShouldNotBeNull();
+            response.Result.As<OkObjectResult>().Value.As<PagesConfigResponse>().EditMode.ShouldBe("metadata");
+            response.Result.As<OkObjectResult>().Value.As<PagesConfigResponse>().Components.Count.ShouldBe(1);
+            response.Result.As<OkObjectResult>().Value.As<PagesConfigResponse>().Components[0].ShouldBe("TestComponent");
         }
 
         [Theory]
@@ -171,7 +171,7 @@ namespace Sitecore.AspNetCore.SDK.Pages.Tests.Controllers
 
             // Assert
             logger.Received().Log(LogLevel.Error, Arg.Any<EventId>(), Arg.Is<object>(o => o.ToString() == "Invalid Pages Editing Secret Value"), null, Arg.Any<Func<object, Exception?, string>>());
-            response.Should().BeOfType<BadRequestResult>();
+            response.ShouldBeOfType<BadRequestResult>();
         }
 
         [Theory]
@@ -219,10 +219,11 @@ namespace Sitecore.AspNetCore.SDK.Pages.Tests.Controllers
 
             // Assert
             logger.Received().Log(LogLevel.Debug, Arg.Any<EventId>(), Arg.Is<object>(o => o.ToString() == "Processing valid Pages Render request."), null, Arg.Any<Func<object, Exception?, string>>());
-            response.Should().BeOfType<RedirectResult>();
-            response.As<RedirectResult>().Permanent.Should().BeFalse();
+            response.ShouldBeOfType<RedirectResult>();
+            response.As<RedirectResult>().Permanent.ShouldBeFalse();
             string validRedirectString = $"{expectedRoute}?mode={expectedMode}&sc_itemid={expectedItemId}&sc_version={expectedVersion}&sc_lang={expectedLanguage}&sc_site={expectedSite}&sc_layoutKind={expectedLayoutKind}&secret={ValidEditingSecret}&tenant_id={expectedTenantId}&route={expectedRoute}";
-            response.As<RedirectResult>().Url.Should().Be(validRedirectString);
+            response.As<RedirectResult>().Url.ShouldBe(validRedirectString);
         }
     }
 }
+

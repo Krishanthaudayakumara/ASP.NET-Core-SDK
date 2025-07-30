@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Rendering;
 using Xunit;
@@ -23,8 +23,8 @@ public class SitecoreRenderingContextFixture
         SitecoreRenderingContext sut = new();
 
         // Assert
-        sut.Response.Should().BeNull();
-        sut.Component.Should().BeNull();
-        sut.Controller.Should().BeNull();
+        sut.Response.ShouldBeNull();
+        sut.Component.ShouldBeNull();
+        sut.Controller.ShouldBeNull();
     }
 }

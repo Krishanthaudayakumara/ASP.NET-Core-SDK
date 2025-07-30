@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
-using FluentAssertions;
+using Shouldly;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Rendering;
@@ -33,7 +33,7 @@ public class ComponentRendererDescriptorFixture
             () => new ComponentRendererDescriptor(null!, null!, string.Empty);
 
         // Act & Assert
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -48,6 +48,6 @@ public class ComponentRendererDescriptorFixture
         IComponentRenderer result = sut.GetOrCreate(services);
 
         // Assert
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 }

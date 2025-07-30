@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Serialization;
 using Xunit;
@@ -16,7 +16,7 @@ public class JsonLayoutServiceSerializerFixture
         Action action = () => _sut.Deserialize(null!);
 
         // Act & Assert
-        action.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually;
     }
 
     [Fact]
@@ -26,9 +26,9 @@ public class JsonLayoutServiceSerializerFixture
         SitecoreLayoutResponseContent? result = _sut.Deserialize("{}");
 
         // Assert
-        result.Should().NotBeNull();
-        result!.Sitecore.Should().BeNull();
-        result.ContextRawData.Should().BeEmpty();
+        result.ShouldNotBeNull();
+        result!.Sitecore.ShouldBeNull();
+        result.ContextRawData.ShouldBeEmpty();
     }
 
     [Fact]
@@ -41,8 +41,8 @@ public class JsonLayoutServiceSerializerFixture
         SitecoreLayoutResponseContent? result = _sut.Deserialize(json);
 
         // Assert
-        result.Should().NotBeNull();
-        result!.Sitecore.Should().NotBeNull();
-        result.ContextRawData.Should().NotBeNullOrWhiteSpace();
+        result.ShouldNotBeNull();
+        result!.Sitecore.ShouldNotBeNull();
+        result.ContextRawData.ShouldNotBeNullOrWhiteSpace();
     }
 }

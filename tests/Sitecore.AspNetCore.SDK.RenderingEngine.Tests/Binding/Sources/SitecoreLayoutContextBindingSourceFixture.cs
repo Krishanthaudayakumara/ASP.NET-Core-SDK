@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using NSubstitute;
@@ -56,13 +56,13 @@ public class SitecoreLayoutContextBindingSourceFixture
             () => sut.GetModel(serviceProvider, modelBindingContext, null!);
 
         // Act & Assert
-        allNull.Should().Throw<ArgumentNullException>();
-        serviceProviderNull.Should().Throw<ArgumentNullException>();
-        firstAndSecondArgsNull.Should().Throw<ArgumentNullException>();
-        firstAndThirdArgsNull.Should().Throw<ArgumentNullException>();
-        secondAndThirdArgsNull.Should().Throw<ArgumentNullException>();
-        bindingContextNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => serviceProviderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => firstAndSecondArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => firstAndThirdArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => secondAndThirdArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => bindingContextNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -82,7 +82,7 @@ public class SitecoreLayoutContextBindingSourceFixture
         CustomContext? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext) as CustomContext;
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     [Theory]
@@ -102,7 +102,7 @@ public class SitecoreLayoutContextBindingSourceFixture
         CustomContext? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext) as CustomContext;
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     [Theory]
@@ -122,7 +122,7 @@ public class SitecoreLayoutContextBindingSourceFixture
         CustomContext? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext) as CustomContext;
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     [Theory]
@@ -141,14 +141,14 @@ public class SitecoreLayoutContextBindingSourceFixture
         CustomContext? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext) as CustomContext;
 
         // Assert
-        model.Should().NotBeNull();
-        model!.TestClass1.Should().NotBeNull();
-        model.TestClass2.Should().NotBeNull();
-        model.SingleProperty.Should().NotBeNullOrWhiteSpace();
-        model.Site.Should().NotBeNull();
-        model.PageState.Should().NotBeNull();
-        model.Language.Should().NotBeNullOrWhiteSpace();
-        model.WrongName.Should().BeNull();
+        model.ShouldNotBeNull();
+        model!.TestClass1.ShouldNotBeNull();
+        model.TestClass2.ShouldNotBeNull();
+        model.SingleProperty.ShouldNotBeNullOrWhiteSpace();
+        model.Site.ShouldNotBeNull();
+        model.PageState.ShouldNotBeNull();
+        model.Language.ShouldNotBeNullOrWhiteSpace();
+        model.WrongName.ShouldBeNull();
     }
 
     [Theory]
@@ -167,11 +167,11 @@ public class SitecoreLayoutContextBindingSourceFixture
         CustomContextIndividual? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext) as CustomContextIndividual;
 
         // Assert
-        model.Should().NotBeNull();
-        model!.TestClass1.Should().NotBeNull();
-        model.TestClass2.Should().NotBeNull();
-        model.SingleProperty.Should().NotBeNullOrWhiteSpace();
-        model.WrongName.Should().BeNull();
+        model.ShouldNotBeNull();
+        model!.TestClass1.ShouldNotBeNull();
+        model.TestClass2.ShouldNotBeNull();
+        model.SingleProperty.ShouldNotBeNullOrWhiteSpace();
+        model.WrongName.ShouldBeNull();
     }
 
     [Theory]
@@ -191,10 +191,10 @@ public class SitecoreLayoutContextBindingSourceFixture
         TestClass1? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext) as TestClass1;
 
         // Assert
-        model.Should().NotBeNull();
-        model!.TestString.Should().NotBeNullOrWhiteSpace();
-        model.TestInt.Should().NotBe(default);
-        model.TestTime.Should().NotBe(default);
+        model.ShouldNotBeNull();
+        model!.TestString.ShouldNotBeNullOrWhiteSpace();
+        model.TestInt.ShouldNotBe(default);
+        model.TestTime.ShouldNotBe(default);
     }
 
     // ReSharper disable UnusedAutoPropertyAccessor.Local - Used by serialization

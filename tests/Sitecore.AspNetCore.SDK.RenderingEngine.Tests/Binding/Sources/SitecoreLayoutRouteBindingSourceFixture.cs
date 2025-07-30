@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using NSubstitute;
@@ -56,13 +56,13 @@ public class SitecoreLayoutRouteBindingSourceFixture
             () => sut.GetModel(serviceProvider, modelBindingContext, null!);
 
         // Act & Assert
-        allNull.Should().Throw<ArgumentNullException>();
-        serviceProviderNull.Should().Throw<ArgumentNullException>();
-        firstAndSecondArgsNull.Should().Throw<ArgumentNullException>();
-        firstAndThirdArgsNull.Should().Throw<ArgumentNullException>();
-        secondAndThirdArgsNull.Should().Throw<ArgumentNullException>();
-        bindingContextNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => serviceProviderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => firstAndSecondArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => firstAndThirdArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => secondAndThirdArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => bindingContextNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -81,7 +81,7 @@ public class SitecoreLayoutRouteBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().Be(renderingContext.Response!.Content!.Sitecore!.Route);
+        model.ShouldBe(renderingContext.Response!.Content!.Sitecore!.Route);
     }
 
     [Theory]
@@ -100,8 +100,8 @@ public class SitecoreLayoutRouteBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().BeOfType(typeof(Route));
-        model.Should().BeEquivalentTo(renderingContext.Response!.Content!.Sitecore!.Route);
+        model.ShouldBeOfType<Route>();
+        model.ShouldBe(renderingContext.Response!.Content!.Sitecore!.Route);
     }
 
     [Theory]
@@ -120,7 +120,7 @@ public class SitecoreLayoutRouteBindingSourceFixture
         object? result = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -144,6 +144,6 @@ public class SitecoreLayoutRouteBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 }

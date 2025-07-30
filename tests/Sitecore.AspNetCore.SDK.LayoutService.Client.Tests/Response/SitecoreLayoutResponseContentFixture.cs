@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response;
 using Xunit;
 
@@ -13,6 +13,6 @@ public class SitecoreLayoutResponseContentFixture
         SitecoreLayoutResponseContent sut = new();
 
         // Act / Assert
-        sut.Sitecore.Should().Be(default);
+        sut.Sitecore.ShouldBe(default);
     }
 }

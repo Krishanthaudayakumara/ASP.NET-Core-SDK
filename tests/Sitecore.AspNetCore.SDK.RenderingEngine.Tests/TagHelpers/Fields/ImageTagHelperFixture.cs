@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -66,9 +66,9 @@ public class ImageTagHelperFixture
         Action contextNull =
             () => sut.Process(null!, tagHelperOutput);
 
-        allNull.Should().Throw<ArgumentNullException>();
-        outputNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => outputNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -86,7 +86,7 @@ public class ImageTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -104,7 +104,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -122,7 +122,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.TagName.Should().BeNull();
+        tagHelperOutput.TagName.ShouldBeNull();
     }
 
     [Theory]
@@ -140,8 +140,8 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
-        tagHelperOutput.Content.GetContent().Should().NotContain(RenderingEngineConstants.SitecoreTagHelpers.ImageHtmlTag);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldNotContain(RenderingEngineConstants.SitecoreTagHelpers.ImageHtmlTag);
     }
 
     [Theory]
@@ -159,7 +159,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -181,7 +181,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(EditableHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(EditableHtml);
     }
 
     [Theory]
@@ -203,7 +203,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -226,7 +226,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -245,9 +245,9 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain("?mw=100&amp;mh=50");
-        tagHelperOutput.Content.GetContent().Should().NotContain("iar=0");
-        tagHelperOutput.Content.GetContent().Should().NotContain("hash=F313AD90AE547CAB09277E42509E289B");
+        tagHelperOutput.Content.GetContent().ShouldContain("?mw=100&amp;mh=50");
+        tagHelperOutput.Content.GetContent().ShouldNotContain("iar=0");
+        tagHelperOutput.Content.GetContent().ShouldNotContain("hash=F313AD90AE547CAB09277E42509E289B");
     }
 
     [Theory]
@@ -265,7 +265,7 @@ public class ImageTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -283,7 +283,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.TagName.Should().Be("img");
+        tagHelperOutput.TagName.ShouldBe("img");
     }
 
     [Theory]
@@ -301,8 +301,8 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "src");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "alt");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "src");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "alt");
     }
 
     [Theory]
@@ -324,7 +324,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(EditableHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(EditableHtml);
     }
 
     [Theory]
@@ -344,7 +344,7 @@ public class ImageTagHelperFixture
         string? url = tagHelperOutput.Attributes["src"].Value.ToString();
 
         // Assert
-        url.Should().Contain("?mw=100&mh=50");
+        url.ShouldContain("?mw=100&mh=50");
     }
 
     [Theory]
@@ -372,7 +372,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(EditableHtmlWithCustomAttributes);
+        tagHelperOutput.Content.GetContent().ShouldBe(EditableHtmlWithCustomAttributes);
     }
 
     [Theory]
@@ -390,14 +390,14 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "src");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "alt");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "width");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "height");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "vspace");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "hspace");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "border");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "title");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "src");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "alt");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "width");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "height");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "vspace");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "hspace");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "border");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "title");
     }
 
     #region asp-image attribute
@@ -416,7 +416,7 @@ public class ImageTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -434,7 +434,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -452,7 +452,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.TagName.Should().BeNull();
+        tagHelperOutput.TagName.ShouldBeNull();
     }
 
     [Theory]
@@ -470,7 +470,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -492,7 +492,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(EditableHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(EditableHtml);
     }
 
     [Theory]
@@ -514,7 +514,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -537,7 +537,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -556,9 +556,9 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain("mw=100&amp;mh=50");
-        tagHelperOutput.Content.GetContent().Should().NotContain("iar=0");
-        tagHelperOutput.Content.GetContent().Should().NotContain("hash=F313AD90AE547CAB09277E42509E289B");
+        tagHelperOutput.Content.GetContent().ShouldContain("mw=100&amp;mh=50");
+        tagHelperOutput.Content.GetContent().ShouldNotContain("iar=0");
+        tagHelperOutput.Content.GetContent().ShouldNotContain("hash=F313AD90AE547CAB09277E42509E289B");
     }
 
     [Theory]
@@ -576,7 +576,7 @@ public class ImageTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -594,7 +594,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.TagName.Should().Be("img");
+        tagHelperOutput.TagName.ShouldBe("img");
     }
 
     [Theory]
@@ -612,8 +612,8 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "src");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "alt");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "src");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "alt");
     }
 
     [Theory]
@@ -635,7 +635,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(EditableHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(EditableHtml);
     }
 
     [Theory]
@@ -655,7 +655,7 @@ public class ImageTagHelperFixture
         string? url = tagHelperOutput.Attributes["src"].Value.ToString();
 
         // Assert
-        url.Should().Contain("?mw=100&mh=50");
+        url.ShouldContain("?mw=100&mh=50");
     }
 
     [Theory]
@@ -683,7 +683,7 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(EditableHtmlWithCustomAttributes);
+        tagHelperOutput.Content.GetContent().ShouldBe(EditableHtmlWithCustomAttributes);
     }
 
     [Theory]
@@ -701,14 +701,14 @@ public class ImageTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "src");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "alt");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "width");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "height");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "vspace");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "hspace");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "border");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "title");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "src");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "alt");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "width");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "height");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "vspace");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "hspace");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "border");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "title");
     }
     #endregion
 

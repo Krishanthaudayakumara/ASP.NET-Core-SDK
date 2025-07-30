@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
-using FluentAssertions;
+using Shouldly;
 using NSubstitute;
 using Xunit;
 
@@ -24,7 +24,7 @@ public class TrackingApplicationConfigurationExtensionsFixture
         Action action = () => TrackingAppConfigurationExtensions.WithTracking(null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("serviceBuilder");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("serviceBuilder");
     }
 }

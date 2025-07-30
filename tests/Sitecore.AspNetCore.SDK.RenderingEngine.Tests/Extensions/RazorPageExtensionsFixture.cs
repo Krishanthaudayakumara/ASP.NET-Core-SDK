@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -52,7 +52,7 @@ public class RazorPageExtensionsFixture
         Func<Route?> act =
             () => RazorPageExtensions.SitecoreRoute(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -63,7 +63,7 @@ public class RazorPageExtensionsFixture
         Route? route = page.SitecoreRoute();
 
         // Assert
-        route.Should().BeEquivalentTo(CannedResponses.StyleGuide1.Sitecore!.Route);
+        route.ShouldBe(CannedResponses.StyleGuide1.Sitecore!.Route);
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class RazorPageExtensionsFixture
         Func<Context?> act =
             () => RazorPageExtensions.SitecoreContext(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -83,7 +83,7 @@ public class RazorPageExtensionsFixture
         Context? route = page.SitecoreContext();
 
         // Assert
-        route.Should().BeEquivalentTo(CannedResponses.StyleGuide1.Sitecore!.Context);
+        route.ShouldBe(CannedResponses.StyleGuide1.Sitecore!.Context);
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class RazorPageExtensionsFixture
         Func<Component?> act =
             () => RazorPageExtensions.SitecoreComponent(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -103,6 +103,6 @@ public class RazorPageExtensionsFixture
         Component? route = page.SitecoreComponent();
 
         // Assert
-        route.Should().BeOfType(typeof(Component));
+        route.ShouldBeOfType<Component>();
     }
 }

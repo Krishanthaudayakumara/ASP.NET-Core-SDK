@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Fields;
 using Xunit;
 
@@ -13,6 +13,6 @@ public class ContentListFieldFixture : FieldFixture<ContentListField>
         ContentListField sut = [];
 
         // Assert
-        sut.Should().BeEmpty();
+        sut.ShouldBeEmpty();
     }
 }

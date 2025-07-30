@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using GraphQL;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Request.Handlers.GraphQL;
@@ -19,6 +19,6 @@ public class LayoutServiceGraphQLExceptionFixture
         GraphQLError result = sut.GraphQLError;
 
         // Assert
-        result.Should().Be(error);
+        result.ShouldBe(error);
     }
 }

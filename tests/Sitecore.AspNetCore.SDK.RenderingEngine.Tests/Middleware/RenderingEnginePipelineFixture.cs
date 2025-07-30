@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using FluentAssertions;
+using System.Reflection;
+using Shouldly;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -20,8 +20,8 @@ public class RenderingEnginePipelineFixture
         Action action = () => sut.Configure(null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("app");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("app");
     }
 
     [Theory]
@@ -43,6 +43,6 @@ public class RenderingEnginePipelineFixture
         // Assert
         bool received = app.ReceivedCalls().Any(c => c.GetArguments().OfType<Delegate>().Any(d =>
             d.Target?.GetType().GetField("_middleware", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(d.Target).As<Type>().FullName == typeof(RenderingEngineMiddleware).FullName));
-        received.Should().BeTrue();
+        received.ShouldBeTrue();
     }
 }

@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using NSubstitute;
@@ -59,13 +59,13 @@ public class SitecoreLayoutRouteFieldsBindingSourceFixture
             () => sut.GetModel(serviceProvider, modelBindingContext, null!);
 
         // Act & Assert
-        allNull.Should().Throw<ArgumentNullException>();
-        serviceProviderNull.Should().Throw<ArgumentNullException>();
-        firstAndSecondArgsNull.Should().Throw<ArgumentNullException>();
-        firstAndThirdArgsNull.Should().Throw<ArgumentNullException>();
-        secondAndThirdArgsNull.Should().Throw<ArgumentNullException>();
-        bindingContextNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => serviceProviderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => firstAndSecondArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => firstAndThirdArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => secondAndThirdArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => bindingContextNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -83,7 +83,7 @@ public class SitecoreLayoutRouteFieldsBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     [Theory]
@@ -102,10 +102,10 @@ public class SitecoreLayoutRouteFieldsBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().NotBeNull();
-        model.Should().BeOfType(typeof(RouteFields));
+        model.ShouldNotBeNull();
+        model.ShouldBeOfType<RouteFields>();
         RouteFields? fieldModel = model as RouteFields;
-        fieldModel!.PageTitle!.Value.Should().Be("Styleguide | Sitecore JSS");
+        fieldModel!.PageTitle!.Value.ShouldBe("Styleguide | Sitecore JSS");
     }
 
     [Theory]
@@ -124,7 +124,7 @@ public class SitecoreLayoutRouteFieldsBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     private class RouteFields

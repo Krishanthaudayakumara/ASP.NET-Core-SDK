@@ -1,6 +1,6 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
-using FluentAssertions;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -71,7 +71,7 @@ public class NumberFieldTagHelperFixture : IDisposable
 
         // Assert
         // check scenario that NumberTagHelper does not reset values of nested helpers.
-        text.InnerHtml.Should().Contain(TestConstants.TestFieldValue);
+        text.InnerHtml.ShouldContain(TestConstants.TestFieldValue);
     }
 
     [Fact]
@@ -94,10 +94,10 @@ public class NumberFieldTagHelperFixture : IDisposable
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes.First(n => n.HasClass("component-with-number"));
 
         // Assert
-        sectionNode.ChildNodes[1].ChildNodes[1].InnerHtml.Should().Contain(TestValue.ToString("C", CultureInfo.CurrentCulture));
-        sectionNode.ChildNodes[1].ChildNodes[2].InnerHtml.Should().Contain(TestValue.ToString("C", CultureInfo.CreateSpecificCulture("ua-ua")));
-        sectionNode.ChildNodes[1].ChildNodes[3].InnerHtml.Should().Contain(TestValue.ToString(CultureInfo.CurrentCulture));
-        sectionNode.ChildNodes[1].ChildNodes[4].InnerHtml.Should().Contain(TestValue.ToString("P", CultureInfo.CurrentCulture));
+        sectionNode.ChildNodes[1].ChildNodes[1].InnerHtml.ShouldContain(TestValue.ToString("C", CultureInfo.CurrentCulture));
+        sectionNode.ChildNodes[1].ChildNodes[2].InnerHtml.ShouldContain(TestValue.ToString("C", CultureInfo.CreateSpecificCulture("ua-ua")));
+        sectionNode.ChildNodes[1].ChildNodes[3].InnerHtml.ShouldContain(TestValue.ToString(CultureInfo.CurrentCulture));
+        sectionNode.ChildNodes[1].ChildNodes[4].InnerHtml.ShouldContain(TestValue.ToString("P", CultureInfo.CurrentCulture));
     }
 
     public void Dispose()

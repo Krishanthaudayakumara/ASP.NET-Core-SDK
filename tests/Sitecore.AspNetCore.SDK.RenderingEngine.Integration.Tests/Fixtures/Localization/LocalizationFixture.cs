@@ -1,6 +1,6 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -75,7 +75,7 @@ public class LocalizationFixture : IDisposable
         // Act
         await client.GetStringAsync(new Uri("/ru-RU/UsingGlobalMiddleware", UriKind.Relative));
 
-        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.Should().Contain("sc_lang=ru-RU");
+        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.ShouldContain("sc_lang=ru-RU");
     }
 
     public void Dispose()

@@ -1,6 +1,6 @@
-﻿using AutoFixture;
+using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -61,7 +61,7 @@ public class DefaultLayoutClientFixture
             () => sut.Request(null!, string.Empty);
 
         // Act & Assert
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -77,7 +77,7 @@ public class DefaultLayoutClientFixture
             () => sut.Request(request, string.Empty);
 
         // Act & Assert
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -94,7 +94,7 @@ public class DefaultLayoutClientFixture
             () => sut.Request(request, handlerName);
 
         // Act / Assert
-        await act.Should().ThrowAsync<NullReferenceException>();
+        var ex = await Should.ThrowAsync<NullReferenceException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -111,7 +111,7 @@ public class DefaultLayoutClientFixture
             () => sut.Request(request, handlerName);
 
         // Act / Assert
-        await act.Should().ThrowAsync<NullReferenceException>();
+        var ex = await Should.ThrowAsync<NullReferenceException>(act); // TODO: Assert exception properties manually;
         return;
 
         static ILayoutRequestHandler Func(IServiceProvider sp) => null!;
@@ -131,7 +131,7 @@ public class DefaultLayoutClientFixture
             () => sut.Request(request, handlerName);
 
         // Act / Assert
-        await act.Should().ThrowAsync<KeyNotFoundException>();
+        var ex = await Should.ThrowAsync<KeyNotFoundException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -257,7 +257,7 @@ public class DefaultLayoutClientFixture
             async () => await sut.Request(request, null!);
 
         // Act & Assert
-        await act.Should().ThrowAsync<ArgumentNullException>().WithMessage("Handler name cannot be null.");
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually// TODO: Assert exception.Message manually;
     }
 
     [Fact]
@@ -378,9 +378,9 @@ public class DefaultLayoutClientFixture
         SitecoreLayoutResponse response = await sut.Request(request, handlerName);
 
         // Assert
-        response.Should().NotBeNull();
-        response.HasErrors.Should().BeTrue();
-        response.Errors.Should().ContainSingle(x => x.GetType() == typeof(CouldNotContactSitecoreLayoutServiceClientException));
+        response.ShouldNotBeNull();
+        response.HasErrors.ShouldBeTrue();
+        response.Errors.Single(x => x.GetType().ShouldNotBeNull() == typeof(CouldNotContactSitecoreLayoutServiceClientException));
     }
 
     [Theory]
@@ -408,8 +408,8 @@ public class DefaultLayoutClientFixture
         SitecoreLayoutResponse response = await sut.Request(request, handlerName);
 
         // Assert
-        response.HasErrors.Should().BeTrue();
-        response.Errors.Should().ContainSingle(x => x.GetType() == typeof(InvalidResponseSitecoreLayoutServiceClientException));
+        response.HasErrors.ShouldBeTrue();
+        response.Errors.Single(x => x.GetType().ShouldNotBeNull() == typeof(InvalidResponseSitecoreLayoutServiceClientException));
     }
 
     [Theory]

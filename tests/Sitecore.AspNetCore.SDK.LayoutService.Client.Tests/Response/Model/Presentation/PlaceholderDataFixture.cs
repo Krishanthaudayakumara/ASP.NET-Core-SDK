@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Presentation;
 using Xunit;
 
@@ -13,8 +13,8 @@ public class PlaceholderDataFixture
         PlaceholderData sut = new();
 
         // Assert
-        sut.Key.Should().BeNull();
-        sut.InstanceId.Should().BeNull();
-        sut.MetadataId.Should().BeNull();
+        sut.Key.ShouldBeNull();
+        sut.InstanceId.ShouldBeNull();
+        sut.MetadataId.ShouldBeNull();
     }
 }

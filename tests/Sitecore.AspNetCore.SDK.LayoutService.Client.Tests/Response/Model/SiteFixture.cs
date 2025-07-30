@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Xunit;
 
@@ -13,6 +13,6 @@ public class SiteFixture
         Site sut = new();
 
         // Act / Assert
-        sut.Name.Should().Be(default);
+        sut.Name.ShouldBe(default);
     }
 }

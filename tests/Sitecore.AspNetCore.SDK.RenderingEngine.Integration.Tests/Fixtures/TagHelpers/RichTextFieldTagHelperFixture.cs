@@ -1,6 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Encodings.Web;
-using FluentAssertions;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -70,7 +70,7 @@ public class RichTextFieldTagHelperFixture : IDisposable
 
         // Assert
         // check scenario that RichTextTagHelper does not reset values of another helpers.
-        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain("12/12/2019");
+        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.ShouldContain("12/12/2019");
     }
 
     [Fact]
@@ -94,15 +94,15 @@ public class RichTextFieldTagHelperFixture : IDisposable
 
         // Assert
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div1", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.RichTextFieldValue1);
+            .ShouldBe(TestConstants.RichTextFieldValue1);
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div2", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.RichTextFieldValue2);
+            .ShouldBe(TestConstants.RichTextFieldValue2);
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div3", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div4", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div5", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.TestFieldValue);
+            .ShouldBe(TestConstants.TestFieldValue);
     }
 
     [Fact]
@@ -134,11 +134,11 @@ public class RichTextFieldTagHelperFixture : IDisposable
         // Assert
         // RichTextField1 is editable
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div1", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(expected.DocumentNode.InnerHtml);
+            .ShouldBe(expected.DocumentNode.InnerHtml);
 
         // RichTextField2 is NOT editable
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div2", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.RichTextFieldValue2);
+            .ShouldBe(TestConstants.RichTextFieldValue2);
     }
 
     public void Dispose()

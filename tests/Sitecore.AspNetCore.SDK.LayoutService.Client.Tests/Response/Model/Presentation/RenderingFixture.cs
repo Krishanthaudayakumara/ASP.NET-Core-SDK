@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Presentation;
 using Xunit;
 
@@ -13,12 +13,12 @@ public class RenderingFixture
         Rendering sut = new();
 
         // Assert
-        sut.Id.Should().BeNull();
-        sut.InstanceId.Should().BeNull();
-        sut.PlaceholderKey.Should().BeEmpty();
-        sut.DataSource.Should().BeNull();
-        sut.Parameters.Should().BeEmpty();
-        sut.Caching.Should().BeNull();
-        sut.Personalization.Should().BeNull();
+        sut.Id.ShouldBeNull();
+        sut.InstanceId.ShouldBeNull();
+        sut.PlaceholderKey.ShouldBeEmpty();
+        sut.DataSource.ShouldBeNull();
+        sut.Parameters.ShouldBeEmpty();
+        sut.Caching.ShouldBeNull();
+        sut.Personalization.ShouldBeNull();
     }
 }

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -29,12 +29,12 @@ public class RequestHeadersValidationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.Errors.FirstOrDefault(error => error.InnerException!.Message == "The format of value 'site;core' is invalid.").Should().Be(null);
+        response.ShouldNotBeNull();
+        response.Errors.FirstOrDefault(error => error.InnerException!.Message == "The format of value 'site;core' is invalid.").ShouldBe(null);
         object? headerKeys = response.Request["sc_request_headers_key"];
 
         Dictionary<string, string[]>? userAgentHeader = headerKeys as Dictionary<string, string[]>;
-        userAgentHeader!["User-Agent"][0].Should().Be("site;core");
+        userAgentHeader!["User-Agent"][0].ShouldBe("site;core");
     }
 
     [Fact]
@@ -51,8 +51,8 @@ public class RequestHeadersValidationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.Errors.FirstOrDefault(error => error.InnerException!.Message == "The format of value 'site;core' is invalid.").Should().NotBe(null);
+        response.ShouldNotBeNull();
+        response.Errors.FirstOrDefault(error => error.InnerException!.Message == "The format of value 'site;core' is invalid.").ShouldNotBe(null);
     }
 
     public void Dispose()

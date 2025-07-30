@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -45,9 +45,9 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
             builder.AddHttpHandler(handlerName, (Func<IServiceProvider, HttpClient>)null!);
 
         // Assert
-        builderNull.Should().Throw<ArgumentNullException>();
-        handlerNull.Should().Throw<ArgumentNullException>();
-        resolveClientNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => builderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => handlerNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => resolveClientNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -62,7 +62,7 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
         ILayoutRequestHandler result = options!.Value.HandlerRegistry[handlerName].Invoke(provider);
 
         // Assert
-        result.Should().BeOfType<HttpLayoutRequestHandler>();
+        result.ShouldBeOfType<HttpLayoutRequestHandler>();
     }
 
     [Theory]
@@ -77,9 +77,9 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
         HttpLayoutRequestHandlerOptions namedHandlerOptions = handlerOptions!.Get(handlerName);
 
         // Assert
-        namedHandlerOptions.Should().NotBeNull();
-        namedHandlerOptions.RequestMap.Should().NotBeNull();
-        namedHandlerOptions.RequestMap.Should().ContainSingle();
+        namedHandlerOptions.ShouldNotBeNull();
+        namedHandlerOptions.RequestMap.ShouldNotBeNull();
+        namedHandlerOptions.RequestMap.Count.ShouldBe(1);
     }
 
     [Theory]
@@ -95,9 +95,9 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
             () => builder.AddHttpHandler(handlerName, (Action<IServiceProvider, HttpClient>)null!);
 
         // Assert
-        builderNull.Should().Throw<ArgumentNullException>();
-        handlerNameNull.Should().Throw<ArgumentNullException>();
-        configure.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => builderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => handlerNameNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => configure()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -112,7 +112,7 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
         ILayoutRequestHandler result = options!.Value.HandlerRegistry[handlerName].Invoke(provider);
 
         // Assert
-        result.Should().BeOfType<HttpLayoutRequestHandler>();
+        result.ShouldBeOfType<HttpLayoutRequestHandler>();
     }
 
     [Theory]
@@ -128,9 +128,9 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
             () => builder.AddHttpHandler(handlerName, (Action<HttpClient>)null!);
 
         // Assert
-        builderNull.Should().Throw<ArgumentNullException>();
-        handlerNameNull.Should().Throw<ArgumentNullException>();
-        configureNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => builderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => handlerNameNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => configureNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -145,7 +145,7 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
         ILayoutRequestHandler result = options!.Value.HandlerRegistry[handlerName].Invoke(provider);
 
         // Assert
-        result.Should().BeOfType<HttpLayoutRequestHandler>();
+        result.ShouldBeOfType<HttpLayoutRequestHandler>();
     }
 
     [Theory]
@@ -161,9 +161,9 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
             () => builder.AddHttpHandler(handlerName, (Uri)null!);
 
         // Assert
-        builderNull.Should().Throw<ArgumentNullException>();
-        handlerNameNull.Should().Throw<ArgumentNullException>();
-        uriNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => builderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => handlerNameNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => uriNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -179,7 +179,7 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
         ILayoutRequestHandler result = options!.Value.HandlerRegistry[handlerName].Invoke(provider);
 
         // Assert
-        result.Should().BeOfType<HttpLayoutRequestHandler>();
+        result.ShouldBeOfType<HttpLayoutRequestHandler>();
     }
 
     [Theory]
@@ -195,9 +195,9 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
             () => builder.AddHttpHandler(handlerName, (string)null!);
 
         // Assert
-        builderNull.Should().Throw<ArgumentNullException>();
-        handlerNameNull.Should().Throw<ArgumentNullException>();
-        uriStringNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => builderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => handlerNameNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => uriStringNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -215,7 +215,7 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
         ILayoutRequestHandler result = options!.Value.HandlerRegistry[handlerName].Invoke(provider);
 
         // Assert
-        result.Should().BeOfType<HttpLayoutRequestHandler>();
+        result.ShouldBeOfType<HttpLayoutRequestHandler>();
     }
 
     [Theory]
@@ -233,10 +233,10 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
             () => builder.AddHttpHandler(handlerName, resolveClient, null!);
 
         // Assert
-        builderNull.Should().Throw<ArgumentNullException>();
-        handlerNameNull.Should().Throw<ArgumentNullException>();
-        resolveClientNull.Should().Throw<ArgumentNullException>();
-        nonValidatedHeadersNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => builderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => handlerNameNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => resolveClientNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => nonValidatedHeadersNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -251,7 +251,7 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
         ILayoutRequestHandler result = options!.Value.HandlerRegistry[handlerName].Invoke(provider);
 
         // Assert
-        result.Should().BeOfType<HttpLayoutRequestHandler>();
+        result.ShouldBeOfType<HttpLayoutRequestHandler>();
     }
 
     [Theory]
@@ -266,9 +266,9 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
         HttpLayoutRequestHandlerOptions namedHandlerOptions = handlerOptions!.Get(handlerName);
 
         // Assert
-        namedHandlerOptions.Should().NotBeNull();
-        namedHandlerOptions.RequestMap.Should().NotBeNull();
-        namedHandlerOptions.RequestMap.Should().ContainSingle();
+        namedHandlerOptions.ShouldNotBeNull();
+        namedHandlerOptions.RequestMap.ShouldNotBeNull();
+        namedHandlerOptions.RequestMap.Count.ShouldBe(1);
     }
 
     [Theory]
@@ -284,9 +284,9 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
             () => LayoutRequestHandlerBuilderExtensions.MapFromRequest(null!, null!);
 
         // Assert
-        builderNull.Should().Throw<ArgumentNullException>();
-        configureHttpRequestMessageNull.Should().Throw<ArgumentNullException>();
-        allNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => builderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => configureHttpRequestMessageNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -303,9 +303,9 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
         HttpLayoutRequestHandlerOptions namedHandlerOptions = handlerOptions!.Get(handlerName);
 
         // Assert
-        namedHandlerOptions.Should().NotBeNull();
-        namedHandlerOptions.RequestMap.Should().NotBeNull();
-        namedHandlerOptions.RequestMap.Should().HaveCount(2);
+        namedHandlerOptions.ShouldNotBeNull();
+        namedHandlerOptions.RequestMap.ShouldNotBeNull();
+        namedHandlerOptions.RequestMap.Count.ShouldBe(2);
         return;
 
         static void ConfigureHttpRequestMessage(SitecoreLayoutRequest request, HttpRequestMessage message) => message.Method = HttpMethod.Post;
@@ -322,7 +322,7 @@ public class HttpLayoutRequestHandlerBuilderExtensionsFixture
             () => handler.ConfigureRequest(null!);
 
         // Assert
-        httpHandlerBuilderNull.Should().Throw<ArgumentNullException>();
-        nonValidatedHeadersNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => httpHandlerBuilderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => nonValidatedHeadersNull()); // TODO: Assert exception properties manually;
     }
 }

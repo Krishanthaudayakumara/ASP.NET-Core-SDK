@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +40,7 @@ public class SitecoreLayoutControllerFilterFixture
         Action act =
             () => sut.OnActionExecuting(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -54,6 +54,6 @@ public class SitecoreLayoutControllerFilterFixture
         sut.OnActionExecuting(context);
 
         // assert
-        httpContext.GetSitecoreRenderingContext()!.Controller.Should().Be(context.Controller as ControllerBase);
+        httpContext.GetSitecoreRenderingContext()!.Controller.ShouldBe(context.Controller as ControllerBase);
     }
 }

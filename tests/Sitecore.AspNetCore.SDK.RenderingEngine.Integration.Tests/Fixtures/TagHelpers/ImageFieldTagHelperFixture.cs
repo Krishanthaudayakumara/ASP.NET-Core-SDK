@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -71,7 +71,7 @@ public class ImageFieldTagHelperFixture : IDisposable
 
         // Assert
         // check scenario that ImageTagHelper render proper image tag with custom attributes.
-        sectionNode.ChildNodes[5].OuterHtml.Should().Contain(TestConstants.SecondImageTestValue);
+        sectionNode.ChildNodes[5].OuterHtml.ShouldContain(TestConstants.SecondImageTestValue);
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class ImageFieldTagHelperFixture : IDisposable
 
         // Assert
         // check that there is proper number of 'img' tags generated.
-        sectionNode.ChildNodes.Count(n => n.Name.Equals("img", StringComparison.OrdinalIgnoreCase)).Should().Be(2);
+        sectionNode.ChildNodes.Count(n => n.Name.Equals("img", StringComparison.OrdinalIgnoreCase)).ShouldBe(2);
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class ImageFieldTagHelperFixture : IDisposable
 
         // Assert
         // check that link will contain user provided link text.
-        sectionNode.ChildNodes[1].OuterHtml.Should().Contain(TestConstants.ImageFieldValue);
+        sectionNode.ChildNodes[1].OuterHtml.ShouldContain(TestConstants.ImageFieldValue);
     }
 
     [Fact]
@@ -144,8 +144,8 @@ public class ImageFieldTagHelperFixture : IDisposable
 
         // Assert
         // check that image url contains mw and mh parameters
-        lastImage.Attributes.Should().Contain(a => a.Name == "src");
-        lastImage.Attributes["src"].Value.Should().Contain("mw=100&amp;mh=50");
+        lastImage.Attributes.ShouldContain(a => a.Name == "src");
+        lastImage.Attributes["src"].Value.ShouldContain("mw=100&amp;mh=50");
     }
 
     [Fact]
@@ -169,11 +169,11 @@ public class ImageFieldTagHelperFixture : IDisposable
 
         // Assert
         // check that editable markup contains all custom params
-        sectionNode.InnerHtml.Should().Contain("height=\"50\"");
-        sectionNode.InnerHtml.Should().Contain("width=\"94\"");
-        sectionNode.InnerHtml.Should().Contain("class=\"image1\"");
-        sectionNode.InnerHtml.Should().Contain("alt=\"customAlt\"");
-        sectionNode.InnerHtml.Should().Contain("src=\"/sitecore/shell/-/jssmedia/styleguide/data/media/img/sc_logo.png?mw=100&mh=50\"");
+        sectionNode.InnerHtml.ShouldContain("height=\"50\"");
+        sectionNode.InnerHtml.ShouldContain("width=\"94\"");
+        sectionNode.InnerHtml.ShouldContain("class=\"image1\"");
+        sectionNode.InnerHtml.ShouldContain("alt=\"customAlt\"");
+        sectionNode.InnerHtml.ShouldContain("src=\"/sitecore/shell/-/jssmedia/styleguide/data/media/img/sc_logo.png?mw=100&mh=50\"");
     }
 
     public void Dispose()

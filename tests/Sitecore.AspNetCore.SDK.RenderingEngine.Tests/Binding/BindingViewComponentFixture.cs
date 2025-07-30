@@ -1,6 +1,6 @@
-﻿using System.Text;
+using System.Text;
 using AutoFixture;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
@@ -31,7 +31,7 @@ public class BindingViewComponentFixture
             () => new BindingViewComponentMock(null!);
 
         // Assert
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -43,7 +43,7 @@ public class BindingViewComponentFixture
         BindingViewComponentMock sut = new(viewModelBinder);
 
         // Assert
-        sut.BinderAccessor.Should().Be(viewModelBinder);
+        sut.BinderAccessor.ShouldBe(viewModelBinder);
     }
 
     [Theory]

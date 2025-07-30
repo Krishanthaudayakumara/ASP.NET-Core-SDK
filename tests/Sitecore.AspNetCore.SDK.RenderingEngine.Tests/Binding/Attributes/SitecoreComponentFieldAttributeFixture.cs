@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Binding.Attributes;
 using Xunit;
@@ -12,7 +12,7 @@ public class SitecoreComponentFieldAttributeFixture
     public void Attribute_Name_ShouldNotBeNull(SitecoreComponentFieldAttribute sut)
     {
         // Assert
-        sut.Name.Should().NotBeNull();
+        sut.Name.ShouldNotBeNull();
     }
 
     [Theory]
@@ -20,6 +20,6 @@ public class SitecoreComponentFieldAttributeFixture
     public void Attribute_BindingSource_ShouldNotBeNull(SitecoreComponentFieldAttribute sut)
     {
         // Assert
-        sut.BindingSource.Should().NotBeNull();
+        sut.BindingSource.ShouldNotBeNull();
     }
 }

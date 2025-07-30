@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using GraphQL;
 using GraphQL.Client.Abstractions;
 using Microsoft.AspNetCore.TestHost;
@@ -81,10 +81,10 @@ public class EdgeSitemapProxyFixture : IDisposable
         await client.SendAsync(request);
 
         // Asserts
-        _mockClientHandler.Requests.Should().ContainSingle();
-        _mockClientHandler.Requests[0].RequestUri!.Host.Should().Be(_edgeSitemapUrl.Host);
-        _mockClientHandler.Requests[0].RequestUri!.Scheme.Should().Be(_edgeSitemapUrl.Scheme);
-        _mockClientHandler.Requests[0].RequestUri!.PathAndQuery.Should().Be("/sitemap.xml");
+        _mockClientHandler.Requests.Count.ShouldBe(1);
+        _mockClientHandler.Requests[0].RequestUri!.Host.ShouldBe(_edgeSitemapUrl.Host);
+        _mockClientHandler.Requests[0].RequestUri!.Scheme.ShouldBe(_edgeSitemapUrl.Scheme);
+        _mockClientHandler.Requests[0].RequestUri!.PathAndQuery.ShouldBe("/sitemap.xml");
     }
 
     public void Dispose()

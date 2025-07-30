@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -68,16 +68,16 @@ public class ComplexModelBindingFixture : IDisposable
 
         // Assert
         sectionNode.ChildNodes.First(n => n.Id.Equals("fieldHeader", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be(TestConstants.PageTitle);
+            .ShouldBe(TestConstants.PageTitle);
 
         sectionNode.ChildNodes.First(n => n.Id.Equals("routeField", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be(TestConstants.PageTitle);
+            .ShouldBe(TestConstants.PageTitle);
 
         sectionNode.ChildNodes.First(n => n.Id.Equals("routeNestedField", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be(TestConstants.SearchKeywords);
+            .ShouldBe(TestConstants.SearchKeywords);
 
         sectionNode.ChildNodes.First(n => n.Id.Equals("componentProperty", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("Complex-Component");
+            .ShouldBe("Complex-Component");
 
         sectionNode.ChildNodes.First(n => n.Id.Equals("routeProperty", StringComparison.OrdinalIgnoreCase)).InnerText.
             Should().Be("styleguide");
@@ -86,19 +86,19 @@ public class ComplexModelBindingFixture : IDisposable
             Should().Be(TestConstants.RichTextFieldValue1);
 
         sectionNode.ChildNodes.First(n => n.Id.Equals("contextProperty", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Contain("False");
+            .ShouldContain("False");
 
         sectionNode.ChildNodes.First(n => n.Id.Equals("nestedComponentHeaderField", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be(TestConstants.PageTitle);
+            .ShouldBe(TestConstants.PageTitle);
 
         sectionNode.ChildNodes.First(n => n.Id.Equals("nestedComponentHeader2Field", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Contain(TestConstants.TestFieldValue);
+            .ShouldContain(TestConstants.TestFieldValue);
 
         sectionNode.ChildNodes.First(n => n.Id.Contains("customField", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Contain(TestConstants.TestFieldValue + "custom");
+            .ShouldContain(TestConstants.TestFieldValue + "custom");
 
         sectionNode.ChildNodes.First(n => n.Id.Equals("paramContent", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be(TestConstants.TestParamNameValue);
+            .ShouldBe(TestConstants.TestParamNameValue);
     }
 
     public void Dispose()

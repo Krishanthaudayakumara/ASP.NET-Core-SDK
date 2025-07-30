@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Presentation;
 using Xunit;
 
@@ -13,9 +13,9 @@ public class DeviceFixture
         Device sut = new();
 
         // Assert
-        sut.Id.Should().BeNull();
-        sut.LayoutId.Should().BeNull();
-        sut.Placeholders.Should().BeEmpty();
-        sut.Renderings.Should().BeEmpty();
+        sut.Id.ShouldBeNull();
+        sut.LayoutId.ShouldBeNull();
+        sut.Placeholders.ShouldBeEmpty();
+        sut.Renderings.ShouldBeEmpty();
     }
 }

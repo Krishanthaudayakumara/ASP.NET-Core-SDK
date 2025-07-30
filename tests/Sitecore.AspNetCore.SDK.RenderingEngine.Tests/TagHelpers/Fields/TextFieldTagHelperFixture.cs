@@ -1,9 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Encodings.Web;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -72,9 +72,9 @@ public class TextFieldTagHelperFixture
         Action contextNull =
             () => sut.Process(null!, tagHelperOutput);
 
-        allNull.Should().Throw<ArgumentNullException>();
-        outputNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => outputNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -88,7 +88,7 @@ public class TextFieldTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(HtmlEncoder.Default.Encode(TestHtml));
+        tagHelperOutput.Content.GetContent().ShouldBe(HtmlEncoder.Default.Encode(TestHtml));
     }
 
     [Theory]
@@ -102,7 +102,7 @@ public class TextFieldTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(expectedOutput);
+        tagHelperOutput.Content.GetContent().ShouldBe(expectedOutput);
     }
 
     [Theory]
@@ -116,7 +116,7 @@ public class TextFieldTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be("<p>This is the test text <br /> with line endings.</p>");
+        tagHelperOutput.Content.GetContent().ShouldBe("<p>This is the test text <br /> with line endings.</p>");
     }
 
     [Theory]
@@ -131,7 +131,7 @@ public class TextFieldTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(HtmlEncoder.Default.Encode(TestMultilineText));
+        tagHelperOutput.Content.GetContent().ShouldBe(HtmlEncoder.Default.Encode(TestMultilineText));
     }
 
     [Theory]
@@ -149,7 +149,7 @@ public class TextFieldTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestEditableMarkup);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestEditableMarkup);
     }
 
     [Theory]
@@ -167,7 +167,7 @@ public class TextFieldTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestText);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestText);
     }
 
     [Theory]
@@ -186,7 +186,7 @@ public class TextFieldTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestText);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestText);
     }
 
     [Theory]
@@ -214,7 +214,7 @@ public class TextFieldTagHelperFixture
         // Assert
         chromeRenderer.Received().Render(openingChrome);
         chromeRenderer.Received().Render(closingChrome);
-        tagHelperOutput.Content.GetContent().Should().Be($"{chromeRenderer.Render(openingChrome)}<span>{TestText}</span>{chromeRenderer.Render(closingChrome)}");
+        tagHelperOutput.Content.GetContent().ShouldBe($"{chromeRenderer.Render(openingChrome)}<span>{TestText}</span>{chromeRenderer.Render(closingChrome)}");
     }
 
     private static IEnumerable<object[]> GetModelExpressionTestData()

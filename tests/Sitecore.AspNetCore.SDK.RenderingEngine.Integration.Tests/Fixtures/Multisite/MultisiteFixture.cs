@@ -1,6 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using AutoFixture.Xunit2;
-using FluentAssertions;
+using Shouldly;
 using GraphQL;
 using GraphQL.Client.Abstractions;
 using Microsoft.AspNetCore.TestHost;
@@ -108,8 +108,8 @@ public class MultisiteFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Be($"\"{expectedSiteName}\"");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldBe($"\"{expectedSiteName}\"");
     }
 
     [Fact]
@@ -124,8 +124,8 @@ public class MultisiteFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Be($"\"{expectedSiteName}\"");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldBe($"\"{expectedSiteName}\"");
     }
 
     [Theory]
@@ -141,8 +141,8 @@ public class MultisiteFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Be($"\"{DefaultSiteName}\"");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldBe($"\"{DefaultSiteName}\"");
     }
 
     [Theory]
@@ -167,10 +167,10 @@ public class MultisiteFixture : IDisposable
         string responseStringSecond = await responseSecond.Content.ReadAsStringAsync();
 
         // Assert
-        responseFirst.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseStringFirst.Should().Be($"\"{resolvedFirsSite}\"");
-        responseSecond.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseStringSecond.Should().Be($"\"{DefaultSiteName}\"");
+        responseFirst.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseStringFirst.ShouldBe($"\"{resolvedFirsSite}\"");
+        responseSecond.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseStringSecond.ShouldBe($"\"{DefaultSiteName}\"");
     }
 
     public void Dispose()

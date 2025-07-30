@@ -1,8 +1,8 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -66,7 +66,7 @@ public class SitecoreVisitorIdentificationTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().BeEmpty();
+        tagHelperOutput.Content.GetContent().ShouldBeEmpty();
     }
 
     [Theory]
@@ -87,7 +87,7 @@ public class SitecoreVisitorIdentificationTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().BeEmpty();
+        tagHelperOutput.Content.GetContent().ShouldBeEmpty();
     }
 
     [Theory]
@@ -121,7 +121,7 @@ public class SitecoreVisitorIdentificationTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be($"<meta name=\"VIcurrentDateTime\" content=\"{fakeDateTimeNowUtc.Ticks}>\"/><meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
+        tagHelperOutput.Content.GetContent().ShouldBe($"<meta name=\"VIcurrentDateTime\" content=\"{fakeDateTimeNowUtc.Ticks}>\"/><meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
     }
 
     [Theory]
@@ -161,7 +161,7 @@ public class SitecoreVisitorIdentificationTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be($"<meta name=\"VIcurrentDateTime\" content=\"{fakeDateTimeNowUtc.Ticks}>\"/><meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
+        tagHelperOutput.Content.GetContent().ShouldBe($"<meta name=\"VIcurrentDateTime\" content=\"{fakeDateTimeNowUtc.Ticks}>\"/><meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
     }
 
     [Theory]
@@ -197,7 +197,7 @@ public class SitecoreVisitorIdentificationTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().NotBe($"<meta name=\"VIcurrentDateTime\" content=\"{fakeDateTimeNowUtc.Ticks}>\"/><meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
+        tagHelperOutput.Content.GetContent().ShouldNotBe($"<meta name=\"VIcurrentDateTime\" content=\"{fakeDateTimeNowUtc.Ticks}>\"/><meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
     }
 
     [Theory]
@@ -232,7 +232,7 @@ public class SitecoreVisitorIdentificationTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be($"<meta name=\"VIcurrentDateTime\" content=\"{fakeDateTimeNowUtc.Ticks}>\"/><meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
+        tagHelperOutput.Content.GetContent().ShouldBe($"<meta name=\"VIcurrentDateTime\" content=\"{fakeDateTimeNowUtc.Ticks}>\"/><meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
     }
 
     [Theory]
@@ -265,7 +265,7 @@ public class SitecoreVisitorIdentificationTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().NotBe($"<meta name=\"VIcurrentDateTime\" content=\"{fakeDateTimeNowUtc.Ticks}>\"/><meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
+        tagHelperOutput.Content.GetContent().ShouldNotBe($"<meta name=\"VIcurrentDateTime\" content=\"{fakeDateTimeNowUtc.Ticks}>\"/><meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
     }
 
     [ExcludeFromCodeCoverage]

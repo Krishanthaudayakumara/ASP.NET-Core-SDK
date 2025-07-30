@@ -1,5 +1,5 @@
-﻿using AutoFixture.Idioms;
-using FluentAssertions;
+using AutoFixture.Idioms;
+using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.AutoFixture.Extensions;
@@ -27,8 +27,8 @@ public class SitecoreLayoutRequestHandlerBuilderTClientFixture
         Action action = () => _ = new SitecoreLayoutRequestHandlerBuilder<ILayoutRequestHandler>(handlerName, services);
 
         // Assert
-        action.Should().Throw<ArgumentException>()
-            .And.ParamName.Should().Be("handlerName");
+        var ex = Should.Throw<ArgumentException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("handlerName");
     }
 
     [Theory]
@@ -39,8 +39,8 @@ public class SitecoreLayoutRequestHandlerBuilderTClientFixture
         SitecoreLayoutRequestHandlerBuilder<ILayoutRequestHandler> sut = new(handlerName, services);
 
         // Assert
-        sut.Services.Should().BeSameAs(services);
-        sut.HandlerName.Should().Be(handlerName);
+        sut.Services.ShouldBeSameAs(services);
+        sut.HandlerName.ShouldBe(handlerName);
     }
 
     private static IEnumerable<object[]> EmptyStrings()

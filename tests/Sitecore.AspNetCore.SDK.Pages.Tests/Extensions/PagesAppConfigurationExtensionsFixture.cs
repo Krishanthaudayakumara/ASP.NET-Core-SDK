@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.Pages.Configuration;
 using Sitecore.AspNetCore.SDK.Pages.Extensions;
 using Xunit;
@@ -14,7 +14,7 @@ namespace Sitecore.AspNetCore.SDK.Pages.Tests.Extensions
             Action action = () => PagesAppConfigurationExtensions.UseSitecorePages(null!, new PagesOptions());
 
             // Assert
-            action.Should().Throw<ArgumentNullException>();
+            var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually;
         }
     }
 }

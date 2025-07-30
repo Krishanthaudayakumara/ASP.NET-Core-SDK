@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -66,9 +66,9 @@ public class NumberTagHelperFixture
         Action contextNull =
             () => sut.Process(null!, tagHelperOutput);
 
-        allNull.Should().Throw<ArgumentNullException>();
-        outputNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => outputNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -86,7 +86,7 @@ public class NumberTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -104,7 +104,7 @@ public class NumberTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Number1.ToString(CultureInfo.CurrentCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(Number1.ToString(CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -123,7 +123,7 @@ public class NumberTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Number1.ToString(sut.NumberFormat, CultureInfo.CurrentCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(Number1.ToString(sut.NumberFormat, CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -141,7 +141,7 @@ public class NumberTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Number2.ToString(CultureInfo.CurrentCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(Number2.ToString(CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -163,7 +163,7 @@ public class NumberTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Editable);
+        tagHelperOutput.Content.GetContent().ShouldBe(Editable);
     }
 
     [Theory]
@@ -183,7 +183,7 @@ public class NumberTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Number1.ToString(sut.NumberFormat, CultureInfo.CreateSpecificCulture(sut.Culture)));
+        tagHelperOutput.Content.GetContent().ShouldBe(Number1.ToString(sut.NumberFormat, CultureInfo.CreateSpecificCulture(sut.Culture)));
     }
 
     #region asp-number attribute
@@ -202,7 +202,7 @@ public class NumberTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -220,7 +220,7 @@ public class NumberTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Number1.ToString(CultureInfo.CurrentCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(Number1.ToString(CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -239,7 +239,7 @@ public class NumberTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Number1.ToString(sut.NumberFormat, CultureInfo.CurrentCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(Number1.ToString(sut.NumberFormat, CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -257,7 +257,7 @@ public class NumberTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Number2.ToString(CultureInfo.CurrentCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(Number2.ToString(CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -279,7 +279,7 @@ public class NumberTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Editable);
+        tagHelperOutput.Content.GetContent().ShouldBe(Editable);
     }
 
     [Theory]
@@ -299,7 +299,7 @@ public class NumberTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Number1.ToString(sut.NumberFormat, CultureInfo.CreateSpecificCulture(sut.Culture)));
+        tagHelperOutput.Content.GetContent().ShouldBe(Number1.ToString(sut.NumberFormat, CultureInfo.CreateSpecificCulture(sut.Culture)));
     }
     #endregion
 

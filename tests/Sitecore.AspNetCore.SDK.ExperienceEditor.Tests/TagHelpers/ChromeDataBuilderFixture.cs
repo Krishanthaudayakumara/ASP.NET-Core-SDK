@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.ExperienceEditor.TagHelpers;
 using Sitecore.AspNetCore.SDK.ExperienceEditor.TagHelpers.Model;
 using Xunit;
@@ -20,12 +20,12 @@ public class ChromeDataBuilderFixture
         ChromeCommand command = _chromeDataBuilder.MapButtonToCommand(button, null, null);
 
         // Assert
-        command.Click.Should().Be("chrome:dummy");
-        command.Icon.Should().Be(button.Icon);
-        command.IsDivider.Should().BeTrue();
-        command.Header.Should().Be(button.Header);
-        command.Tooltip.Should().BeNull();
-        command.Type.Should().Be("separator");
+        command.Click.ShouldBe("chrome:dummy");
+        command.Icon.ShouldBe(button.Icon);
+        command.IsDivider.ShouldBeTrue();
+        command.Header.ShouldBe(button.Header);
+        command.Tooltip.ShouldBeNull();
+        command.Type.ShouldBe("separator");
     }
 
     [Fact]
@@ -44,12 +44,12 @@ public class ChromeDataBuilderFixture
         ChromeCommand command = _chromeDataBuilder.MapButtonToCommand(button, null, null);
 
         // Assert
-        command.Click.Should().Be(button.Click);
-        command.Icon.Should().Be(button.Icon);
-        command.IsDivider.Should().BeFalse();
-        command.Header.Should().Be(button.Header);
-        command.Tooltip.Should().Be(button.Tooltip);
-        command.Type.Should().Be(button.Type);
+        command.Click.ShouldBe(button.Click);
+        command.Icon.ShouldBe(button.Icon);
+        command.IsDivider.ShouldBeFalse();
+        command.Header.ShouldBe(button.Header);
+        command.Tooltip.ShouldBe(button.Tooltip);
+        command.Type.ShouldBe(button.Type);
     }
 
     [Fact]
@@ -69,12 +69,12 @@ public class ChromeDataBuilderFixture
         ChromeCommand command = _chromeDataBuilder.MapButtonToCommand(button, itemId, null);
 
         // Assert
-        command.Click.Should().Be($"javascript:Sitecore.PageModes.PageEditor.postRequest('webedit:fieldeditor(command={DefaultEditFrameButtonIds.Edit}, fields={string.Join('|', button.Fields)}, id={itemId})',null,false)");
-        command.Icon.Should().Be(button.Icon);
-        command.IsDivider.Should().BeFalse();
-        command.Header.Should().Be(button.Header);
-        command.Tooltip.Should().Be(button.Tooltip);
-        command.Type.Should().BeNull();
+        command.Click.ShouldBe($"javascript:Sitecore.PageModes.PageEditor.postRequest('webedit:fieldeditor(command={DefaultEditFrameButtonIds.Edit}, fields={string.Join('|', button.Fields)}, id={itemId})',null,false)");
+        command.Icon.ShouldBe(button.Icon);
+        command.IsDivider.ShouldBeFalse();
+        command.Header.ShouldBe(button.Header);
+        command.Tooltip.ShouldBe(button.Tooltip);
+        command.Type.ShouldBeNull();
     }
 
     [Fact]
@@ -128,11 +128,11 @@ public class ChromeDataBuilderFixture
         ChromeCommand command = _chromeDataBuilder.MapButtonToCommand(button, itemId, frameParams);
 
         // Assert
-        command.Click.Should().Be($"javascript:Sitecore.PageModes.PageEditor.postRequest('test:MethodWithParams(\"\"=, id={itemId}, btnParam1=btnVal1, btnParam2=btnVal2, frameParam1=frameVal1, frameParam2=frameVal2)',null,false)");
-        command.Icon.Should().Be(button.Icon);
-        command.IsDivider.Should().BeFalse();
-        command.Header.Should().Be(button.Header);
-        command.Tooltip.Should().Be(button.Tooltip);
-        command.Type.Should().Be(button.Type);
+        command.Click.ShouldBe($"javascript:Sitecore.PageModes.PageEditor.postRequest('test:MethodWithParams(\"\"=, id={itemId}, btnParam1=btnVal1, btnParam2=btnVal2, frameParam1=frameVal1, frameParam2=frameVal2)',null,false)");
+        command.Icon.ShouldBe(button.Icon);
+        command.IsDivider.ShouldBeFalse();
+        command.Header.ShouldBe(button.Header);
+        command.Tooltip.ShouldBe(button.Tooltip);
+        command.Type.ShouldBe(button.Type);
     }
 }

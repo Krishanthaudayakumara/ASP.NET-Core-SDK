@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using GraphQL;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.GraphQL.Request;
@@ -28,10 +28,10 @@ public class PagesEditingFixture(TestWebApplicationFactory<TestPagesProgram> fac
         string? responseBody = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
         responseBody.Should().NotBeNullOrEmpty();
-        responseBody.Should().Contain("<code chrometype='placeholder' class='scpm' kind='open' type='text/sitecore' id='headless-main_00000000-0000-0000-0000-000000000000'></code><code chrometype='placeholder' class='scpm' kind='close' type='text/sitecore'></code></div>");
-        responseBody.Should().Contain("<code chrometype='placeholder' class='scpm' kind='close' type='text/sitecore'></code></div>");
+        responseBody.ShouldContain("<code chrometype='placeholder' class='scpm' kind='open' type='text/sitecore' id='headless-main_00000000-0000-0000-0000-000000000000'></code><code chrometype='placeholder' class='scpm' kind='close' type='text/sitecore'></code></div>");
+        responseBody.ShouldContain("<code chrometype='placeholder' class='scpm' kind='close' type='text/sitecore'></code></div>");
     }
 }

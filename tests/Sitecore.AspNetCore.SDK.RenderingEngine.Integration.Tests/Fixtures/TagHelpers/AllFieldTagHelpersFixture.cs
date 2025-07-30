@@ -1,6 +1,6 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
-using FluentAssertions;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -69,24 +69,24 @@ public class AllFieldTagHelpersFixture : IDisposable
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes.First(n => n.HasClass("component-allfields"));
 
         // Assert
-        sectionNode.ChildNodes.First(n => n.Name.Equals("h1", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Be(TestConstants.TestFieldValue);
+        sectionNode.ChildNodes.First(n => n.Name.Equals("h1", StringComparison.OrdinalIgnoreCase)).InnerText.ShouldBe(TestConstants.TestFieldValue);
 
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div1", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.TestMultilineFieldValue.Replace(Environment.NewLine, "<br>", StringComparison.OrdinalIgnoreCase));
+            .ShouldBe(TestConstants.TestMultilineFieldValue.Replace(Environment.NewLine, "<br>", StringComparison.OrdinalIgnoreCase));
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div2", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.RichTextFieldValue1);
+            .ShouldBe(TestConstants.RichTextFieldValue1);
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div3", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.RichTextFieldValue2);
+            .ShouldBe(TestConstants.RichTextFieldValue2);
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div4", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.LinkFieldValue);
+            .ShouldBe(TestConstants.LinkFieldValue);
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div5", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.AllFieldsImageValue);
+            .ShouldBe(TestConstants.AllFieldsImageValue);
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div6", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.DateFieldValue);
+            .ShouldBe(TestConstants.DateFieldValue);
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div7", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.MediaLibraryItemImageFieldValue);
+            .ShouldBe(TestConstants.MediaLibraryItemImageFieldValue);
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase) && n.Id.Equals("div8", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(9.99m.ToString(CultureInfo.CurrentCulture));
+            .ShouldBe(9.99m.ToString(CultureInfo.CurrentCulture));
     }
 
     public void Dispose()

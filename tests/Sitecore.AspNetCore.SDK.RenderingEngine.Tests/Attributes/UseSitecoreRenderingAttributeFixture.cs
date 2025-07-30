@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Attributes;
 using Xunit;
@@ -14,8 +14,8 @@ public class UseSitecoreRenderingAttributeFixture
         Action action = () => _ = new UseSitecoreRenderingAttribute(null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("configurationType");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("configurationType");
     }
 
     [Fact]

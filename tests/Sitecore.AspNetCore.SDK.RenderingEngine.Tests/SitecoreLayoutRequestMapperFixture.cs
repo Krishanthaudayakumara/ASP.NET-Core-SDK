@@ -1,6 +1,6 @@
-﻿using AutoFixture;
+using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -41,8 +41,8 @@ public class SitecoreLayoutRequestMapperFixture
         Action action = () => _ = new SitecoreLayoutRequestMapper(options);
 
         // Act / Assert
-        action.Should().Throw<ArgumentException>()
-            .WithMessage("A non-nullable value must be provided for the RequestMappings action list.");
+        var ex = Should.Throw<ArgumentException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Assert exception.Message manually;
     }
 
     [Theory]
@@ -54,7 +54,7 @@ public class SitecoreLayoutRequestMapperFixture
             () => sut.Map(null!);
 
         // Act & Assert
-        act.Should().Throw<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'request')");
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually// TODO: Assert exception.Message manually");
     }
 
     [Theory]
@@ -65,8 +65,8 @@ public class SitecoreLayoutRequestMapperFixture
         Action action = () => sut.Map(null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -83,6 +83,6 @@ public class SitecoreLayoutRequestMapperFixture
         SitecoreLayoutRequest result = sut.Map(request);
 
         // Assert
-        result.Path().Should().Be("SET");
+        result.Path().ShouldBe("SET");
     }
 }

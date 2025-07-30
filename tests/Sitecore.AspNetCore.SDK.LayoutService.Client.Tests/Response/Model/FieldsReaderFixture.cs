@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Exceptions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
@@ -23,7 +23,7 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         Field<string>? result = _sut.ReadField<Field<string>>(name);
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -38,7 +38,7 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         Field<string>? result = _sut.ReadField<Field<string>>(readName);
 
         // Assert
-        result.Should().Be(field);
+        result.ShouldBe(field);
     }
 
     [Theory]
@@ -52,8 +52,8 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         bool result = _sut.TryReadField(name, out Field<string>? field);
 
         // Assert
-        result.Should().BeFalse();
-        field.Should().BeNull();
+        result.ShouldBeFalse();
+        field.ShouldBeNull();
     }
 
     [Theory]
@@ -68,8 +68,8 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         bool result = _sut.TryReadField(readName, out Field<string>? field);
 
         // Assert
-        result.Should().BeTrue();
-        field.Should().Be(fieldInstance);
+        result.ShouldBeTrue();
+        field.ShouldBe(fieldInstance);
     }
 
     [Theory]
@@ -83,7 +83,7 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         object? result = _sut.ReadField(typeof(Field<string>), name);
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -110,7 +110,7 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         object? result = _sut.ReadField(typeof(Field<string>), readName);
 
         // Assert
-        result.Should().Be(field);
+        result.ShouldBe(field);
     }
 
     [Theory]
@@ -124,8 +124,8 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         bool result = _sut.TryReadField(typeof(Field<string>), name, out object? field);
 
         // Assert
-        result.Should().BeFalse();
-        field.Should().BeNull();
+        result.ShouldBeFalse();
+        field.ShouldBeNull();
     }
 
     [Theory]
@@ -139,8 +139,8 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         bool result = _sut.TryReadField(typeof(string), name, out object? field);
 
         // Assert
-        result.Should().BeFalse();
-        field.Should().BeNull();
+        result.ShouldBeFalse();
+        field.ShouldBeNull();
     }
 
     [Theory]
@@ -155,8 +155,8 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         bool result = _sut.TryReadField(typeof(Field<string>), readName, out object? field);
 
         // Assert
-        result.Should().BeTrue();
-        field.Should().Be(fieldInstance);
+        result.ShouldBeTrue();
+        field.ShouldBe(fieldInstance);
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         SimpleTestModel? result = _sut.ReadFields<SimpleTestModel>();
 
         // Act / Assert
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 
     [Fact]
@@ -183,9 +183,9 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         SimpleTestModel? result = _sut.ReadFields<SimpleTestModel>();
 
         // Act / Assert
-        result.Should().NotBeNull();
-        result!.Text!.Value.Should().Be("testing");
-        result.Number!.Value.Should().Be(500);
+        result.ShouldNotBeNull();
+        result!.Text!.Value.ShouldBe("testing");
+        result.Number!.Value.ShouldBe(500);
     }
 
     [Fact]
@@ -198,8 +198,8 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         bool result = _sut.TryReadFields(out SimpleTestModel? instance);
 
         // Assert
-        result.Should().BeTrue();
-        instance.Should().NotBeNull();
+        result.ShouldBeTrue();
+        instance.ShouldNotBeNull();
     }
 
     [Fact]
@@ -213,9 +213,9 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         bool result = _sut.TryReadFields(out SimpleTestModel? instance);
 
         // Assert
-        result.Should().BeTrue();
-        instance!.Text!.Value.Should().Be("testing");
-        instance.Number!.Value.Should().Be(500);
+        result.ShouldBeTrue();
+        instance!.Text!.Value.ShouldBe("testing");
+        instance.Number!.Value.ShouldBe(500);
     }
 
     [Fact]
@@ -228,7 +228,7 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         object? result = _sut.ReadFields(typeof(SimpleTestModel));
 
         // Assert
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 
     [Fact]
@@ -242,10 +242,10 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         object? result = _sut.ReadFields(typeof(SimpleTestModel));
 
         // Assert
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
         SimpleTestModel? instance = result as SimpleTestModel;
-        instance!.Text!.Value.Should().Be("testing");
-        instance.Number!.Value.Should().Be(500);
+        instance!.Text!.Value.ShouldBe("testing");
+        instance.Number!.Value.ShouldBe(500);
     }
 
     [Fact]
@@ -258,8 +258,8 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         bool result = _sut.TryReadFields(typeof(SimpleTestModel), out object? instance);
 
         // Assert
-        result.Should().BeTrue();
-        instance.Should().NotBeNull();
+        result.ShouldBeTrue();
+        instance.ShouldNotBeNull();
     }
 
     [Fact]
@@ -273,10 +273,10 @@ public abstract class FieldsReaderFixture<TFieldsReader>
         bool result = _sut.TryReadFields(typeof(SimpleTestModel), out object? instance);
 
         // Assert
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
         SimpleTestModel? typedInstance = instance as SimpleTestModel;
-        typedInstance!.Text!.Value.Should().Be("testing");
-        typedInstance.Number!.Value.Should().Be(500);
+        typedInstance!.Text!.Value.ShouldBe("testing");
+        typedInstance.Number!.Value.ShouldBe(500);
     }
 
     private static IEnumerable<object[]> Keys()

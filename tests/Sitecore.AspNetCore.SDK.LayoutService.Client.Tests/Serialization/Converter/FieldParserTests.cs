@@ -1,8 +1,8 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AutoFixture;
-using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Serialization.Converter;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Serialization.Fields;
@@ -39,10 +39,10 @@ public class FieldParserTests
         Dictionary<string, IFieldReader> result = _sut.ParseFields(ref reader);
 
         // Assert
-        result.Should().ContainSingle();
+        result.Count.ShouldBe(1);
         (string key, IFieldReader value) = result.First();
-        key.Should().Be(FieldParser.CustomContentFieldKey);
-        value.Should().BeOfType<JsonSerializedField>();
+        key.ShouldBe(FieldParser.CustomContentFieldKey);
+        value.ShouldBeOfType<JsonSerializedField>();
     }
 
     [Fact]
@@ -58,9 +58,9 @@ public class FieldParserTests
         Dictionary<string, IFieldReader> result = _sut.ParseFields(ref reader);
 
         // Assert
-        result.Should().ContainSingle();
+        result.Count.ShouldBe(1);
         (string key, IFieldReader value) = result.First();
-        key.Should().Be("value");
-        value.Should().BeOfType<JsonSerializedField>();
+        key.ShouldBe("value");
+        value.ShouldBeOfType<JsonSerializedField>();
     }
 }

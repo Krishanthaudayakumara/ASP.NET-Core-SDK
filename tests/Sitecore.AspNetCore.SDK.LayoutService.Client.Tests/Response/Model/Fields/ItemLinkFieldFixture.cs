@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Fields;
 using Xunit;
 
@@ -13,8 +13,8 @@ public class ItemLinkFieldFixture : FieldFixture<ItemLinkField>
         ItemLinkField instance = new();
 
         // Assert
-        instance.Fields.Should().BeEmpty();
-        instance.Id.Should().Be(default(Guid));
-        instance.Url.Should().BeNull();
+        instance.Fields.ShouldBeEmpty();
+        instance.Id.ShouldBe(default(Guid));
+        instance.Url.ShouldBeNull();
     }
 }

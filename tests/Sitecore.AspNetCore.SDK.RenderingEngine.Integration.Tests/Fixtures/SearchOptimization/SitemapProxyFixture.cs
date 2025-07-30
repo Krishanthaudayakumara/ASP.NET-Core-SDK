@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Mocks;
@@ -53,10 +53,10 @@ public class SitemapProxyFixture : IDisposable
         await client.SendAsync(request);
 
         // Asserts
-        _mockClientHandler.Requests.Should().ContainSingle();
-        _mockClientHandler.Requests[0].RequestUri!.Host.Should().Be(_cdInstanceUri.Host);
-        _mockClientHandler.Requests[0].RequestUri!.Scheme.Should().Be(_cdInstanceUri.Scheme);
-        _mockClientHandler.Requests[0].RequestUri!.PathAndQuery.Should().Be("/sitemap.xml");
+        _mockClientHandler.Requests.Count.ShouldBe(1);
+        _mockClientHandler.Requests[0].RequestUri!.Host.ShouldBe(_cdInstanceUri.Host);
+        _mockClientHandler.Requests[0].RequestUri!.Scheme.ShouldBe(_cdInstanceUri.Scheme);
+        _mockClientHandler.Requests[0].RequestUri!.PathAndQuery.ShouldBe("/sitemap.xml");
     }
 
     public void Dispose()

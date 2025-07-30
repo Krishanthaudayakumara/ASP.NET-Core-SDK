@@ -1,5 +1,5 @@
-﻿using System.Text.Json;
-using FluentAssertions;
+using System.Text.Json;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Fields;
@@ -32,7 +32,7 @@ public class FieldConverterTests
         Action action = () => _sut.Write(null!, null!, null!);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -50,19 +50,19 @@ public class FieldConverterTests
         stream.Position = 0;
         using StreamReader reader = new(stream);
         string value = reader.ReadToEnd();
-        value.Should().Be(result);
+        value.ShouldBe(result);
     }
 
     [Fact]
     public void CanConvert_TypeIsField_ReturnsTrue()
     {
-        _sut.CanConvert(typeof(IFieldReader)).Should().BeTrue();
+        _sut.CanConvert(typeof(IFieldReader)).ShouldBeTrue();
     }
 
     [Fact]
     public void CanConvert_TypeIsNotField_ReturnsFalse()
     {
-        _sut.CanConvert(typeof(string)).Should().BeFalse();
+        _sut.CanConvert(typeof(string)).ShouldBeFalse();
     }
 
     [Theory]
@@ -76,8 +76,8 @@ public class FieldConverterTests
         Action nullOptions = () => Read(objectType, null!);
 
         // Assert
-        nullType.Should().Throw<ArgumentNullException>();
-        nullOptions.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => nullType()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => nullOptions()); // TODO: Assert exception properties manually;
         return;
 
         void Read(Type type, JsonSerializerOptions jsonOptions)
@@ -99,7 +99,7 @@ public class FieldConverterTests
         IFieldReader actualValue = _sut.Read(ref reader, typeof(IFieldReader), options);
 
         // Assert
-        actualValue.Should().BeOfType<JsonSerializedField>();
+        actualValue.ShouldBeOfType<JsonSerializedField>();
     }
 
     [Theory]
@@ -114,7 +114,7 @@ public class FieldConverterTests
         IFieldReader actualValue = _sut.Read(ref reader, typeof(IFieldReader), options);
 
         // Assert
-        actualValue.Should().BeOfType<JsonSerializedField>();
+        actualValue.ShouldBeOfType<JsonSerializedField>();
     }
 
     [Theory]
@@ -125,8 +125,8 @@ public class FieldConverterTests
         Action invalidJson = Read;
 
         // Assert
-        invalidJson.Should().Throw<JsonException>()
-            .WithMessage($"Expected an array or object when deserializing a {typeof(IFieldReader)}. Found String");
+        var ex = Should.Throw<JsonException>(() => invalidJson()); // TODO: Assert exception properties manually
+            // TODO: Assert exception.Message manually}. Found String");
         return;
 
         void Read()

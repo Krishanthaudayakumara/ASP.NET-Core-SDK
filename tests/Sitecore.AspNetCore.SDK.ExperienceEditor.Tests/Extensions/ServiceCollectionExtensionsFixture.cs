@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.ExperienceEditor.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Interfaces;
 using Xunit;
@@ -13,6 +13,6 @@ public class ServiceCollectionExtensionsFixture
         Func<ISitecoreRenderingEngineBuilder> act =
             () => ExperienceEditorAppConfigurationExtensions.WithExperienceEditor(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 }

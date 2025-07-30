@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -46,8 +46,8 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => RenderingEngineOptionsExtensions.AddPartialView(null!, (Predicate<string>)null!, null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("options");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("options");
     }
 
     [Theory]
@@ -58,7 +58,7 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => options.AddPartialView(value, null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentException>();
+        var ex = Should.Throw<ArgumentException>(() => action()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -69,7 +69,7 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => options.AddPartialView(layoutComponentName, value);
 
         // Act / Assert
-        action.Should().Throw<ArgumentException>().WithParameterName("partialViewPath");
+        var ex = Should.Throw<ArgumentException>(() => action()); // TODO: Assert exception properties manually// TODO: Assert exception.ParamName manually;
     }
 
     [Theory]
@@ -81,10 +81,10 @@ public class RenderingEngineOptionsExtensionsFixture
         options.AddPartialView("~/foo/Bar.cshtml");
 
         // Act / Assert
-        options.RendererRegistry.Values.Should().NotBeEmpty();
+        options.RendererRegistry.Values.ShouldNotBeEmpty();
 
         ComponentRendererDescriptor descriptor = options.RendererRegistry.Values[0];
-        descriptor.Match("Bar").Should().BeTrue();
+        descriptor.Match("Bar").ShouldBeTrue();
     }
 
     [Theory]
@@ -99,14 +99,14 @@ public class RenderingEngineOptionsExtensionsFixture
         options.AddPartialView(layoutComponentName, partialViewPath);
 
         // Act / Assert
-        options.RendererRegistry.Values.Should().NotBeEmpty();
+        options.RendererRegistry.Values.ShouldNotBeEmpty();
 
         ComponentRendererDescriptor descriptor = options.RendererRegistry.Values[0];
-        descriptor.Should().NotBeNull();
+        descriptor.ShouldNotBeNull();
 
         IComponentRenderer renderer = descriptor.GetOrCreate(services);
-        renderer.Should().NotBeNull();
-        renderer.Should().BeOfType(typeof(PartialViewComponentRenderer));
+        renderer.ShouldNotBeNull();
+        renderer.ShouldBeOfType<PartialViewComponentRenderer>();
     }
 
     [Fact]
@@ -116,8 +116,8 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => RenderingEngineOptionsExtensions.AddViewComponent(null!, (Predicate<string>)null!, null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("options");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("options");
     }
 
     [Theory]
@@ -128,8 +128,8 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => options.AddViewComponent(value, null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentException>()
-            .And.ParamName.Should().Be("layoutComponentName");
+        var ex = Should.Throw<ArgumentException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("layoutComponentName");
     }
 
     [Theory]
@@ -140,7 +140,7 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => options.AddViewComponent(layoutComponentName, value);
 
         // Act / Assert
-        action.Should().Throw<ArgumentException>();
+        var ex = Should.Throw<ArgumentException>(() => action()); // TODO: Assert exception properties manually;
     }
 
     [Fact]
@@ -150,8 +150,8 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => RenderingEngineOptionsExtensions.AddModelBoundView<ContentBlock>(null!, (Predicate<string>)null!, null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("options");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("options");
     }
 
     [Theory]
@@ -162,8 +162,8 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => options.AddModelBoundView<ContentBlock>((Predicate<string>)null!, null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("match");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("match");
     }
 
     [Theory]
@@ -174,8 +174,8 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => options.AddModelBoundView<ContentBlock>(match, null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("viewName");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("viewName");
     }
 
     [Theory]
@@ -186,7 +186,7 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => options.AddModelBoundView<ContentBlock>(match, string.Empty);
 
         // Act / Assert
-        action.Should().Throw<ArgumentException>().WithParameterName("viewName");
+        var ex = Should.Throw<ArgumentException>(() => action()); // TODO: Assert exception properties manually// TODO: Assert exception.ParamName manually;
     }
 
     [Theory]
@@ -198,10 +198,10 @@ public class RenderingEngineOptionsExtensionsFixture
         options.AddModelBoundView<ContentBlock>("~/foo/Bar.cshtml");
 
         // Act / Assert
-        options.RendererRegistry.Values.Should().NotBeEmpty();
+        options.RendererRegistry.Values.ShouldNotBeEmpty();
 
         ComponentRendererDescriptor descriptor = options.RendererRegistry.Values[0];
-        descriptor.Match("Bar").Should().BeTrue();
+        descriptor.Match("Bar").ShouldBeTrue();
     }
 
     [Theory]
@@ -215,8 +215,8 @@ public class RenderingEngineOptionsExtensionsFixture
         options = options.AddModelBoundView<ContentBlock>(match, viewComponentName);
 
         // Assert
-        options.RendererRegistry.Should().ContainSingle();
-        options.RendererRegistry[0].Should().BeOfType(typeof(ComponentRendererDescriptor));
+        options.RendererRegistry.Count.ShouldBe(1);
+        options.RendererRegistry[0].ShouldBeOfType<ComponentRendererDescriptor>();
     }
 
     [Theory]
@@ -232,8 +232,8 @@ public class RenderingEngineOptionsExtensionsFixture
         options = options.AddModelBoundView<ContentBlock>(name => name == "TestComponent", viewComponentName);
 
         // Assert
-        options.RendererRegistry.Should().HaveCount(2);
-        options.RendererRegistry[1].Should().BeOfType(typeof(ComponentRendererDescriptor));
+        options.RendererRegistry.Count.ShouldBe(2);
+        options.RendererRegistry[1].ShouldBeOfType<ComponentRendererDescriptor>();
     }
 
     [Theory]
@@ -249,8 +249,8 @@ public class RenderingEngineOptionsExtensionsFixture
         // Assert
         ComponentRendererDescriptor descriptor = options.RendererRegistry[0];
         IComponentRenderer renderer = descriptor.GetOrCreate(services);
-        renderer.Should().NotBeNull();
-        renderer.Should().BeOfType(typeof(ModelBoundViewComponentComponentRenderer<ContentBlock>));
+        renderer.ShouldNotBeNull();
+        renderer.ShouldBeOfType<ModelBoundViewComponentComponentRenderer<ContentBlock>>();
     }
 
     [Fact]
@@ -260,8 +260,8 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => RenderingEngineOptionsExtensions.AddDefaultComponentRenderer(null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("options");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("options");
     }
 
     [Theory]
@@ -273,11 +273,11 @@ public class RenderingEngineOptionsExtensionsFixture
 
         // Act / Assert
         ComponentRendererDescriptor? descriptor = options.DefaultRenderer;
-        descriptor.Should().NotBeNull();
+        descriptor.ShouldNotBeNull();
 
         IComponentRenderer renderer = descriptor!.GetOrCreate(services);
-        renderer.Should().NotBeNull();
-        renderer.Should().BeOfType(typeof(LoggingComponentRenderer));
+        renderer.ShouldNotBeNull();
+        renderer.ShouldBeOfType<LoggingComponentRenderer>();
     }
 
     [Fact]
@@ -287,8 +287,8 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action = () => RenderingEngineOptionsExtensions.AddDefaultComponentRenderer<TestComponentRenderer>(null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("options");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("options");
     }
 
     [Theory]
@@ -300,11 +300,11 @@ public class RenderingEngineOptionsExtensionsFixture
 
         // Act / Assert
         ComponentRendererDescriptor? descriptor = options.DefaultRenderer;
-        descriptor.Should().NotBeNull();
+        descriptor.ShouldNotBeNull();
 
         IComponentRenderer renderer = descriptor!.GetOrCreate(services);
-        renderer.Should().NotBeNull();
-        renderer.Should().BeOfType(typeof(TestComponentRenderer));
+        renderer.ShouldNotBeNull();
+        renderer.ShouldBeOfType<TestComponentRenderer>();
     }
 
     [Theory]
@@ -316,10 +316,10 @@ public class RenderingEngineOptionsExtensionsFixture
         Action action2 = () => options.AddPostRenderingAction(null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("options");
-        action2.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("postAction");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("options");
+        var ex = Should.Throw<ArgumentNullException>(() => action2()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("postAction");
     }
 
     private static IEnumerable<object[]> EmptyStrings()

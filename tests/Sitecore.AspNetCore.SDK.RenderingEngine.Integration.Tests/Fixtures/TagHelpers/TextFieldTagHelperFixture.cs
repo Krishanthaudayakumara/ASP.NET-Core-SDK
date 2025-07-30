@@ -1,6 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Encodings.Web;
-using FluentAssertions;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -69,19 +69,19 @@ public class TextFieldTagHelperFixture : IDisposable
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes.First(n => n.HasClass("component-3"));
 
         // Assert
-        sectionNode.ChildNodes.First(n => n.Name.Equals("h1", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Be(TestConstants.TestFieldValue);
+        sectionNode.ChildNodes.First(n => n.Name.Equals("h1", StringComparison.OrdinalIgnoreCase)).InnerText.ShouldBe(TestConstants.TestFieldValue);
 
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
 
         sectionNode.ChildNodes.First(n => n.Name.Equals("p", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
 
         sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be(HtmlEncoder.Default.Encode(TestConstants.RichTextFieldValue1));
+            .ShouldBe(HtmlEncoder.Default.Encode(TestConstants.RichTextFieldValue1));
 
         sectionNode.ChildNodes.First(n => n.Name.Equals("span", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.TestMultilineFieldValue.Replace(Environment.NewLine, "<br>", StringComparison.OrdinalIgnoreCase));
+            .ShouldBe(TestConstants.TestMultilineFieldValue.Replace(Environment.NewLine, "<br>", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
@@ -113,11 +113,11 @@ public class TextFieldTagHelperFixture : IDisposable
         // Assert
         // TestField is editable
         sectionNode.ChildNodes.First(n => n.Name.Equals("h1", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(expected.DocumentNode.InnerHtml);
+            .ShouldBe(expected.DocumentNode.InnerHtml);
 
         // EmptyField is NOT editable
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(string.Empty);
+            .ShouldBe(string.Empty);
     }
 
     public void Dispose()

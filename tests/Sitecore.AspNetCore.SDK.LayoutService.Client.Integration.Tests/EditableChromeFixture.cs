@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Newtonsoft.Json.Linq;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
@@ -38,18 +38,18 @@ public class EditableChromeFixture
 
         dynamic? expectedChrome = jsonModel.sitecore.route.placeholders["jss-main"][1];
 
-        resultChrome.Should().NotBeNull();
-        resultChrome!.Name.Should().Be((string)expectedChrome.name);
-        resultChrome.Type.Should().Be((string)expectedChrome.type);
-        resultChrome.Content.Should().Be((string)expectedChrome.contents);
-        resultChrome.Attributes.Should().HaveCount(7);
-        resultChrome.Attributes["type"].Should().Be((string)expectedChrome.attributes.type);
-        resultChrome.Attributes["chrometype"].Should().Be((string)expectedChrome.attributes.chrometype);
-        resultChrome.Attributes["kind"].Should().Be((string)expectedChrome.attributes.kind);
-        resultChrome.Attributes["id"].Should().Be((string)expectedChrome.attributes.id);
-        resultChrome.Attributes["hintname"].Should().Be((string)expectedChrome.attributes.hintname);
-        resultChrome.Attributes["class"].Should().Be((string)expectedChrome.attributes.@class);
-        resultChrome.Attributes["data-selectable"].Should().Be((string)expectedChrome.attributes["data-selectable"]);
+        resultChrome.ShouldNotBeNull();
+        resultChrome!.Name.ShouldBe((string)expectedChrome.name);
+        resultChrome.Type.ShouldBe((string)expectedChrome.type);
+        resultChrome.Content.ShouldBe((string)expectedChrome.contents);
+        resultChrome.Attributes.Count.ShouldBe(7);
+        resultChrome.Attributes["type"].ShouldBe((string)expectedChrome.attributes.type);
+        resultChrome.Attributes["chrometype"].ShouldBe((string)expectedChrome.attributes.chrometype);
+        resultChrome.Attributes["kind"].ShouldBe((string)expectedChrome.attributes.kind);
+        resultChrome.Attributes["id"].ShouldBe((string)expectedChrome.attributes.id);
+        resultChrome.Attributes["hintname"].ShouldBe((string)expectedChrome.attributes.hintname);
+        resultChrome.Attributes["class"].ShouldBe((string)expectedChrome.attributes.@class);
+        resultChrome.Attributes["data-selectable"].ShouldBe((string)expectedChrome.attributes["data-selectable"]);
     }
 
     [Theory]
@@ -68,17 +68,17 @@ public class EditableChromeFixture
 
         dynamic? expectedChrome = jsonModel.sitecore.route.placeholders["jss-main"][3];
 
-        resultChrome.Should().NotBeNull();
-        resultChrome!.Name.Should().Be((string)expectedChrome.name);
-        resultChrome.Type.Should().Be((string)expectedChrome.type);
-        resultChrome.Content.Should().Be((string)expectedChrome.contents);
-        resultChrome.Attributes.Should().HaveCount(6);
-        resultChrome.Attributes["type"].Should().Be((string)expectedChrome.attributes.type);
-        resultChrome.Attributes["chrometype"].Should().Be((string)expectedChrome.attributes.chrometype);
-        resultChrome.Attributes["kind"].Should().Be((string)expectedChrome.attributes.kind);
-        resultChrome.Attributes["id"].Should().Be((string)expectedChrome.attributes.id);
-        resultChrome.Attributes["hintkey"].Should().Be((string)expectedChrome.attributes.hintkey);
-        resultChrome.Attributes["class"].Should().Be((string)expectedChrome.attributes.@class);
+        resultChrome.ShouldNotBeNull();
+        resultChrome!.Name.ShouldBe((string)expectedChrome.name);
+        resultChrome.Type.ShouldBe((string)expectedChrome.type);
+        resultChrome.Content.ShouldBe((string)expectedChrome.contents);
+        resultChrome.Attributes.Count.ShouldBe(6);
+        resultChrome.Attributes["type"].ShouldBe((string)expectedChrome.attributes.type);
+        resultChrome.Attributes["chrometype"].ShouldBe((string)expectedChrome.attributes.chrometype);
+        resultChrome.Attributes["kind"].ShouldBe((string)expectedChrome.attributes.kind);
+        resultChrome.Attributes["id"].ShouldBe((string)expectedChrome.attributes.id);
+        resultChrome.Attributes["hintkey"].ShouldBe((string)expectedChrome.attributes.hintkey);
+        resultChrome.Attributes["class"].ShouldBe((string)expectedChrome.attributes.@class);
     }
 
     [Theory]
@@ -97,18 +97,18 @@ public class EditableChromeFixture
 
         dynamic? expectedChrome = jsonModel.sitecore.route.placeholders["jss-main"][0];
 
-        resultChrome.Should().NotBeNull();
-        resultChrome!.Name.Should().Be((string)expectedChrome.name);
-        resultChrome.Type.Should().Be((string)expectedChrome.type);
-        resultChrome.Content.Should().Be((string)expectedChrome.contents);
-        resultChrome.Attributes.Should().HaveCount(7);
-        resultChrome.Attributes["type"].Should().Be((string)expectedChrome.attributes.type);
-        resultChrome.Attributes["chrometype"].Should().Be((string)expectedChrome.attributes.chrometype);
-        resultChrome.Attributes["kind"].Should().Be((string)expectedChrome.attributes.kind);
-        resultChrome.Attributes["id"].Should().Be((string)expectedChrome.attributes.id);
-        resultChrome.Attributes["key"].Should().Be((string)expectedChrome.attributes.key);
-        resultChrome.Attributes["class"].Should().Be((string)expectedChrome.attributes.@class);
-        resultChrome.Attributes["data-selectable"].Should().Be((string)expectedChrome.attributes["data-selectable"]);
+        resultChrome.ShouldNotBeNull();
+        resultChrome!.Name.ShouldBe((string)expectedChrome.name);
+        resultChrome.Type.ShouldBe((string)expectedChrome.type);
+        resultChrome.Content.ShouldBe((string)expectedChrome.contents);
+        resultChrome.Attributes.Count.ShouldBe(7);
+        resultChrome.Attributes["type"].ShouldBe((string)expectedChrome.attributes.type);
+        resultChrome.Attributes["chrometype"].ShouldBe((string)expectedChrome.attributes.chrometype);
+        resultChrome.Attributes["kind"].ShouldBe((string)expectedChrome.attributes.kind);
+        resultChrome.Attributes["id"].ShouldBe((string)expectedChrome.attributes.id);
+        resultChrome.Attributes["key"].ShouldBe((string)expectedChrome.attributes.key);
+        resultChrome.Attributes["class"].ShouldBe((string)expectedChrome.attributes.@class);
+        resultChrome.Attributes["data-selectable"].ShouldBe((string)expectedChrome.attributes["data-selectable"]);
     }
 
     [Theory]
@@ -127,16 +127,16 @@ public class EditableChromeFixture
 
         dynamic? expectedChrome = jsonModel.sitecore.route.placeholders["jss-main"][7];
 
-        resultChrome.Should().NotBeNull();
-        resultChrome!.Name.Should().Be((string)expectedChrome.name);
-        resultChrome.Type.Should().Be((string)expectedChrome.type);
-        resultChrome.Content.Should().Be((string)expectedChrome.contents);
-        resultChrome.Attributes.Should().HaveCount(6);
-        resultChrome.Attributes["type"].Should().Be((string)expectedChrome.attributes.type);
-        resultChrome.Attributes["chrometype"].Should().Be((string)expectedChrome.attributes.chrometype);
-        resultChrome.Attributes["kind"].Should().Be((string)expectedChrome.attributes.kind);
-        resultChrome.Attributes["id"].Should().Be((string)expectedChrome.attributes.id);
-        resultChrome.Attributes["hintname"].Should().Be((string)expectedChrome.attributes.hintname);
-        resultChrome.Attributes["class"].Should().Be((string)expectedChrome.attributes.@class);
+        resultChrome.ShouldNotBeNull();
+        resultChrome!.Name.ShouldBe((string)expectedChrome.name);
+        resultChrome.Type.ShouldBe((string)expectedChrome.type);
+        resultChrome.Content.ShouldBe((string)expectedChrome.contents);
+        resultChrome.Attributes.Count.ShouldBe(6);
+        resultChrome.Attributes["type"].ShouldBe((string)expectedChrome.attributes.type);
+        resultChrome.Attributes["chrometype"].ShouldBe((string)expectedChrome.attributes.chrometype);
+        resultChrome.Attributes["kind"].ShouldBe((string)expectedChrome.attributes.kind);
+        resultChrome.Attributes["id"].ShouldBe((string)expectedChrome.attributes.id);
+        resultChrome.Attributes["hintname"].ShouldBe((string)expectedChrome.attributes.hintname);
+        resultChrome.Attributes["class"].ShouldBe((string)expectedChrome.attributes.@class);
     }
 }

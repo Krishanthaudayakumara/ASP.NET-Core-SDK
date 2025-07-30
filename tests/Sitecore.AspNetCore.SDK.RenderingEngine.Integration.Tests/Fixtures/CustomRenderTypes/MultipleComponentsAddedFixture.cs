@@ -1,6 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Encodings.Web;
-using FluentAssertions;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -75,11 +75,11 @@ public class MultipleComponentsAddedFixture : IDisposable
 
         HtmlNode? sectionNode = docNodes.First(n => n.HasClass("component-3"));
         sectionNode.ChildNodes.First(n => n.Name.Equals("h1", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be(HtmlEncoder.Default.Encode(TestConstants.TestFieldValue));
+            .ShouldBe(HtmlEncoder.Default.Encode(TestConstants.TestFieldValue));
 
         sectionNode = doc.DocumentNode.ChildNodes.First(n => n.HasClass("component-6"));
         sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be(HtmlEncoder.Default.Encode(TestConstants.TestFieldValue + " from Component-6"));
+            .ShouldBe(HtmlEncoder.Default.Encode(TestConstants.TestFieldValue + " from Component-6"));
     }
 
     public void Dispose()

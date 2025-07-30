@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using NSubstitute;
@@ -23,7 +23,7 @@ public class RenderingEngineOptionsFixture
     [Fact]
     public void Ctor_RendererRegistry_IsEmpty()
     {
-        _sut.RendererRegistry.Should().BeEmpty();
+        _sut.RendererRegistry.ShouldBeEmpty();
     }
 
     [Theory]
@@ -37,7 +37,7 @@ public class RenderingEngineOptionsFixture
         _sut.RequestMappings.Single().Invoke(http, scRequest);
 
         // Assert
-        scRequest.Path().Should().Be(http.Path);
+        scRequest.Path().ShouldBe(http.Path);
     }
 
     [Theory]
@@ -56,7 +56,7 @@ public class RenderingEngineOptionsFixture
         _sut.RequestMappings.Single().Invoke(http, scRequest);
 
         // Assert
-        scRequest.Path().Should().Be(path);
+        scRequest.Path().ShouldBe(path);
     }
 
     [Theory]
@@ -76,6 +76,6 @@ public class RenderingEngineOptionsFixture
         _sut.RequestMappings.Single().Invoke(http, scRequest);
 
         // Assert
-        scRequest.Language().Should().Be(requestedCulture);
+        scRequest.Language().ShouldBe(requestedCulture);
     }
 }

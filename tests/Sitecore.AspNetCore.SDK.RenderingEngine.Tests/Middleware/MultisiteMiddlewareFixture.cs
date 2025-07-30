@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -51,9 +51,9 @@ public class MultisiteMiddlewareFixture
         _renderingEngineOptions.Value.RequestMappings.LastOrDefault()?.Invoke(httpRequest, sitecoreLayoutRequest);
 
         // Assert
-        resolvedSiteName.Should().Be(expectedSiteName);
+        resolvedSiteName.ShouldBe(expectedSiteName);
         await _next.Received(1).Invoke(httpContext);
-        sitecoreLayoutRequest.SiteName().Should().Be(expectedSiteName);
+        sitecoreLayoutRequest.SiteName().ShouldBe(expectedSiteName);
         await _siteResolver.Received(1).GetByHost(httpRequest.Host.Value);
     }
 
@@ -83,9 +83,9 @@ public class MultisiteMiddlewareFixture
         _renderingEngineOptions.Value.RequestMappings.LastOrDefault()?.Invoke(httpRequest, sitecoreLayoutRequest);
 
         // Assert
-        resolvedSiteName.Should().Be(expectedSiteName);
+        resolvedSiteName.ShouldBe(expectedSiteName);
         await _next.Received(1).Invoke(httpContext);
-        sitecoreLayoutRequest.SiteName().Should().Be(expectedSiteName);
+        sitecoreLayoutRequest.SiteName().ShouldBe(expectedSiteName);
         await _siteResolver.Received(0).GetByHost(httpRequest.Host.Value);
     }
 
@@ -106,8 +106,8 @@ public class MultisiteMiddlewareFixture
         _renderingEngineOptions.Value.RequestMappings.LastOrDefault()?.Invoke(httpContext.Request, sitecoreLayoutRequest);
 
         // Assert
-        resolvedSiteName.Should().Be(null);
-        sitecoreLayoutRequest.SiteName().Should().Be(defaultSiteName);
+        resolvedSiteName.ShouldBe(null);
+        sitecoreLayoutRequest.SiteName().ShouldBe(defaultSiteName);
         await _next.Received(1).Invoke(httpContext);
         await _siteResolver.Received(1).GetByHost(httpContext.Request.Host.Value);
     }

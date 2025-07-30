@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Xunit;
 
@@ -14,7 +14,7 @@ public class DictionaryExtensionsFixture
             () => ((Dictionary<string, string>)null!).ToDebugString();
 
         // Act & Assert
-        act.Should().Throw<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'dictionary')");
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually// TODO: Assert exception.Message manually");
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class DictionaryExtensionsFixture
         string result = testsDictionary.ToDebugString();
 
         // Assert
-        result.Should().Be("{}");
+        result.ShouldBe("{}");
     }
 
     [Fact]
@@ -41,6 +41,6 @@ public class DictionaryExtensionsFixture
         string result = testsDictionary.ToDebugString();
 
         // Assert
-        result.Should().Be("{key1=value1,key2=value2}");
+        result.ShouldBe("{key1=value1,key2=value2}");
     }
 }

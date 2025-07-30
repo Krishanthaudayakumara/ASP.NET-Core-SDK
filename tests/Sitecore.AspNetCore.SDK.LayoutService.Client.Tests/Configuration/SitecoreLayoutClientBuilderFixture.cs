@@ -1,5 +1,5 @@
-﻿using AutoFixture.Idioms;
-using FluentAssertions;
+using AutoFixture.Idioms;
+using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.AutoFixture.Extensions;
@@ -26,6 +26,6 @@ public class SitecoreLayoutClientBuilderFixture
         SitecoreLayoutClientBuilder sut = new(services);
 
         // Assert
-        sut.Services.Should().BeSameAs(services);
+        sut.Services.ShouldBeSameAs(services);
     }
 }

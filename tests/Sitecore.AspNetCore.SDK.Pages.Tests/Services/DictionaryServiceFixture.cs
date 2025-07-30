@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using GraphQL;
 using GraphQL.Client.Abstractions;
 using Microsoft.Extensions.Options;
@@ -41,7 +41,7 @@ public class DictionaryServiceFixture
         Func<Task> act = async () => { await sut.GetSiteDictionary(string.Empty, null!, null!); };
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -52,7 +52,7 @@ public class DictionaryServiceFixture
         Func<Task> act = async () => { await sut.GetSiteDictionary("valid_site", null!, null!); };
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -63,7 +63,7 @@ public class DictionaryServiceFixture
         Func<Task> act = async () => { await sut.GetSiteDictionary("valid_site", "valid_language", null!); };
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -79,7 +79,7 @@ public class DictionaryServiceFixture
         List<SiteInfoDictionaryItem> result = await sut.GetSiteDictionary("valid_site", "valid_language", graphQLClient);
 
         // Assert
-        result.Should().HaveCount(1);
+        result.Count.ShouldBe(1);
     }
 
     [Theory]
@@ -96,7 +96,7 @@ public class DictionaryServiceFixture
         List<SiteInfoDictionaryItem> result = await sut.GetSiteDictionary("valid_site", "valid_language", graphQLClient);
 
         // Assert
-        result.Should().HaveCount(2);
+        result.Count.ShouldBe(2);
     }
 
     public bool GraphQLQueryHasAfterVariableWithValue(GraphQLRequest graphQlRequst, string expectedAfterValue)
@@ -122,3 +122,4 @@ public class DictionaryServiceFixture
         return afterVariableValue.ToString() == expectedAfterValue;
     }
 }
+

@@ -1,5 +1,5 @@
-﻿using AutoFixture.Idioms;
-using FluentAssertions;
+using AutoFixture.Idioms;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.AutoFixture.Extensions;
 using Sitecore.AspNetCore.SDK.ExperienceEditor.Models;
@@ -30,9 +30,9 @@ public class ExperienceEditorPostModelFixture
         ExperienceEditorPostModel sut = new();
 
         // Assert
-        sut.Id.Should().BeNull();
-        sut.FunctionName.Should().BeNull();
-        sut.ModuleName.Should().BeNull();
+        sut.Id.ShouldBeNull();
+        sut.FunctionName.ShouldBeNull();
+        sut.ModuleName.ShouldBeNull();
         sut.Args.Should().BeEmpty("Assigned by default to an empty list");
     }
 
@@ -44,7 +44,7 @@ public class ExperienceEditorPostModelFixture
         JsonLayoutServiceSerializer serializer = new();
         SitecoreLayoutResponseContent? layout = serializer.Deserialize(model!.Args[1]);
 
-        model.Should().NotBeNull();
-        layout.Should().NotBeNull();
+        model.ShouldNotBeNull();
+        layout.ShouldNotBeNull();
     }
 }

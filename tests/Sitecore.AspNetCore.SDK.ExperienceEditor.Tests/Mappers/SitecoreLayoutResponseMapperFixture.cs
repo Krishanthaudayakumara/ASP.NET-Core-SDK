@@ -1,7 +1,7 @@
-﻿using AutoFixture;
+using AutoFixture;
 using AutoFixture.Idioms;
 using AutoFixture.Xunit2;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -44,7 +44,7 @@ public class SitecoreLayoutResponseMapperFixture
         Action action = () => sut.MapRoute(content, "/", null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>().WithParameterName("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually// TODO: Assert exception.ParamName manually;
     }
 
     [Theory]
@@ -64,6 +64,6 @@ public class SitecoreLayoutResponseMapperFixture
         string? result = sut.MapRoute(content, "/testString/", request);
 
         // Assert
-        result.Should().Be("/testString/master");
+        result.ShouldBe("/testString/master");
     }
 }

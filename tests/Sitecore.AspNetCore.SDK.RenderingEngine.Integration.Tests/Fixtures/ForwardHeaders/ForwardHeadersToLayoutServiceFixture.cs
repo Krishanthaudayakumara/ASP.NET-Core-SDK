@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -96,16 +96,16 @@ public class ForwardHeadersToLayoutServiceFixture : IDisposable
         HttpRequestMessage lsRequest = _mockClientHandler.Requests.First();
 
         // Assert
-        lsRequest.Headers.Contains("x-forwarded-proto").Should().BeTrue();
-        lsRequest.Headers.GetValues("x-forwarded-proto").Should().ContainSingle();
-        lsRequest.Headers.GetValues("x-forwarded-proto").First().Should().Be("https");
+        lsRequest.Headers.Contains("x-forwarded-proto").ShouldBeTrue();
+        lsRequest.Headers.GetValues("x-forwarded-proto").Count.ShouldBe(1);
+        lsRequest.Headers.GetValues("x-forwarded-proto").First().ShouldBe("https");
 
-        lsRequest.Headers.Contains("connection").Should().BeFalse();
-        lsRequest.Headers.Contains("keep-alive").Should().BeFalse();
-        lsRequest.Headers.Contains("public").Should().BeFalse();
-        lsRequest.Headers.Contains("proxy-authenticate").Should().BeFalse();
-        lsRequest.Headers.Contains("transfer-encoding").Should().BeFalse();
-        lsRequest.Headers.Contains("upgrade").Should().BeFalse();
+        lsRequest.Headers.Contains("connection").ShouldBeFalse();
+        lsRequest.Headers.Contains("keep-alive").ShouldBeFalse();
+        lsRequest.Headers.Contains("public").ShouldBeFalse();
+        lsRequest.Headers.Contains("proxy-authenticate").ShouldBeFalse();
+        lsRequest.Headers.Contains("transfer-encoding").ShouldBeFalse();
+        lsRequest.Headers.Contains("upgrade").ShouldBeFalse();
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class ForwardHeadersToLayoutServiceFixture : IDisposable
         HttpRequestMessage lsRequest = _mockClientHandler.Requests.First();
 
         // Assert
-        lsRequest.Headers.Contains("cookie").Should().BeTrue();
+        lsRequest.Headers.Contains("cookie").ShouldBeTrue();
     }
 
     [Fact]
@@ -149,7 +149,7 @@ public class ForwardHeadersToLayoutServiceFixture : IDisposable
         HttpRequestMessage lsRequest = _mockClientHandler.Requests.First();
 
         // Assert
-        lsRequest.Headers.Contains("testNonWhitelistedHeader").Should().BeTrue();
+        lsRequest.Headers.Contains("testNonWhitelistedHeader").ShouldBeTrue();
     }
 
     [Fact]
@@ -170,8 +170,8 @@ public class ForwardHeadersToLayoutServiceFixture : IDisposable
         HttpRequestMessage lsRequest = _mockClientHandler.Requests.First();
 
         // Assert
-        lsRequest.Headers.Contains("cookie").Should().BeTrue();
-        lsRequest.Headers.Contains("connection").Should().BeFalse();
+        lsRequest.Headers.Contains("cookie").ShouldBeTrue();
+        lsRequest.Headers.Contains("connection").ShouldBeFalse();
     }
 
     [Fact]
@@ -197,9 +197,9 @@ public class ForwardHeadersToLayoutServiceFixture : IDisposable
         HttpRequestMessage lsRequest = _mockClientHandler.Requests.First();
 
         // Asserts
-        lsRequest.Headers.GetValues("headerToModify").Should().BeEquivalentTo("newModifiedHeaderValue");
-        lsRequest.Headers.Contains("cookie").Should().BeTrue();
-        lsRequest.Headers.Contains("HEADERTOCOPY").Should().BeTrue();
+        lsRequest.Headers.GetValues("headerToModify").ShouldBe("newModifiedHeaderValue");
+        lsRequest.Headers.Contains("cookie").ShouldBeTrue();
+        lsRequest.Headers.Contains("HEADERTOCOPY").ShouldBeTrue();
     }
 
     [Fact]
@@ -224,9 +224,9 @@ public class ForwardHeadersToLayoutServiceFixture : IDisposable
         HttpRequestMessage lsRequest = _mockClientHandler.Requests.First();
 
         // Asserts
-        lsRequest.Headers.GetValues("Cookie").Should().Contain(i => i.Contains("SC_ANALYTICS_GLOBAL_COOKIE=", StringComparison.OrdinalIgnoreCase));
-        lsRequest.Headers.GetValues("Cookie").Should().Contain(i => i.Contains("ASP.NET_SessionId=", StringComparison.OrdinalIgnoreCase));
-        lsRequest.Headers.GetValues("Cookie").Should().Contain(i => i.Contains("NewAddedCookie=", StringComparison.OrdinalIgnoreCase));
+        lsRequest.Headers.GetValues("Cookie").ShouldContain(i => i.Contains("SC_ANALYTICS_GLOBAL_COOKIE=", StringComparison.OrdinalIgnoreCase));
+        lsRequest.Headers.GetValues("Cookie").ShouldContain(i => i.Contains("ASP.NET_SessionId=", StringComparison.OrdinalIgnoreCase));
+        lsRequest.Headers.GetValues("Cookie").ShouldContain(i => i.Contains("NewAddedCookie=", StringComparison.OrdinalIgnoreCase));
     }
 
     public void Dispose()

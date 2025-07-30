@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -65,9 +65,9 @@ public class RichTextTagHelperFixture
         Action contextNull =
             () => sut.Process(null!, tagHelperOutput);
 
-        allNull.Should().Throw<ArgumentNullException>();
-        outputNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => outputNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     #region sc-text tag with asp-for attribute tests
@@ -87,7 +87,7 @@ public class RichTextTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -106,7 +106,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     [Theory]
@@ -125,7 +125,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.TagName.Should().BeNull();
+        tagHelperOutput.TagName.ShouldBeNull();
     }
 
     [Theory]
@@ -144,8 +144,8 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
-        tagHelperOutput.Content.GetContent().Should().NotContain(RenderingEngineConstants.SitecoreTagHelpers.RichTextHtmlTag);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldNotContain(RenderingEngineConstants.SitecoreTagHelpers.RichTextHtmlTag);
     }
 
     [Theory]
@@ -164,7 +164,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -187,7 +187,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestEditableMarkup);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestEditableMarkup);
     }
 
     [Theory]
@@ -210,7 +210,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     [Theory]
@@ -234,7 +234,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     #endregion
@@ -257,7 +257,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     [Theory]
@@ -276,7 +276,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.TagName.Should().BeNull();
+        tagHelperOutput.TagName.ShouldBeNull();
     }
 
     [Theory]
@@ -295,8 +295,8 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
-        tagHelperOutput.Content.GetContent().Should().NotContain(RenderingEngineConstants.SitecoreTagHelpers.RichTextHtmlTag);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldNotContain(RenderingEngineConstants.SitecoreTagHelpers.RichTextHtmlTag);
     }
 
     [Theory]
@@ -315,7 +315,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -338,7 +338,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestEditableMarkup);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestEditableMarkup);
     }
 
     [Theory]
@@ -361,7 +361,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     [Theory]
@@ -385,7 +385,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     #endregion
@@ -407,7 +407,7 @@ public class RichTextTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -426,7 +426,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     [Theory]
@@ -445,7 +445,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.TagName.Should().Be("div");
+        tagHelperOutput.TagName.ShouldBe("div");
     }
 
     [Theory]
@@ -464,7 +464,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -483,7 +483,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -506,7 +506,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestEditableMarkup);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestEditableMarkup);
     }
 
     [Theory]
@@ -529,7 +529,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     [Theory]
@@ -553,7 +553,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     #endregion
@@ -576,7 +576,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     [Theory]
@@ -595,7 +595,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.TagName.Should().Be("div");
+        tagHelperOutput.TagName.ShouldBe("div");
     }
 
     [Theory]
@@ -614,7 +614,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -633,7 +633,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -656,7 +656,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestEditableMarkup);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestEditableMarkup);
     }
 
     [Theory]
@@ -679,7 +679,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     [Theory]
@@ -703,7 +703,7 @@ public class RichTextTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(TestHtml);
+        tagHelperOutput.Content.GetContent().ShouldBe(TestHtml);
     }
 
     #endregion
@@ -733,7 +733,7 @@ public class RichTextTagHelperFixture
         // Assert
         chromeRenderer.Received().Render(openingChrome);
         chromeRenderer.Received().Render(closingChrome);
-        tagHelperOutput.Content.GetContent().Should().Be($"{chromeRenderer.Render(openingChrome)}<span>{TestHtml}</span>{chromeRenderer.Render(closingChrome)}");
+        tagHelperOutput.Content.GetContent().ShouldBe($"{chromeRenderer.Render(openingChrome)}<span>{TestHtml}</span>{chromeRenderer.Render(closingChrome)}");
     }
 
     private static ModelExpression GetModelExpression(Field model)

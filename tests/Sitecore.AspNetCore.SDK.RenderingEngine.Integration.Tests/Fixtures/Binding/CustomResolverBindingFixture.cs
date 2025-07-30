@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -70,12 +70,12 @@ public class CustomResolverBindingFixture : IDisposable
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes["head"].ChildNodes.First(n => n.HasClass("custom-resolver"));
 
         // Assert
-        sectionNode.ChildNodes["ul"].ChildNodes.Count(c => c.Name.Equals("li")).Should().Be(1);
-        sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes.Count(c => c.Name.Equals("span")).Should().Be(1);
-        sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes["span"].InnerText.Should().Be("Home");
+        sectionNode.ChildNodes["ul"].ChildNodes.Count(c => c.Name.Equals("li")).ShouldBe(1);
+        sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes.Count(c => c.Name.Equals("span")).ShouldBe(1);
+        sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes["span"].InnerText.ShouldBe("Home");
 
-        sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes["ul"].ChildNodes.Count(c => c.Name.Equals("li")).Should().Be(1);
-        sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes["ul"].ChildNodes["li"].ChildNodes["span"].InnerText.Should().Be("About");
+        sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes["ul"].ChildNodes.Count(c => c.Name.Equals("li")).ShouldBe(1);
+        sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes["ul"].ChildNodes["li"].ChildNodes["span"].InnerText.ShouldBe("About");
     }
 
     public void Dispose()

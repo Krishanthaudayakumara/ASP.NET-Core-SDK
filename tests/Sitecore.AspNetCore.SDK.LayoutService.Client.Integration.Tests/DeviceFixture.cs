@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Newtonsoft.Json.Linq;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Presentation;
@@ -31,30 +31,30 @@ public class DeviceFixture
 
         dynamic? expectedDevice = jsonModel.sitecore.devices[0];
 
-        resultDevice.Should().NotBeNull();
-        resultDevice.Id.Should().Be((string)expectedDevice.id);
-        resultDevice.LayoutId.Should().Be((string)expectedDevice.layoutId);
-        resultDevice.Placeholders.Should().BeEmpty();
-        resultDevice.Renderings.Should().HaveCount(3);
+        resultDevice.ShouldNotBeNull();
+        resultDevice.Id.ShouldBe((string)expectedDevice.id);
+        resultDevice.LayoutId.ShouldBe((string)expectedDevice.layoutId);
+        resultDevice.Placeholders.ShouldBeEmpty();
+        resultDevice.Renderings.Count.ShouldBe(3);
 
         for (int i = 0; i < 3; i++)
         {
-            resultDevice.Renderings[i].Id.Should().Be((string)expectedDevice.renderings[i].id);
-            resultDevice.Renderings[i].InstanceId.Should().Be((string)expectedDevice.renderings[i].instanceId);
-            resultDevice.Renderings[i].PlaceholderKey.Should().Be((string)expectedDevice.renderings[i].placeholderKey);
-            resultDevice.Renderings[i].Parameters.Should().BeEmpty();
-            resultDevice.Renderings[i].Caching!.Cacheable.Should().Be(null);
-            resultDevice.Renderings[i].Caching!.ClearOnIndexUpdate.Should().Be(null);
-            resultDevice.Renderings[i].Caching!.VaryByData.Should().Be(null);
-            resultDevice.Renderings[i].Caching!.VaryByDevice.Should().Be(null);
-            resultDevice.Renderings[i].Caching!.VaryByLogin.Should().Be(null);
-            resultDevice.Renderings[i].Caching!.VaryByParameters.Should().Be(null);
-            resultDevice.Renderings[i].Caching!.VaryByQueryString.Should().Be(null);
-            resultDevice.Renderings[i].Caching!.VaryByUser.Should().Be(null);
-            resultDevice.Renderings[i].Personalization!.Conditions.Should().Be(null);
-            resultDevice.Renderings[i].Personalization!.MultiVariateTestId.Should().Be(null);
-            resultDevice.Renderings[i].Personalization!.PersonalizationTest.Should().Be(null);
-            resultDevice.Renderings[i].Personalization!.Rules.Should().Be(null);
+            resultDevice.Renderings[i].Id.ShouldBe((string)expectedDevice.renderings[i].id);
+            resultDevice.Renderings[i].InstanceId.ShouldBe((string)expectedDevice.renderings[i].instanceId);
+            resultDevice.Renderings[i].PlaceholderKey.ShouldBe((string)expectedDevice.renderings[i].placeholderKey);
+            resultDevice.Renderings[i].Parameters.ShouldBeEmpty();
+            resultDevice.Renderings[i].Caching!.Cacheable.ShouldBe(null);
+            resultDevice.Renderings[i].Caching!.ClearOnIndexUpdate.ShouldBe(null);
+            resultDevice.Renderings[i].Caching!.VaryByData.ShouldBe(null);
+            resultDevice.Renderings[i].Caching!.VaryByDevice.ShouldBe(null);
+            resultDevice.Renderings[i].Caching!.VaryByLogin.ShouldBe(null);
+            resultDevice.Renderings[i].Caching!.VaryByParameters.ShouldBe(null);
+            resultDevice.Renderings[i].Caching!.VaryByQueryString.ShouldBe(null);
+            resultDevice.Renderings[i].Caching!.VaryByUser.ShouldBe(null);
+            resultDevice.Renderings[i].Personalization!.Conditions.ShouldBe(null);
+            resultDevice.Renderings[i].Personalization!.MultiVariateTestId.ShouldBe(null);
+            resultDevice.Renderings[i].Personalization!.PersonalizationTest.ShouldBe(null);
+            resultDevice.Renderings[i].Personalization!.Rules.ShouldBe(null);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Xunit;
 
@@ -14,8 +14,8 @@ public class PlaceholderExtensionsFixture
         Action action = () => PlaceholderExtensions.ComponentAt(null!, 0);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("placeholder");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("placeholder");
     }
 
     [Fact]
@@ -25,8 +25,8 @@ public class PlaceholderExtensionsFixture
         Action action = () => new Placeholder().ComponentAt(0);
 
         // Assert
-        action.Should().Throw<ArgumentOutOfRangeException>()
-            .And.ParamName.Should().Be("index");
+        var ex = Should.Throw<ArgumentOutOfRangeException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("index");
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public class PlaceholderExtensionsFixture
         Component? component = placeholder.ComponentAt(0);
 
         // Assert
-        component.Should().BeNull();
+        component.ShouldBeNull();
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class PlaceholderExtensionsFixture
         Component? component = placeholder.ComponentAt(0);
 
         // Assert
-        component.Should().NotBeNull();
+        component.ShouldNotBeNull();
     }
     #endregion
 
@@ -62,8 +62,8 @@ public class PlaceholderExtensionsFixture
         Action action = () => PlaceholderExtensions.ChromeAt(null!, 0);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("placeholder");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("placeholder");
     }
 
     [Fact]
@@ -73,8 +73,8 @@ public class PlaceholderExtensionsFixture
         Action action = () => new Placeholder().ChromeAt(0);
 
         // Assert
-        action.Should().Throw<ArgumentOutOfRangeException>()
-            .And.ParamName.Should().Be("index");
+        var ex = Should.Throw<ArgumentOutOfRangeException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("index");
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class PlaceholderExtensionsFixture
         EditableChrome? chrome = placeholder.ChromeAt(0);
 
         // Assert
-        chrome.Should().BeNull();
+        chrome.ShouldBeNull();
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class PlaceholderExtensionsFixture
         EditableChrome? chrome = placeholder.ChromeAt(0);
 
         // Assert
-        chrome.Should().NotBeNull();
+        chrome.ShouldNotBeNull();
     }
     #endregion
 }

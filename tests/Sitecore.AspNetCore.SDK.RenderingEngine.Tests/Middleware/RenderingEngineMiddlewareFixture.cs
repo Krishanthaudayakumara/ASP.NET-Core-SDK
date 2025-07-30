@@ -1,7 +1,7 @@
-﻿using AutoFixture;
+using AutoFixture;
 using AutoFixture.Idioms;
 using AutoFixture.Xunit2;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -47,7 +47,7 @@ public class RenderingEngineMiddlewareFixture
         Func<Task> act =
             () => sut.Invoke(null!, componentHelper, htmlHelper);
 
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -84,7 +84,7 @@ public class RenderingEngineMiddlewareFixture
         // assert
         requestMapper.Received(1).Map(httpContext.Request);
         Received.InOrder(() => layoutClient.Request(Arg.Any<SitecoreLayoutRequest>()));
-        httpContext.Features.Get<SitecoreRenderingContext>().Should().NotBeNull();
+        httpContext.Features.Get<SitecoreRenderingContext>().ShouldNotBeNull();
     }
 
     [Theory]
@@ -110,6 +110,6 @@ public class RenderingEngineMiddlewareFixture
         await sut.Invoke(httpContext, componentHelper, htmlHelper);
 
         // assert
-        executed.Should().Be(2);
+        executed.ShouldBe(2);
     }
 }

@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Xunit;
 
@@ -23,11 +23,11 @@ public class ComponentFixture : FieldsReaderFixture<Component>
         bool idIsGuid = Guid.TryParse(sut.Id, out Guid _);
 
         // Assert
-        idIsGuid.Should().BeTrue();
-        sut.Name.Should().BeEmpty();
-        sut.DataSource.Should().Be("available-in-connected-mode");
-        sut.Parameters.Should().BeEmpty();
-        sut.Placeholders.Should().BeEmpty();
-        sut.Fields.Should().BeEmpty();
+        idIsGuid.ShouldBeTrue();
+        sut.Name.ShouldBeEmpty();
+        sut.DataSource.ShouldBe("available-in-connected-mode");
+        sut.Parameters.ShouldBeEmpty();
+        sut.Placeholders.ShouldBeEmpty();
+        sut.Fields.ShouldBeEmpty();
     }
 }

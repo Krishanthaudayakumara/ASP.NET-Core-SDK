@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
@@ -19,7 +19,7 @@ public class BindingExtensionsFixture
             () => BindingExtensions.GetModelBinder<TestSitecoreLayoutBindingSource, object>(null!);
 
         // Act & Assert
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class BindingExtensionsFixture
             () => BindingExtensions.GetModelBinder<TestSitecoreLayoutBindingSource>(null!);
 
         // Act & Assert
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class BindingExtensionsFixture
             () => BindingExtensions.AddSitecoreModelBinderProviders(null!);
 
         // Act & Assert
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class BindingExtensionsFixture
         BinderTypeModelBinder? result = context.GetModelBinder<TestSitecoreLayoutBindingSource>();
 
         // Assert
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class BindingExtensionsFixture
         BinderTypeModelBinder? result = context.GetModelBinder<TestSitecoreLayoutBindingSource>();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class BindingExtensionsFixture
         BinderTypeModelBinder? result = context.GetModelBinder<TestSitecoreLayoutBindingSource, string>();
 
         // Assert
-        result.Should().NotBeNull();
+        result.ShouldNotBeNull();
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public class BindingExtensionsFixture
         BinderTypeModelBinder? result = context.GetModelBinder<TestSitecoreLayoutBindingSource, string>();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Fact]
@@ -126,10 +126,10 @@ public class BindingExtensionsFixture
         options.AddSitecoreModelBinderProviders();
 
         // Assert
-        options.ModelBinderProviders.Should().HaveCount(4);
-        options.ModelBinderProviders[0].Should().BeOfType(typeof(SitecoreLayoutRouteModelBinderProvider));
-        options.ModelBinderProviders[1].Should().BeOfType(typeof(SitecoreLayoutContextModelBinderProvider));
-        options.ModelBinderProviders[2].Should().BeOfType(typeof(SitecoreLayoutComponentModelBinderProvider));
-        options.ModelBinderProviders[3].Should().BeOfType(typeof(SitecoreLayoutResponseModelBinderProvider));
+        options.ModelBinderProviders.Count.ShouldBe(4);
+        options.ModelBinderProviders[0].ShouldBeOfType<SitecoreLayoutRouteModelBinderProvider>();
+        options.ModelBinderProviders[1].ShouldBeOfType<SitecoreLayoutContextModelBinderProvider>();
+        options.ModelBinderProviders[2].ShouldBeOfType<SitecoreLayoutComponentModelBinderProvider>();
+        options.ModelBinderProviders[3].ShouldBeOfType<SitecoreLayoutResponseModelBinderProvider>();
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.ExperienceEditor.Extensions;
@@ -67,13 +67,13 @@ public class ExperienceEditorCustomRoutingFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.ReasonPhrase.Should().Be("OK");
-        response.Content.Headers.ContentType!.MediaType.Should().Be("application/json");
-        response.Content.Headers.ContentType.CharSet.Should().Be("utf-8");
-        responseString.Should().Contain("{\"html\":\"");
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.ReasonPhrase.ShouldBe("OK");
+        response.Content.Headers.ContentType!.MediaType.ShouldBe("application/json");
+        response.Content.Headers.ContentType.CharSet.ShouldBe("utf-8");
+        responseString.ShouldContain("{\"html\":\"");
         responseString.Should().EndWith("}");
-        responseString.Should().Contain("master");
+        responseString.ShouldContain("master");
     }
 }
