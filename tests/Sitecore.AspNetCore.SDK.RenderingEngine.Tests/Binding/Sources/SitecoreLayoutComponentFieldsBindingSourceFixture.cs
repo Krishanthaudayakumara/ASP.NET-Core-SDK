@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using NSubstitute;
@@ -59,13 +59,13 @@ public class SitecoreLayoutComponentFieldsBindingSourceFixture
             () => sut.GetModel(serviceProvider, modelBindingContext, null!);
 
         // Act & Assert
-        allNull.Should().Throw<ArgumentNullException>();
-        serviceProviderNull.Should().Throw<ArgumentNullException>();
-        firstAndSecondArgsNull.Should().Throw<ArgumentNullException>();
-        firstAndThirdArgsNull.Should().Throw<ArgumentNullException>();
-        secondAndThirdArgsNull.Should().Throw<ArgumentNullException>();
-        bindingContextNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => serviceProviderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => firstAndSecondArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => firstAndThirdArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => secondAndThirdArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => bindingContextNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -85,7 +85,7 @@ public class SitecoreLayoutComponentFieldsBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     [Theory]
@@ -104,11 +104,11 @@ public class SitecoreLayoutComponentFieldsBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().NotBeNull();
-        model.Should().BeOfType(typeof(HeaderBlockFields));
+        model.ShouldNotBeNull();
+        model.ShouldBeOfType<HeaderBlockFields>();
         HeaderBlockFields? fieldsModel = model as HeaderBlockFields;
-        fieldsModel!.Heading1!.Value.Should().Be("HeaderBlock - This is heading1");
-        fieldsModel.Heading2!.Value.Should().Be("HeaderBlock - This is heading2");
+        fieldsModel!.Heading1!.Value.ShouldBe("HeaderBlock - This is heading1");
+        fieldsModel.Heading2!.Value.ShouldBe("HeaderBlock - This is heading2");
     }
 
     [Theory]
@@ -127,7 +127,7 @@ public class SitecoreLayoutComponentFieldsBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     private class HeaderBlockFields

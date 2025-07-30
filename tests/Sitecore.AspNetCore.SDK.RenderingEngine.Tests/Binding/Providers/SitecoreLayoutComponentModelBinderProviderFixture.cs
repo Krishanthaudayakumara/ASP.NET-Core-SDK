@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
@@ -51,7 +51,7 @@ public class SitecoreLayoutComponentModelBinderProviderFixture
             () => sut.GetBinder(null!);
 
         // Act & Assert
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -64,7 +64,7 @@ public class SitecoreLayoutComponentModelBinderProviderFixture
         IModelBinder? binder = sut.GetBinder(modelBinderProviderContext);
 
         // Assert
-        binder.Should().NotBeNull();
+        binder.ShouldNotBeNull();
     }
 
     [Theory]
@@ -77,7 +77,7 @@ public class SitecoreLayoutComponentModelBinderProviderFixture
         IModelBinder? binder = sut.GetBinder(modelBinderProviderContext);
 
         // Assert
-        binder.Should().BeNull();
+        binder.ShouldBeNull();
     }
 
     [Theory]
@@ -105,6 +105,6 @@ public class SitecoreLayoutComponentModelBinderProviderFixture
         IModelBinder? binder = sut.GetBinder(modelBinderProviderContext);
 
         // Assert
-        binder.Should().NotBeNull();
+        binder.ShouldNotBeNull();
     }
 }

@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Xunit;
 
@@ -23,7 +23,7 @@ public class FieldOfTValueFixture
         string result = sut.Value;
 
         // Assert
-        result.Should().Be(string.Empty);
+        result.ShouldBe(string.Empty);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class FieldOfTValueFixture
         SimpleTestModel result = sut.Value;
 
         // Assert
-        result.Should().Be(default);
+        result.ShouldBe(default);
     }
 
     [Fact]
@@ -49,6 +49,6 @@ public class FieldOfTValueFixture
         Field<SimpleTestModel>? result = sut.Read<Field<SimpleTestModel>>();
 
         // Assert
-        result.Should().BeSameAs(sut);
+        result.ShouldBeSameAs(sut);
     }
 }

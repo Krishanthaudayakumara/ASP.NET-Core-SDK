@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Xunit;
 
@@ -13,9 +13,9 @@ public class EditableChromeFixture
         EditableChrome sut = new();
 
         // Assert
-        sut.Name.Should().Be("code");
-        sut.Type.Should().Be("text/sitecore");
-        sut.Content.Should().BeEmpty();
-        sut.Attributes.Should().BeEmpty();
+        sut.Name.ShouldBe("code");
+        sut.Type.ShouldBe("text/sitecore");
+        sut.Content.ShouldBeEmpty();
+        sut.Attributes.ShouldBeEmpty();
     }
 }

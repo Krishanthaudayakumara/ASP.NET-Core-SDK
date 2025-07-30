@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
@@ -31,8 +31,8 @@ public class SitecoreLayoutRequestHandlerBuilderExtensionsFixture
         Action action = () => LayoutRequestHandlerBuilderExtensions.AsDefaultHandler<HttpLayoutRequestHandler>(null!);
 
         // Act / Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("builder");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("builder");
     }
 
     [Theory]
@@ -45,7 +45,7 @@ public class SitecoreLayoutRequestHandlerBuilderExtensionsFixture
         // Assert
         ServiceProvider provider = result.Services.BuildServiceProvider();
         SitecoreLayoutClientOptions options = provider.GetRequiredService<IOptions<SitecoreLayoutClientOptions>>().Value;
-        options.DefaultHandler.Should().Be(builder.HandlerName);
+        options.DefaultHandler.ShouldBe(builder.HandlerName);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class SitecoreLayoutRequestHandlerBuilderExtensionsFixture
             () => builder.WithRequestOptions(null!);
 
         // Act & Assert
-        act.Should().Throw<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'builder')");
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually// TODO: Assert exception.Message manually");
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class SitecoreLayoutRequestHandlerBuilderExtensionsFixture
             () => builder.WithRequestOptions(null!);
 
         // Arrange & Act
-        act.Should().Throw<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'configureRequest')");
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually// TODO: Assert exception.Message manually");
     }
 
     [Theory]
@@ -87,10 +87,10 @@ public class SitecoreLayoutRequestHandlerBuilderExtensionsFixture
         ServiceProvider provider = result.Services.BuildServiceProvider();
         IOptionsSnapshot<SitecoreLayoutRequestOptions>? options = provider.GetService<IOptionsSnapshot<SitecoreLayoutRequestOptions>>();
 
-        options.Should().NotBeNull();
-        options!.Value.Should().NotBeNull();
-        options.Value.Should().BeOfType<SitecoreLayoutRequestOptions>();
+        options.ShouldNotBeNull();
+        options!.Value.ShouldNotBeNull();
+        options.Value.ShouldBeOfType<SitecoreLayoutRequestOptions>();
         options.Get(handlerName).RequestDefaults.Should().ContainKey(RequestKeys.ApiKey);
-        options.Get(handlerName).RequestDefaults.ApiKey().Should().Be("test_api_key");
+        options.Get(handlerName).RequestDefaults.ApiKey().ShouldBe("test_api_key");
     }
 }

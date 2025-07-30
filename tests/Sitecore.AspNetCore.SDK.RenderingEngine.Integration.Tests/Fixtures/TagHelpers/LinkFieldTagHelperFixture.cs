@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -69,7 +69,7 @@ public class LinkFieldTagHelperFixture : IDisposable
 
         // Assert
         // check scenario that LinkTagHelper does not reset values of nested helpers.
-        secondLink.InnerHtml.Should().Contain(TestConstants.TestFieldValue);
+        secondLink.InnerHtml.ShouldContain(TestConstants.TestFieldValue);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class LinkFieldTagHelperFixture : IDisposable
 
         // Assert
         // check that there is proper number of 'a' tags generated.
-        sectionNode.ChildNodes.Count(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase)).Should().Be(7);
+        sectionNode.ChildNodes.Count(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase)).ShouldBe(7);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class LinkFieldTagHelperFixture : IDisposable
 
         // Assert
         // check that link will contain user provided link text.
-        sectionNode.ChildNodes.First(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain("Sample internal link");
+        sectionNode.ChildNodes.First(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase)).InnerText.ShouldContain("Sample internal link");
     }
 
     [Fact]
@@ -141,7 +141,7 @@ public class LinkFieldTagHelperFixture : IDisposable
 
         // Assert
         // check that link will contain user provided link text.
-        sectionNode.ChildNodes.First(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase) && n.HasClass("author-text")).InnerText.Should().Contain("This is field text");
+        sectionNode.ChildNodes.First(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase) && n.HasClass("author-text")).InnerText.ShouldContain("This is field text");
     }
 
     [Fact]
@@ -167,15 +167,15 @@ public class LinkFieldTagHelperFixture : IDisposable
         // check that link will contain user provided link text.
         HtmlNode? linkNode = sectionNode.ChildNodes.Last(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase));
 
-        linkNode.Should().NotBeNull();
-        linkNode.Attributes.SingleOrDefault(a => a.Name == "href").Should().NotBeNull();
-        linkNode.Attributes.Single(a => a.Name == "href").Value.Should().NotBe(string.Empty);
-        linkNode.Attributes.SingleOrDefault(a => a.Name == "target").Should().NotBeNull();
-        linkNode.Attributes.Single(a => a.Name == "target").Value.Should().NotBe(string.Empty);
-        linkNode.Attributes.SingleOrDefault(a => a.Name == "title").Should().NotBeNull();
-        linkNode.Attributes.Single(a => a.Name == "title").Value.Should().NotBe(string.Empty);
-        linkNode.Attributes.SingleOrDefault(a => a.Name == "class").Should().NotBeNull();
-        linkNode.Attributes.Single(a => a.Name == "class").Value.Should().NotBe(string.Empty);
+        linkNode.ShouldNotBeNull();
+        linkNode.Attributes.SingleOrDefault(a => a.Name == "href").ShouldNotBeNull();
+        linkNode.Attributes.Single(a => a.Name == "href").Value.ShouldNotBe(string.Empty);
+        linkNode.Attributes.SingleOrDefault(a => a.Name == "target").ShouldNotBeNull();
+        linkNode.Attributes.Single(a => a.Name == "target").Value.ShouldNotBe(string.Empty);
+        linkNode.Attributes.SingleOrDefault(a => a.Name == "title").ShouldNotBeNull();
+        linkNode.Attributes.Single(a => a.Name == "title").Value.ShouldNotBe(string.Empty);
+        linkNode.Attributes.SingleOrDefault(a => a.Name == "class").ShouldNotBeNull();
+        linkNode.Attributes.Single(a => a.Name == "class").Value.ShouldNotBe(string.Empty);
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class LinkFieldTagHelperFixture : IDisposable
 
         // Assert
         // check that link will contain user provided link text.
-        sectionNode.ChildNodes.Last(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Be(TestConstants.TestFieldValue);
+        sectionNode.ChildNodes.Last(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase)).InnerText.ShouldBe(TestConstants.TestFieldValue);
     }
 
     [Fact]
@@ -247,7 +247,7 @@ public class LinkFieldTagHelperFixture : IDisposable
 
         // Assert
         // check that link will contain user provided link text.
-        sectionNode.ChildNodes.First(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase) && n.HasClass("author-text-ee")).InnerText.Should().Contain("This is field text");
+        sectionNode.ChildNodes.First(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase) && n.HasClass("author-text-ee")).InnerText.ShouldContain("This is field text");
     }
 
     [Fact]
@@ -271,7 +271,7 @@ public class LinkFieldTagHelperFixture : IDisposable
 
         // Assert
         // check that link will contain user provided link text.
-        sectionNode.ChildNodes.First(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase) && n.HasClass("author-text-ee-editable-false")).InnerText.Should().Contain("custom text");
+        sectionNode.ChildNodes.First(n => n.Name.Equals("a", StringComparison.OrdinalIgnoreCase) && n.HasClass("author-text-ee-editable-false")).InnerText.ShouldContain("custom text");
     }
 
     public void Dispose()

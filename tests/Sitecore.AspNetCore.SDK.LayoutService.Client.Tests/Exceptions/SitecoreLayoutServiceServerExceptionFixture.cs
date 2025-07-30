@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Exceptions;
 using Xunit;
@@ -17,7 +17,7 @@ public class SitecoreLayoutServiceServerExceptionFixture
         SitecoreLayoutServiceServerException sut = new(message);
 
         // Assert
-        sut.Message.Should().Be(message);
+        sut.Message.ShouldBe(message);
     }
 
     [Theory]
@@ -30,8 +30,8 @@ public class SitecoreLayoutServiceServerExceptionFixture
         SitecoreLayoutServiceServerException sut = new(message, exception);
 
         // Assert
-        sut.Message.Should().Be(message);
-        sut.InnerException.Should().Be(exception);
+        sut.Message.ShouldBe(message);
+        sut.InnerException.ShouldBe(exception);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class SitecoreLayoutServiceServerExceptionFixture
         SitecoreLayoutServiceServerException sut = new();
 
         // Assert
-        sut.Message.Should().Be(DefaultMessage);
+        sut.Message.ShouldBe(DefaultMessage);
     }
 
     [Theory]
@@ -53,7 +53,7 @@ public class SitecoreLayoutServiceServerExceptionFixture
         SitecoreLayoutServiceServerException sut = new(exception);
 
         // Assert
-        sut.Message.Should().Be(DefaultMessage);
-        sut.InnerException.Should().Be(exception);
+        sut.Message.ShouldBe(DefaultMessage);
+        sut.InnerException.ShouldBe(exception);
     }
 }

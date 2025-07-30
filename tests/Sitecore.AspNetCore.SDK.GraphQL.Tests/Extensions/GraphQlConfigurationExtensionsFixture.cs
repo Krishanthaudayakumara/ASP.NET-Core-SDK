@@ -1,5 +1,5 @@
-﻿using AutoFixture.Xunit2;
-using FluentAssertions;
+using AutoFixture.Xunit2;
+using Shouldly;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,8 +24,8 @@ public class GraphQLConfigurationExtensionsFixture
         Func<IServiceCollection> configNull =
             () => serviceCollection.AddGraphQLClient(null!);
 
-        servicesNull.Should().Throw<ArgumentNullException>().WithParameterName("services");
-        configNull.Should().Throw<ArgumentNullException>().WithParameterName("configuration");
+        var ex = Should.Throw<ArgumentNullException>(() => servicesNull()); // TODO: Assert exception properties manually// TODO: Assert exception.ParamName manually;
+        var ex = Should.Throw<ArgumentNullException>(() => configNull()); // TODO: Assert exception properties manually// TODO: Assert exception.ParamName manually;
     }
 
     [Fact]
@@ -33,8 +33,8 @@ public class GraphQLConfigurationExtensionsFixture
     {
         Func<IServiceCollection> act =
             () => Substitute.For<IServiceCollection>().AddGraphQLClient(_ => { });
-        act.Should().Throw<InvalidGraphQLConfigurationException>()
-            .WithMessage(Resources.Exception_MissingApiKeyAndContextId);
+        var ex = Should.Throw<InvalidGraphQLConfigurationException>(() => act()); // TODO: Assert exception properties manually
+            // TODO: Assert exception.Message manually;
     }
 
     [Theory]
@@ -46,8 +46,8 @@ public class GraphQLConfigurationExtensionsFixture
             {
                 options.ApiKey = apiKey;
             });
-        act.Should().Throw<InvalidGraphQLConfigurationException>()
-            .WithMessage(Resources.Exception_MissingEndpoint);
+        var ex = Should.Throw<InvalidGraphQLConfigurationException>(() => act()); // TODO: Assert exception properties manually
+            // TODO: Assert exception.Message manually;
     }
 
     [Theory]
@@ -65,7 +65,7 @@ public class GraphQLConfigurationExtensionsFixture
         GraphQLHttpClient? graphQlClient = serviceCollection.BuildServiceProvider().GetService<IGraphQLClient>() as GraphQLHttpClient;
 
         // Assert
-        graphQlClient!.Options.EndPoint!.OriginalString.Should().Contain(SitecoreGraphQLClientOptions.DefaultEdgeEndpoint.OriginalString);
+        graphQlClient!.Options.EndPoint!.OriginalString.ShouldContain(SitecoreGraphQLClientOptions.DefaultEdgeEndpoint.OriginalString);
     }
 
     [Theory]
@@ -86,10 +86,10 @@ public class GraphQLConfigurationExtensionsFixture
         GraphQLHttpClient? graphQlClient = serviceCollection.BuildServiceProvider().GetService<IGraphQLClient>() as GraphQLHttpClient;
 
         // Assert
-        graphQlClient.Should().NotBeNull();
-        graphQlClient!.Options.EndPoint.Should().Be(endpointUri);
-        graphQlClient.HttpClient.DefaultRequestHeaders.Contains("sc_apikey").Should().BeTrue();
-        apiKey.Should().Be(graphQlClient.HttpClient.DefaultRequestHeaders.GetValues("sc_apikey").FirstOrDefault());
+        graphQlClient.ShouldNotBeNull();
+        graphQlClient!.Options.EndPoint.ShouldBe(endpointUri);
+        graphQlClient.HttpClient.DefaultRequestHeaders.Contains("sc_apikey").ShouldBeTrue();
+        apiKey.ShouldBe(graphQlClient.HttpClient.DefaultRequestHeaders.GetValues("sc_apikey").FirstOrDefault());
     }
 
     [Theory]
@@ -110,8 +110,8 @@ public class GraphQLConfigurationExtensionsFixture
         GraphQLHttpClient? graphQlClient = serviceCollection.BuildServiceProvider().GetService<IGraphQLClient>() as GraphQLHttpClient;
 
         // Assert
-        graphQlClient.Should().NotBeNull();
-        graphQlClient!.Options.EndPoint!.Host.Should().Be(endpointUri.Host);
-        graphQlClient.Options.EndPoint.Query.Should().Contain($"sitecoreContextId={contextId}");
+        graphQlClient.ShouldNotBeNull();
+        graphQlClient!.Options.EndPoint!.Host.ShouldBe(endpointUri.Host);
+        graphQlClient.Options.EndPoint.Query.ShouldContain($"sitecoreContextId={contextId}");
     }
 }

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Newtonsoft.Json.Linq;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
@@ -31,12 +31,12 @@ public class ContextFixture
 
         dynamic? expectedContext = jsonModel.sitecore.context;
 
-        resultContext.Should().NotBeNull();
-        resultContext!.IsEditing.Should().Be((bool)expectedContext.pageEditing);
+        resultContext.ShouldNotBeNull();
+        resultContext!.IsEditing.ShouldBe((bool)expectedContext.pageEditing);
 
-        resultContext.Site.Should().NotBeNull();
-        resultContext.Site!.Name.Should().Be((string)expectedContext.site.name);
-        resultContext.PageState.Should().Be((PageState)expectedContext.pageState);
-        resultContext.Language.Should().Be((string)expectedContext.language);
+        resultContext.Site.ShouldNotBeNull();
+        resultContext.Site!.Name.ShouldBe((string)expectedContext.site.name);
+        resultContext.PageState.ShouldBe((PageState)expectedContext.pageState);
+        resultContext.Language.ShouldBe((string)expectedContext.language);
     }
 }

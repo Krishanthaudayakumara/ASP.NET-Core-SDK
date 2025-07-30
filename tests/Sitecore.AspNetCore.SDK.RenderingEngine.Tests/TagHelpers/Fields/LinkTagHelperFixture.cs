@@ -1,7 +1,7 @@
-﻿using System.Globalization;
+using System.Globalization;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -66,9 +66,9 @@ public class LinkTagHelperFixture
         Action contextNull =
             () => sut.Process(null!, tagHelperOutput);
 
-        allNull.Should().Throw<ArgumentNullException>();
-        outputNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => outputNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -86,7 +86,7 @@ public class LinkTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -104,7 +104,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -122,7 +122,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -142,7 +142,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(HtmlWithRel);
+        tagHelperOutput.Content.GetContent().ShouldBe(HtmlWithRel);
     }
 
     [Theory]
@@ -162,7 +162,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(HtmlWithAnchor);
+        tagHelperOutput.Content.GetContent().ShouldBe(HtmlWithAnchor);
     }
 
     [Theory]
@@ -185,7 +185,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Editable);
+        tagHelperOutput.Content.GetContent().ShouldBe(Editable);
     }
 
     [Theory]
@@ -212,7 +212,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain(customLinkText);
+        tagHelperOutput.Content.GetContent().ShouldContain(customLinkText);
     }
 
     [Theory]
@@ -239,7 +239,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain(_hyperLink.Text);
+        tagHelperOutput.Content.GetContent().ShouldContain(_hyperLink.Text);
     }
 
     [Theory]
@@ -262,7 +262,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -286,7 +286,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -304,7 +304,7 @@ public class LinkTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -322,9 +322,9 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "class");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "href");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "title");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "class");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "href");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "title");
     }
 
     [Theory]
@@ -343,7 +343,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name.Equals("class") && a.Value.Equals("test-class"));
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name.Equals("class") && a.Value.Equals("test-class"));
     }
 
     [Theory]
@@ -361,7 +361,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.TagName.Should().Be("a");
+        tagHelperOutput.TagName.ShouldBe("a");
     }
 
     [Theory]
@@ -384,7 +384,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Editable);
+        tagHelperOutput.Content.GetContent().ShouldBe(Editable);
     }
 
     [Theory]
@@ -402,7 +402,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain(_hyperLink.Text);
+        tagHelperOutput.Content.GetContent().ShouldContain(_hyperLink.Text);
     }
 
     [Theory]
@@ -422,7 +422,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain(testDescription);
+        tagHelperOutput.Content.GetContent().ShouldContain(testDescription);
     }
 
     #region asp-link attribute
@@ -441,7 +441,7 @@ public class LinkTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -459,7 +459,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -477,7 +477,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -497,7 +497,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(HtmlWithRel);
+        tagHelperOutput.Content.GetContent().ShouldBe(HtmlWithRel);
     }
 
     [Theory]
@@ -520,7 +520,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Editable);
+        tagHelperOutput.Content.GetContent().ShouldBe(Editable);
     }
 
     [Theory]
@@ -547,7 +547,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain(customLinkText);
+        tagHelperOutput.Content.GetContent().ShouldContain(customLinkText);
     }
 
     [Theory]
@@ -574,7 +574,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain(_hyperLink.Text);
+        tagHelperOutput.Content.GetContent().ShouldContain(_hyperLink.Text);
     }
 
     [Theory]
@@ -597,7 +597,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -621,7 +621,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Html);
+        tagHelperOutput.Content.GetContent().ShouldBe(Html);
     }
 
     [Theory]
@@ -639,7 +639,7 @@ public class LinkTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -657,9 +657,9 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "class");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "href");
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name == "title");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "class");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "href");
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name == "title");
     }
 
     [Theory]
@@ -678,7 +678,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name.Equals("class") && a.Value.Equals("test-class"));
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name.Equals("class") && a.Value.Equals("test-class"));
     }
 
     [Theory]
@@ -701,7 +701,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Editable);
+        tagHelperOutput.Content.GetContent().ShouldBe(Editable);
     }
 
     [Theory]
@@ -719,7 +719,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain(_hyperLink.Text);
+        tagHelperOutput.Content.GetContent().ShouldContain(_hyperLink.Text);
     }
 
     [Theory]
@@ -739,7 +739,7 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain(testDescription);
+        tagHelperOutput.Content.GetContent().ShouldContain(testDescription);
     }
 
     [Theory]
@@ -759,8 +759,8 @@ public class LinkTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name.Equals("target") && a.Value.Equals(_hyperLink.Target));
-        tagHelperOutput.Attributes.Should().Contain(a => a.Name.Equals("rel") && a.Value.Equals("noopener noreferrer"));
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name.Equals("target") && a.Value.Equals(_hyperLink.Target));
+        tagHelperOutput.Attributes.ShouldContain(a => a.Name.Equals("rel") && a.Value.Equals("noopener noreferrer"));
     }
 
     [Theory]

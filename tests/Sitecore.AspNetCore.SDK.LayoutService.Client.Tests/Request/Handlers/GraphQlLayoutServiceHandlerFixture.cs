@@ -1,6 +1,6 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using AutoFixture.Xunit2;
-using FluentAssertions;
+using Shouldly;
 using GraphQL;
 using GraphQL.Client.Abstractions;
 using Microsoft.Extensions.Logging;
@@ -157,7 +157,7 @@ public class GraphQLLayoutServiceHandlerFixture
         SitecoreLayoutResponse result = await _graphQlLayoutServiceHandler.Request(request, handlerName);
 
         // Assert
-        result.Content.Should().Be(resultContent);
+        result.Content.ShouldBe(resultContent);
     }
 
     [Theory]
@@ -180,8 +180,8 @@ public class GraphQLLayoutServiceHandlerFixture
         SitecoreLayoutResponse result = await _graphQlLayoutServiceHandler.Request(request, handlerName);
 
         // Assert
-        result.Errors.Should().Contain(e => e is ItemNotFoundSitecoreLayoutServiceClientException);
-        result.Content.Should().BeNull();
+        result.Errors.ShouldContain(e => e is ItemNotFoundSitecoreLayoutServiceClientException);
+        result.Content.ShouldBeNull();
     }
 
     [Theory]
@@ -223,7 +223,7 @@ public class GraphQLLayoutServiceHandlerFixture
         SitecoreLayoutResponse result = await _graphQlLayoutServiceHandler.Request(request, handlerName);
 
         // Assert
-        result.Errors.Should().Contain(e => e != null);
-        result.Content.Should().NotBeNull();
+        result.Errors.ShouldContain(e => e != null);
+        result.Content.ShouldNotBeNull();
     }
 }

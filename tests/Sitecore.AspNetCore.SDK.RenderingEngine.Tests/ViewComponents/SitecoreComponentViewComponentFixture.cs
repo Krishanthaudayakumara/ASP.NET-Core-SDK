@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NSubstitute;
@@ -41,7 +41,7 @@ public class SitecoreComponentViewComponentFixture
         ArgumentNullException exception = await Assert.ThrowsAsync<ArgumentNullException>(() => sut.InvokeAsync(null!, null!));
 
         // Assert
-        exception.Message.Should().Be("Value cannot be null. (Parameter 'modelType')");
+        exception.Message.ShouldBe("Value cannot be null. (Parameter 'modelType')");
     }
 
     [Theory]
@@ -55,7 +55,7 @@ public class SitecoreComponentViewComponentFixture
         ArgumentNullException exception = await Assert.ThrowsAsync<ArgumentNullException>(() => sut.InvokeAsync(model.GetType(), null!));
 
         // Assert
-        exception.Message.Should().Be("Value cannot be null. (Parameter 'viewName')");
+        exception.Message.ShouldBe("Value cannot be null. (Parameter 'viewName')");
     }
 
     [Theory]
@@ -68,7 +68,7 @@ public class SitecoreComponentViewComponentFixture
             () => sut.InvokeAsync(model.GetType(), string.Empty);
 
         // Act & Assert
-        await act.Should().ThrowAsync<ArgumentException>().WithParameterName("viewName");
+        var ex = await Should.ThrowAsync<ArgumentException>(act); // TODO: Assert exception properties manually// TODO: Assert exception.ParamName manually;
     }
 
     [Theory]

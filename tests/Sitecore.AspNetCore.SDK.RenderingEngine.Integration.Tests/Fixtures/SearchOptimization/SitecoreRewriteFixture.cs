@@ -1,5 +1,5 @@
-Ôªøusing System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Caching.Memory;
 using NSubstitute;
@@ -62,7 +62,7 @@ public class SitecoreRewriteFixture
 
         string response = await server.CreateClient().GetStringAsync("foo");
 
-        response.Should().Be("http://example.com/foo");
+        response.ShouldBe("http://example.com/foo");
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class SitecoreRewriteFixture
         TestServer server = host.GetTestServer();
 
         HttpResponseMessage response = await server.CreateClient().GetAsync(string.Empty);
-        response.Headers.Location!.OriginalString.Should().Be("/");
+        response.Headers.Location!.OriginalString.ShouldBe("/");
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class SitecoreRewriteFixture
 
         string response = await server.CreateClient().GetStringAsync(string.Empty);
 
-        response.Should().Be("/");
+        response.ShouldBe("/");
     }
 
     [Theory]
@@ -204,7 +204,7 @@ public class SitecoreRewriteFixture
 
         string response = await server.CreateClient().GetStringAsync(requestUrl);
 
-        response.Should().Be(expectedUrl);
+        response.ShouldBe(expectedUrl);
     }
 
     [Theory]
@@ -213,7 +213,7 @@ public class SitecoreRewriteFixture
     [InlineData("path/(.*)", "path?value=$1", RedirectType.REDIRECT_301, true, null, "path/value", "/path?value=value")]
     [InlineData("path/(.*)", "path?param=$1", RedirectType.REDIRECT_301, true, null, "path/value?param1=OtherValue", "/path?param1=OtherValue&param=value")]
     [InlineData("path/(.*)", "http://example.com/pathBase/path?param=$1", RedirectType.REDIRECT_301, true, "http://example.com/pathBase", "path/value?param1=OtherValue", "http://example.com/pathBase/path?param1=OtherValue&param=value")]
-    [InlineData("path/(.*)", "http://hoœàst.com/p√ÇthBase/path?par√£m=$1", RedirectType.REDIRECT_301, true, "http://example.com/pathBase", "path/value?p√§ram1=OtherVal√ºe", "http://xn--host-cpd.com/p%C3%82thBase/path?p%C3%A4ram1=OtherVal%C3%BCe&par√£m=value")]
+    [InlineData("path/(.*)", "http://ho?st.com/p¬thBase/path?par„m=$1", RedirectType.REDIRECT_301, true, "http://example.com/pathBase", "path/value?p‰ram1=OtherVal¸e", "http://xn--host-cpd.com/p%C3%82thBase/path?p%C3%A4ram1=OtherVal%C3%BCe&par„m=value")]
     [InlineData("(.*)", "http://example.com/$1", RedirectType.REDIRECT_302, true, null, "path", "http://example.com/path")]
     [InlineData("^/ab[cd]/$", "graphql", RedirectType.REDIRECT_301, true, null, "abc", "/graphql")]
     [InlineData("/bro/", "graphql", RedirectType.REDIRECT_301, true, null, "bro", "/graphql")]
@@ -267,7 +267,7 @@ public class SitecoreRewriteFixture
         HttpResponseMessage response = await server.CreateClient().GetAsync(requestUrl);
 
         HttpStatusCode expectedRedirectCode = redirectType == RedirectType.REDIRECT_301 ? HttpStatusCode.MovedPermanently : HttpStatusCode.Redirect;
-        response.StatusCode.Should().Be(expectedRedirectCode);
-        response.Headers.Location!.OriginalString.Should().Be(expectedUrl);
+        response.StatusCode.ShouldBe(expectedRedirectCode);
+        response.Headers.Location!.OriginalString.ShouldBe(expectedUrl);
     }
 }

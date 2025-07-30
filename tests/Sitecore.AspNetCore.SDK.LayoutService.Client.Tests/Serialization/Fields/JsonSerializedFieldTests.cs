@@ -1,8 +1,8 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.AutoFixture.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Exceptions;
@@ -49,7 +49,7 @@ public class JsonSerializedFieldTests
         ValueField<int>? result = sut.Read<ValueField<int>>();
 
         // Assert
-        result!.Value.Should().Be(100);
+        result!.Value.ShouldBe(100);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class JsonSerializedFieldTests
         };
 
         // Act / Assert
-        action.Should().NotThrow();
+        Should.NotThrow(() => action());
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class JsonSerializedFieldTests
         Action action = () => sut.Read<ValueField<int>>();
 
         // Act / Assert
-        action.Should().Throw<FieldReaderException>()
+        var ex = Should.Throw<FieldReaderException>(() => action()); // TODO: Assert exception properties manually
             .WithInnerException<JsonException>();
     }
 
@@ -98,9 +98,9 @@ public class JsonSerializedFieldTests
         bool result = sut.TryRead(typeof(ValueField<int>), out IField? field);
 
         // Assert
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
         field.Should().BeOfType<ValueField<int>>();
-        ((ValueField<int>)field!).Value.Should().Be(100);
+        ((ValueField<int>)field!).Value.ShouldBe(100);
     }
 
     [Fact]
@@ -115,8 +115,8 @@ public class JsonSerializedFieldTests
         bool result = sut.TryRead(typeof(ValueField<int>), out IField? field);
 
         // Assert
-        result.Should().BeFalse();
-        field.Should().BeNull();
+        result.ShouldBeFalse();
+        field.ShouldBeNull();
     }
 
     [Fact]
@@ -131,7 +131,7 @@ public class JsonSerializedFieldTests
         string result = sut.GetRawValue();
 
         // Assert
-        result.Should().Be(json);
+        result.ShouldBe(json);
     }
 
     private class ValueField<T> : IField

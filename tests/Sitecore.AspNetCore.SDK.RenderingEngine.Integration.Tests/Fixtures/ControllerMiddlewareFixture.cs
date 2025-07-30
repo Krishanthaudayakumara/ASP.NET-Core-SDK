@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -52,7 +52,7 @@ public class ControllerMiddlewareFixture : IDisposable
         HttpClient client = _server.CreateClient();
         await client.GetAsync(MiddlewareController);
 
-        _mockClientHandler.WasInvoked.Should().BeTrue();
+        _mockClientHandler.WasInvoked.ShouldBeTrue();
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public class ControllerMiddlewareFixture : IDisposable
         HttpClient client = _server.CreateClient();
         await client.GetAsync(GlobalMiddlewareController);
 
-        _mockClientHandler.WasInvoked.Should().BeFalse();
+        _mockClientHandler.WasInvoked.ShouldBeFalse();
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class ControllerMiddlewareFixture : IDisposable
         HttpClient client = _server.CreateClient();
         string response = await client.GetStringAsync(GlobalMiddlewareController);
 
-        response.Should().Be("\"success\"");
+        response.ShouldBe("\"success\"");
     }
 
     [Fact]

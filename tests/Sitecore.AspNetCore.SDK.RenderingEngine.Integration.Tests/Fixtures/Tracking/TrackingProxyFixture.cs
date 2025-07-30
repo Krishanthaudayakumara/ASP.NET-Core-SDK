@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -79,14 +79,14 @@ public class TrackingProxyFixture : IDisposable
         await client.SendAsync(request);
 
         // Asserts
-        _mockClientHandler.Requests.Should().ContainSingle("A call to rendering middleware is not expected.");
-        _mockClientHandler.Requests[0].RequestUri!.Host.Should().Be(_cmInstanceUri.Host);
-        _mockClientHandler.Requests[0].RequestUri!.Scheme.Should().Be(_cmInstanceUri.Scheme);
-        _mockClientHandler.Requests[0].RequestUri!.PathAndQuery.Should().Be("/layouts/System/VisitorIdentification.js");
-        _mockClientHandler.Requests[0].Headers.Should().Contain(h => h.Key.Equals("Cookie"));
-        _mockClientHandler.Requests[0].Headers.GetValues("x-forwarded-for").First().ToUpperInvariant().Should().Be("172.217.16.14");
-        _mockClientHandler.Requests[0].Headers.GetValues("x-forwarded-host").First().ToUpperInvariant().Should().Be("LOCALHOST");
-        _mockClientHandler.Requests[0].Headers.GetValues("x-forwarded-proto").First().ToUpperInvariant().Should().Be("HTTP");
+        _mockClientHandler.Requests.Single("A call to rendering middleware is not expected.").ShouldNotBeNull();
+        _mockClientHandler.Requests[0].RequestUri!.Host.ShouldBe(_cmInstanceUri.Host);
+        _mockClientHandler.Requests[0].RequestUri!.Scheme.ShouldBe(_cmInstanceUri.Scheme);
+        _mockClientHandler.Requests[0].RequestUri!.PathAndQuery.ShouldBe("/layouts/System/VisitorIdentification.js");
+        _mockClientHandler.Requests[0].Headers.ShouldContain(h => h.Key.Equals("Cookie"));
+        _mockClientHandler.Requests[0].Headers.GetValues("x-forwarded-for").First().ToUpperInvariant().ShouldBe("172.217.16.14");
+        _mockClientHandler.Requests[0].Headers.GetValues("x-forwarded-host").First().ToUpperInvariant().ShouldBe("LOCALHOST");
+        _mockClientHandler.Requests[0].Headers.GetValues("x-forwarded-proto").First().ToUpperInvariant().ShouldBe("HTTP");
     }
 
     public void Dispose()

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.ExperienceEditor.TagHelpers;
 using Xunit;
 
@@ -18,7 +18,7 @@ public class ChromeDataSerializerFixture
         string result = _serializer.Serialize(data);
 
         // Assert
-        result.Should().Be("{}");
+        result.ShouldBe("{}");
     }
 
     [Fact]
@@ -36,6 +36,6 @@ public class ChromeDataSerializerFixture
         string result = _serializer.Serialize(data);
 
         // Assert
-        result.Should().Be("{\"class\":\"my-super-class\",\"displayName\":\"my-super-name\",\"itsNull\":null}");
+        result.ShouldBe("{\"class\":\"my-super-class\",\"displayName\":\"my-super-name\",\"itsNull\":null}");
     }
 }

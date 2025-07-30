@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -66,8 +66,8 @@ public class RequestDefaultsConfigurationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.Request["key2"].Should().Be("value2");
+        response.ShouldNotBeNull();
+        response.Request["key2"].ShouldBe("value2");
     }
 
     [Fact]
@@ -82,8 +82,8 @@ public class RequestDefaultsConfigurationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.Request["key3"].Should().Be("value4");
+        response.ShouldNotBeNull();
+        response.Request["key3"].ShouldBe("value4");
     }
 
     [Fact]
@@ -101,8 +101,8 @@ public class RequestDefaultsConfigurationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.Request["somekey"].Should().Be("somevalue");
+        response.ShouldNotBeNull();
+        response.Request["somekey"].ShouldBe("somevalue");
     }
 
     [Fact]
@@ -117,8 +117,8 @@ public class RequestDefaultsConfigurationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.Request["key1"].Should().Be("value3");
+        response.ShouldNotBeNull();
+        response.Request["key1"].ShouldBe("value3");
     }
 
     [Fact]
@@ -133,8 +133,8 @@ public class RequestDefaultsConfigurationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request, "mockwithoutoptions");
 
         // Assert
-        response.Should().NotBeNull();
-        response.Request["key2"].Should().Be("requestvalue");
+        response.ShouldNotBeNull();
+        response.Request["key2"].ShouldBe("requestvalue");
     }
 
     [Fact]
@@ -149,8 +149,8 @@ public class RequestDefaultsConfigurationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.Request["key1"].Should().Be("requestvalue");
+        response.ShouldNotBeNull();
+        response.Request["key1"].ShouldBe("requestvalue");
     }
 
     [Fact]
@@ -165,10 +165,10 @@ public class RequestDefaultsConfigurationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.Request["key2"].Should().Be("value2");
-        response.Request["key3"].Should().Be("value4");
-        response.Request["requestKey"].Should().Be("requestValue");
+        response.ShouldNotBeNull();
+        response.Request["key2"].ShouldBe("value2");
+        response.Request["key3"].ShouldBe("value4");
+        response.Request["requestKey"].ShouldBe("requestValue");
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class RequestDefaultsConfigurationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
+        response.ShouldNotBeNull();
         response.Request.Should().NotContainKey("key2");
     }
 
@@ -205,7 +205,7 @@ public class RequestDefaultsConfigurationFixture : IDisposable
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
+        response.ShouldNotBeNull();
         response.Request.Should().NotContainKey("key3");
     }
 

@@ -1,5 +1,5 @@
-﻿using AutoFixture.Idioms;
-using FluentAssertions;
+using AutoFixture.Idioms;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.AutoFixture.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response;
@@ -24,12 +24,12 @@ public class SitecoreLayoutResponseFixture
         SitecoreLayoutResponse sut = new([], []);
 
         // Assert
-        sut.Metadata.Should().BeNull();
-        sut.Content.Should().Be(default);
-        sut.HasErrors.Should().BeFalse();
-        sut.Errors.Should().NotBeNull();
-        sut.Errors.Should().BeEmpty();
-        sut.Request.Should().BeEmpty();
+        sut.Metadata.ShouldBeNull();
+        sut.Content.ShouldBe(default);
+        sut.HasErrors.ShouldBeFalse();
+        sut.Errors.ShouldNotBeNull();
+        sut.Errors.ShouldBeEmpty();
+        sut.Request.ShouldBeEmpty();
     }
 
     [Fact]
@@ -39,10 +39,10 @@ public class SitecoreLayoutResponseFixture
         SitecoreLayoutResponse sut = new([]);
 
         // Assert
-        sut.Metadata.Should().BeNull();
-        sut.Content.Should().Be(default);
-        sut.HasErrors.Should().BeFalse();
-        sut.Errors.Should().BeEmpty();
-        sut.Request.Should().BeEmpty();
+        sut.Metadata.ShouldBeNull();
+        sut.Content.ShouldBe(default);
+        sut.HasErrors.ShouldBeFalse();
+        sut.Errors.ShouldBeEmpty();
+        sut.Request.ShouldBeEmpty();
     }
 }

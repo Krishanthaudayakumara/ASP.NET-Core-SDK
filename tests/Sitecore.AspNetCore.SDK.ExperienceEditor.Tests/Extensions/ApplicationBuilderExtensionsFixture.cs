@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using FluentAssertions;
+using System.Reflection;
+using Shouldly;
 using Microsoft.AspNetCore.Builder;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
@@ -18,7 +18,7 @@ public class ApplicationBuilderExtensionsFixture
         Func<IApplicationBuilder> act =
             () => ExperienceEditorAppConfigurationExtensions.UseSitecoreExperienceEditor(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -34,6 +34,6 @@ public class ApplicationBuilderExtensionsFixture
         // Assert
         bool received = appBuilder.ReceivedCalls().Any(c => c.GetArguments().OfType<Delegate>().Any(d =>
             d.Target?.GetType().GetField("_middleware", BindingFlags.Instance | BindingFlags.NonPublic)?.GetValue(d.Target).As<Type>().FullName == typeof(ExperienceEditorMiddleware).FullName));
-        received.Should().BeFalse();
+        received.ShouldBeFalse();
     }
 }

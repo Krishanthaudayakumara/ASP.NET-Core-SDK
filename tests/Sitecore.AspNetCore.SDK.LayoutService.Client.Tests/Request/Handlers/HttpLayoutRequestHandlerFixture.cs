@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -79,7 +79,7 @@ public class HttpLayoutRequestHandlerFixture
             () => new HttpLayoutRequestHandler(client, serializer, options, logger);
 
         // Act & assert
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -91,7 +91,7 @@ public class HttpLayoutRequestHandlerFixture
             () => sut.Request(null!, string.Empty);
 
         // Act & Assert
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -137,12 +137,12 @@ public class HttpLayoutRequestHandlerFixture
         stub.RequestMessage!.Headers.TryGetValues("Cookie", out IEnumerable<string>? cookies);
 
         // Assert
-        stub.RequestMessage!.RequestUri!.Query.Should().Contain("alpha=this&beta=that");
-        stub.RequestMessage.Headers.Should().NotBeEmpty();
-        stub.RequestMessage.Headers.Host.Should().Be(hostHeader);
-        cookies.Should().Contain(authCookie);
-        stub.RequestMessage.Method.Should().Be(messageMethod);
-        stub.RequestMessage.Content.Should().Be(messageContent);
+        stub.RequestMessage!.RequestUri!.Query.ShouldContain("alpha=this&beta=that");
+        stub.RequestMessage.Headers.ShouldNotBeEmpty();
+        stub.RequestMessage.Headers.Host.ShouldBe(hostHeader);
+        cookies.ShouldContain(authCookie);
+        stub.RequestMessage.Method.ShouldBe(messageMethod);
+        stub.RequestMessage.Content.ShouldBe(messageContent);
     }
 
     [Theory]
@@ -180,7 +180,7 @@ public class HttpLayoutRequestHandlerFixture
         await stub.Request(request, handlerName);
 
         // Assert
-        stub.RequestMessage!.RequestUri!.Query.Should().Be(expectedQueryString);
+        stub.RequestMessage!.RequestUri!.Query.ShouldBe(expectedQueryString);
     }
 
     [Theory]
@@ -207,9 +207,9 @@ public class HttpLayoutRequestHandlerFixture
         SitecoreLayoutResponse response = await stub.Request(request, handlerName);
 
         // Assert
-        response.HasErrors.Should().BeTrue();
-        response.Errors.Should().ContainSingle(x => x.GetType() == typeof(SitecoreLayoutServiceMessageConfigurationException));
-        response.Errors.FirstOrDefault(error => error.InnerException != null && error.InnerException.Message.Equals("The given key 'inexistent_key' was not present in the dictionary.", StringComparison.OrdinalIgnoreCase)).Should().NotBeNull();
+        response.HasErrors.ShouldBeTrue();
+        response.Errors.Single(x => x.GetType().ShouldNotBeNull() == typeof(SitecoreLayoutServiceMessageConfigurationException));
+        response.Errors.FirstOrDefault(error => error.InnerException != null && error.InnerException.Message.Equals("The given key 'inexistent_key' was not present in the dictionary.", StringComparison.OrdinalIgnoreCase)).ShouldNotBeNull();
     }
 
     [Theory]
@@ -224,7 +224,7 @@ public class HttpLayoutRequestHandlerFixture
 
         // Assert
         serializer.Received(1).Deserialize("JSON");
-        result.Content.Should().BeEquivalentTo(CannedResponses.Simple);
+        result.Content.ShouldBe(CannedResponses.Simple);
     }
 
     [Theory]
@@ -246,8 +246,8 @@ public class HttpLayoutRequestHandlerFixture
         SitecoreLayoutResponse result = await stub.Request(request, string.Empty);
 
         // Assert
-        result.Metadata.Should().NotBeEmpty();
-        result.Metadata!["Header1"].Should().ContainSingle(x => x == "Value1");
+        result.Metadata.ShouldNotBeEmpty();
+        result.Metadata!["Header1"].Single(x => x == "Value1").ShouldNotBeNull();
     }
 
     [Theory]
@@ -268,8 +268,8 @@ public class HttpLayoutRequestHandlerFixture
         SitecoreLayoutResponse result = await stub.Request(request, string.Empty);
 
         // Assert
-        result.Metadata.Should().NotBeEmpty();
-        result.Metadata!["Header1"].Should().ContainSingle(x => x == "Value1");
+        result.Metadata.ShouldNotBeEmpty();
+        result.Metadata!["Header1"].Single(x => x == "Value1").ShouldNotBeNull();
     }
 
     [Theory]
@@ -285,8 +285,8 @@ public class HttpLayoutRequestHandlerFixture
         SitecoreLayoutResponse result = await sut.Request(testRequest, string.Empty);
 
         // Assert
-        result.HasErrors.Should().BeTrue();
-        result.Errors.Should().ContainSingle(x => x.GetType() == typeof(CouldNotContactSitecoreLayoutServiceClientException));
+        result.HasErrors.ShouldBeTrue();
+        result.Errors.Single(x => x.GetType().ShouldNotBeNull() == typeof(CouldNotContactSitecoreLayoutServiceClientException));
     }
 
     [Theory]
@@ -305,9 +305,9 @@ public class HttpLayoutRequestHandlerFixture
         SitecoreLayoutResponse result = await stub.Request(request, string.Empty);
 
         // Assert
-        result.HasErrors.Should().BeTrue();
-        result.Errors.Should().ContainSingle(x => x.GetType() == typeof(SitecoreLayoutServiceClientException));
-        result.Errors.First().Data[StatusCodeKey].Should().Be((int)System.Net.HttpStatusCode.Continue);
+        result.HasErrors.ShouldBeTrue();
+        result.Errors.Single(x => x.GetType().ShouldNotBeNull() == typeof(SitecoreLayoutServiceClientException));
+        result.Errors.First().Data[StatusCodeKey].ShouldBe((int)System.Net.HttpStatusCode.Continue);
     }
 
     [Theory]
@@ -326,9 +326,9 @@ public class HttpLayoutRequestHandlerFixture
         SitecoreLayoutResponse result = await stub.Request(request, string.Empty);
 
         // Assert
-        result.HasErrors.Should().BeTrue();
-        result.Errors.Should().ContainSingle(x => x.GetType() == typeof(SitecoreLayoutServiceClientException));
-        result.Errors.First().Data[StatusCodeKey].Should().Be((int)System.Net.HttpStatusCode.PermanentRedirect);
+        result.HasErrors.ShouldBeTrue();
+        result.Errors.Single(x => x.GetType().ShouldNotBeNull() == typeof(SitecoreLayoutServiceClientException));
+        result.Errors.First().Data[StatusCodeKey].ShouldBe((int)System.Net.HttpStatusCode.PermanentRedirect);
     }
 
     [Theory]
@@ -350,10 +350,10 @@ public class HttpLayoutRequestHandlerFixture
 
         // Assert
         serializer.Received(1).Deserialize("JSON");
-        result.Content.Should().BeEquivalentTo(CannedResponses.Simple);
-        result.HasErrors.Should().BeTrue();
-        result.Errors.Should().ContainSingle(x => x.GetType() == typeof(ItemNotFoundSitecoreLayoutServiceClientException));
-        result.Errors.First().Data[StatusCodeKey].Should().Be((int)System.Net.HttpStatusCode.NotFound);
+        result.Content.ShouldBe(CannedResponses.Simple);
+        result.HasErrors.ShouldBeTrue();
+        result.Errors.Single(x => x.GetType().ShouldNotBeNull() == typeof(ItemNotFoundSitecoreLayoutServiceClientException));
+        result.Errors.First().Data[StatusCodeKey].ShouldBe((int)System.Net.HttpStatusCode.NotFound);
     }
 
     [Theory]
@@ -372,9 +372,9 @@ public class HttpLayoutRequestHandlerFixture
         SitecoreLayoutResponse result = await stub.Request(request, string.Empty);
 
         // Assert
-        result.HasErrors.Should().BeTrue();
-        result.Errors.Should().ContainSingle(x => x.GetType() == typeof(InvalidRequestSitecoreLayoutServiceClientException));
-        result.Errors.First().Data[StatusCodeKey].Should().Be((int)System.Net.HttpStatusCode.BadRequest);
+        result.HasErrors.ShouldBeTrue();
+        result.Errors.Single(x => x.GetType().ShouldNotBeNull() == typeof(InvalidRequestSitecoreLayoutServiceClientException));
+        result.Errors.First().Data[StatusCodeKey].ShouldBe((int)System.Net.HttpStatusCode.BadRequest);
     }
 
     [Theory]
@@ -393,11 +393,11 @@ public class HttpLayoutRequestHandlerFixture
         SitecoreLayoutResponse result = await stub.Request(request, string.Empty);
 
         // Assert
-        result.HasErrors.Should().BeTrue();
-        result.Errors.Should().ContainSingle(x => x.GetType() == typeof(InvalidResponseSitecoreLayoutServiceClientException));
-        result.Errors.ToList().First().InnerException.Should().NotBeNull();
-        result.Errors.ToList().First().InnerException.Should().BeOfType(typeof(SitecoreLayoutServiceServerException));
-        result.Errors.First().Data[StatusCodeKey].Should().Be((int)System.Net.HttpStatusCode.InternalServerError);
+        result.HasErrors.ShouldBeTrue();
+        result.Errors.Single(x => x.GetType().ShouldNotBeNull() == typeof(InvalidResponseSitecoreLayoutServiceClientException));
+        result.Errors.ToList().First().InnerException.ShouldNotBeNull();
+        result.Errors.ToList().First().InnerException.ShouldBeOfType<SitecoreLayoutServiceServerException>();
+        result.Errors.First().Data[StatusCodeKey].ShouldBe((int)System.Net.HttpStatusCode.InternalServerError);
     }
 
     [Theory]
@@ -414,9 +414,9 @@ public class HttpLayoutRequestHandlerFixture
         SitecoreLayoutResponse result = await stub.Request(request, string.Empty);
 
         // Assert
-        result.HasErrors.Should().BeTrue();
-        result.Errors.Should().ContainSingle(x => x.GetType() == typeof(InvalidResponseSitecoreLayoutServiceClientException));
-        result.Errors.First().Data[StatusCodeKey].Should().Be((int)System.Net.HttpStatusCode.OK);
+        result.HasErrors.ShouldBeTrue();
+        result.Errors.Single(x => x.GetType().ShouldNotBeNull() == typeof(InvalidResponseSitecoreLayoutServiceClientException));
+        result.Errors.First().Data[StatusCodeKey].ShouldBe((int)System.Net.HttpStatusCode.OK);
     }
 
     [Theory]
@@ -437,8 +437,8 @@ public class HttpLayoutRequestHandlerFixture
         SitecoreLayoutResponse result = await stub.Request(request, string.Empty);
 
         // Assert
-        result.HasErrors.Should().BeFalse();
-        result.Errors.Should().BeEmpty();
-        result.Content.Should().NotBeNull();
+        result.HasErrors.ShouldBeFalse();
+        result.Errors.ShouldBeEmpty();
+        result.Content.ShouldNotBeNull();
     }
 }

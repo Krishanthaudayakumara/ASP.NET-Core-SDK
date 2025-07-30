@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -37,7 +37,7 @@ public class SitecoreLayoutModelBinderFixture
         Func<Task> act =
             () => sut.BindModelAsync(null!);
 
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -50,7 +50,7 @@ public class SitecoreLayoutModelBinderFixture
         sut.BindModelAsync(defaultModelBindingContext);
 
         // Assert
-        defaultModelBindingContext.Result.IsModelSet.Should().BeFalse();
+        defaultModelBindingContext.Result.IsModelSet.ShouldBeFalse();
     }
 
     [Theory]

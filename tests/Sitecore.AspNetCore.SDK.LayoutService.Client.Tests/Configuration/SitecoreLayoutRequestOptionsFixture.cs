@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Configuration;
 using Xunit;
 
@@ -13,7 +13,7 @@ public class SitecoreLayoutRequestOptionsFixture
         SitecoreLayoutRequestOptions sut = new();
 
         // Assert
-        sut.RequestDefaults.Should().NotBeNull();
-        sut.RequestDefaults.Should().BeEmpty();
+        sut.RequestDefaults.ShouldNotBeNull();
+        sut.RequestDefaults.ShouldBeEmpty();
     }
 }

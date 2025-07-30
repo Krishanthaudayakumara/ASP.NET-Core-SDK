@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Binding;
@@ -18,7 +18,7 @@ public class ServiceCollectionExtensionsFixture
         Func<ISitecoreRenderingEngineBuilder> act =
             () => ServiceCollectionExtensions.AddSitecoreRenderingEngine(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Fact]
@@ -31,11 +31,11 @@ public class ServiceCollectionExtensionsFixture
         services.AddSitecoreRenderingEngine();
 
         // Assert
-        services.Should().Contain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IHttpContextAccessor) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
-        services.Should().Contain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ISitecoreLayoutRequestMapper) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
-        services.Should().Contain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IComponentRendererFactory) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
-        services.Should().Contain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IEditableChromeRenderer) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
-        services.Should().Contain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IViewModelBinder) && serviceDescriptor.Lifetime == ServiceLifetime.Scoped);
-        services.Should().Contain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(SitecoreQueryStringCultureProvider) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
+        services.ShouldContain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IHttpContextAccessor) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
+        services.ShouldContain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ISitecoreLayoutRequestMapper) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
+        services.ShouldContain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IComponentRendererFactory) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
+        services.ShouldContain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IEditableChromeRenderer) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
+        services.ShouldContain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(IViewModelBinder) && serviceDescriptor.Lifetime == ServiceLifetime.Scoped);
+        services.ShouldContain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(SitecoreQueryStringCultureProvider) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
     }
 }

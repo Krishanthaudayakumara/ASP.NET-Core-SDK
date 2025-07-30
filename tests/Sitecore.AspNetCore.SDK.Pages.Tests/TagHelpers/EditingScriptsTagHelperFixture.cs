@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -69,7 +69,7 @@ public class EditingScriptsTagHelperFixture
         Func<Task> act = async () => await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        await act.Should().ThrowAsync<NullReferenceException>();
+        var ex = await Should.ThrowAsync<NullReferenceException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -101,7 +101,7 @@ public class EditingScriptsTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().BeEmpty();
+        tagHelperOutput.Content.GetContent().ShouldBeEmpty();
     }
 
     [Theory]
@@ -134,9 +134,9 @@ public class EditingScriptsTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // assert
-        tagHelperOutput.Content.GetContent().Should().Contain("<script type=\"text/javascript\" src=\"/assets/js/script1.js\"></script>");
-        tagHelperOutput.Content.GetContent().Should().Contain("<script type=\"text/javascript\" src=\"/assets/js/script2.js\"></script>");
-        tagHelperOutput.Content.GetContent().Should().Contain("<script type=\"text/javascript\" src=\"/assets/js/script3.js\"></script>");
+        tagHelperOutput.Content.GetContent().ShouldContain("<script type=\"text/javascript\" src=\"/assets/js/script1.js\"></script>");
+        tagHelperOutput.Content.GetContent().ShouldContain("<script type=\"text/javascript\" src=\"/assets/js/script2.js\"></script>");
+        tagHelperOutput.Content.GetContent().ShouldContain("<script type=\"text/javascript\" src=\"/assets/js/script3.js\"></script>");
     }
 
     [Theory]
@@ -182,7 +182,7 @@ public class EditingScriptsTagHelperFixture
                                 }}
                             </script>
                         ";
-        tagHelperOutput.Content.GetContent().Should().Contain(expectedItemDataScriptTag);
+        tagHelperOutput.Content.GetContent().ShouldContain(expectedItemDataScriptTag);
     }
 
     [Theory]
@@ -215,6 +215,6 @@ public class EditingScriptsTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // assert
-        tagHelperOutput.Content.GetContent().Should().Contain("<script id=\"hrz-canvas-verification-token\" type=\"application/json\">token_1234</script>");
+        tagHelperOutput.Content.GetContent().ShouldContain("<script id=\"hrz-canvas-verification-token\" type=\"application/json\">token_1234</script>");
     }
 }

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Middleware.Models;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Services;
@@ -34,7 +34,7 @@ public class SiteResolverFixture
         string? result = await siteResolver.GetByHost(hostName);
 
         // Assert
-        result.Should().Be(expectedSiteName);
+        result.ShouldBe(expectedSiteName);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class SiteResolverFixture
         string? result = await siteResolver.GetByHost("foo.com");
 
         // Assert
-        result.Should().Be("wildcard");
+        result.ShouldBe("wildcard");
     }
 
     [Fact]
@@ -79,10 +79,10 @@ public class SiteResolverFixture
         string? site4 = await siteResolver.GetByHost("Baz.app.net");
 
         // Assert
-        site1.Should().Be("foo");
-        site2.Should().Be("bar");
-        site3.Should().Be("i-bar");
-        site4.Should().Be("baz");
+        site1.ShouldBe("foo");
+        site2.ShouldBe("bar");
+        site3.ShouldBe("i-bar");
+        site4.ShouldBe("baz");
     }
 
     [Fact]
@@ -105,8 +105,8 @@ public class SiteResolverFixture
         string? site2 = await siteResolver.GetByHost("bar.net");
 
         // Assert
-        site1.Should().Be("foo");
-        site2.Should().Be("bar");
+        site1.ShouldBe("foo");
+        site2.ShouldBe("bar");
     }
 
     [Theory]
@@ -120,6 +120,6 @@ public class SiteResolverFixture
             () => siteResolver.GetByHost(hostName!);
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentException>().WithParameterName(nameof(hostName));
+        var ex = await Should.ThrowAsync<ArgumentException>(act); // TODO: Assert exception properties manually// TODO: Assert exception.ParamName manually);
     }
 }

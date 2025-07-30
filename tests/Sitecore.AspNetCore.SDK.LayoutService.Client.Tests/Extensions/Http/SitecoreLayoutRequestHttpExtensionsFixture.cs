@@ -1,6 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using AutoFixture;
-using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Request;
@@ -31,9 +31,9 @@ public class SitecoreLayoutRequestHttpExtensionsFixture
             () => SitecoreLayoutRequestExtensions.BuildDefaultSitecoreLayoutRequestUri(null!, baseAddress);
 
         // Assert
-        allNull.Should().Throw<ArgumentNullException>();
-        uriNull.Should().Throw<ArgumentNullException>();
-        requestNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => uriNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => requestNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -51,10 +51,10 @@ public class SitecoreLayoutRequestHttpExtensionsFixture
             () => request.BuildUri(null!, uriArgs);
 
         // Assert
-        requestNull.Should().Throw<ArgumentNullException>();
-        allNull.Should().Throw<ArgumentNullException>();
-        queryParamsNull.Should().Throw<ArgumentNullException>();
-        uriNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => requestNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => queryParamsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => uriNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -73,7 +73,7 @@ public class SitecoreLayoutRequestHttpExtensionsFixture
         Uri uri = sut.BuildDefaultSitecoreLayoutRequestUri(baseAddress);
 
         // Assert
-        uri.Should().Be($"{baseAddress}?sc_apikey=apikey&sc_lang=en&item=home&sc_site=site&sc_mode=edit&sc_date=121212");
+        uri.ShouldBe($"{baseAddress}?sc_apikey=apikey&sc_lang=en&item=home&sc_site=site&sc_mode=edit&sc_date=121212");
     }
 
     [Theory]
@@ -90,7 +90,7 @@ public class SitecoreLayoutRequestHttpExtensionsFixture
         Uri uri = sut.BuildDefaultSitecoreLayoutRequestUri(baseAddress);
 
         // Assert
-        uri.Should().Be($"{baseAddress}?sc_apikey=apikey&sc_lang=en");
+        uri.ShouldBe($"{baseAddress}?sc_apikey=apikey&sc_lang=en");
     }
 
     [Theory]
@@ -107,7 +107,7 @@ public class SitecoreLayoutRequestHttpExtensionsFixture
         Uri uri = sut.BuildDefaultSitecoreLayoutRequestUri(baseAddress, ["test1", "test2"]);
 
         // Assert
-        uri.Should().Be($"{baseAddress}?sc_apikey=apikey&sc_lang=en&test1=testvalue1&test2=testvalue2");
+        uri.ShouldBe($"{baseAddress}?sc_apikey=apikey&sc_lang=en&test1=testvalue1&test2=testvalue2");
     }
 
     [Theory]
@@ -126,7 +126,7 @@ public class SitecoreLayoutRequestHttpExtensionsFixture
         Uri uri = sut.BuildUri(baseAddress, defaultKeys);
 
         // Assert
-        uri.Should().Be($"{baseAddress}");
+        uri.ShouldBe($"{baseAddress}");
     }
 
     [Theory]
@@ -142,6 +142,6 @@ public class SitecoreLayoutRequestHttpExtensionsFixture
         Uri uri = sut.BuildUri(baseAddress, defaultKeys);
 
         // Assert
-        uri.Should().Be($"{baseAddress}?sc_apikey=<script+type%3D\"text%2Fjavascript\">alert(\"hello\")%3B<%2Fscript>");
+        uri.ShouldBe($"{baseAddress}?sc_apikey=<script+type%3D\"text%2Fjavascript\">alert(\"hello\")%3B<%2Fscript>");
     }
 }

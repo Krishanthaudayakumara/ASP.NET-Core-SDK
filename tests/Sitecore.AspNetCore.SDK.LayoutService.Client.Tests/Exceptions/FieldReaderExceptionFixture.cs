@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Exceptions;
 using Xunit;
@@ -17,7 +17,7 @@ public class FieldReaderExceptionFixture
         FieldReaderException sut = new(message);
 
         // Assert
-        sut.Message.Should().Be(message);
+        sut.Message.ShouldBe(message);
     }
 
     [Theory]
@@ -30,8 +30,8 @@ public class FieldReaderExceptionFixture
         FieldReaderException sut = new(message, exception);
 
         // Assert
-        sut.Message.Should().Be(message);
-        sut.InnerException.Should().Be(exception);
+        sut.Message.ShouldBe(message);
+        sut.InnerException.ShouldBe(exception);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class FieldReaderExceptionFixture
         FieldReaderException sut = new(type);
 
         // Assert
-        sut.Message.Should().Be(string.Format(System.Globalization.CultureInfo.CurrentCulture, DefaultMessage, type));
+        sut.Message.ShouldBe(string.Format(System.Globalization.CultureInfo.CurrentCulture, DefaultMessage, type));
     }
 
     [Theory]
@@ -55,7 +55,7 @@ public class FieldReaderExceptionFixture
         FieldReaderException sut = new(type, exception);
 
         // Assert
-        sut.Message.Should().Be(string.Format(System.Globalization.CultureInfo.CurrentCulture, DefaultMessage, type));
-        sut.InnerException.Should().Be(exception);
+        sut.Message.ShouldBe(string.Format(System.Globalization.CultureInfo.CurrentCulture, DefaultMessage, type));
+        sut.InnerException.ShouldBe(exception);
     }
 }

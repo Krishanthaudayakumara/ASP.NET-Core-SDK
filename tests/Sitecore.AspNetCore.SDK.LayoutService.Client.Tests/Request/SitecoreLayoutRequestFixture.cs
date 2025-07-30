@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Request;
 using Xunit;
 
@@ -12,6 +12,6 @@ public class SitecoreLayoutRequestFixture
     public void Ctor_IsEmptyDictionary()
     {
         // Assert
-        _sut.Should().BeEmpty();
+        _sut.ShouldBeEmpty();
     }
 }

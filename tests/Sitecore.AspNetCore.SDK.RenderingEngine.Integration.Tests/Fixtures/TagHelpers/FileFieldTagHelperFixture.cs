@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -71,30 +71,30 @@ public class FileFieldTagHelperFixture : IDisposable
         HtmlNode? downloadLink4 = sectionNode.ChildNodes[7];
 
         // Assert
-        downloadLink1.InnerHtml.Should().Contain("Download link text");
-        downloadLink3.Attributes.Should().HaveCount(3);
-        downloadLink1.Attributes["type"].Value.Should().Be("application/pdf");
-        downloadLink1.Attributes["title"].Value.Should().Be("Download link description");
-        downloadLink1.Attributes["href"].Value.Should().Be("/doc.pdf");
+        downloadLink1.InnerHtml.ShouldContain("Download link text");
+        downloadLink3.Attributes.Count.ShouldBe(3);
+        downloadLink1.Attributes["type"].Value.ShouldBe("application/pdf");
+        downloadLink1.Attributes["title"].Value.ShouldBe("Download link description");
+        downloadLink1.Attributes["href"].Value.ShouldBe("/doc.pdf");
 
-        downloadLink2.InnerHtml.Should().Contain("Download link text");
-        downloadLink3.Attributes.Should().HaveCount(3);
-        downloadLink2.Attributes["type"].Value.Should().Be("application/pdf");
-        downloadLink2.Attributes["title"].Value.Should().Be("Download link description");
-        downloadLink2.Attributes["href"].Value.Should().Be("/doc.pdf");
+        downloadLink2.InnerHtml.ShouldContain("Download link text");
+        downloadLink3.Attributes.Count.ShouldBe(3);
+        downloadLink2.Attributes["type"].Value.ShouldBe("application/pdf");
+        downloadLink2.Attributes["title"].Value.ShouldBe("Download link description");
+        downloadLink2.Attributes["href"].Value.ShouldBe("/doc.pdf");
 
         // Assert
-        downloadLink3.InnerHtml.Should().Contain("Download link text");
-        downloadLink3.Attributes.Should().HaveCount(3);
-        downloadLink3.Attributes["type"].Value.Should().Be("application/pdf");
-        downloadLink3.Attributes["title"].Value.Should().Be("Download link description");
-        downloadLink3.Attributes["href"].Value.Should().Be("/doc.pdf");
+        downloadLink3.InnerHtml.ShouldContain("Download link text");
+        downloadLink3.Attributes.Count.ShouldBe(3);
+        downloadLink3.Attributes["type"].Value.ShouldBe("application/pdf");
+        downloadLink3.Attributes["title"].Value.ShouldBe("Download link description");
+        downloadLink3.Attributes["href"].Value.ShouldBe("/doc.pdf");
 
-        downloadLink4.InnerHtml.Should().Contain("Download link text");
-        downloadLink3.Attributes.Should().HaveCount(3);
-        downloadLink4.Attributes["type"].Value.Should().Be("application/pdf");
-        downloadLink4.Attributes["title"].Value.Should().Be("Download link description");
-        downloadLink4.Attributes["href"].Value.Should().Be("/doc.pdf");
+        downloadLink4.InnerHtml.ShouldContain("Download link text");
+        downloadLink3.Attributes.Count.ShouldBe(3);
+        downloadLink4.Attributes["type"].Value.ShouldBe("application/pdf");
+        downloadLink4.Attributes["title"].Value.ShouldBe("Download link description");
+        downloadLink4.Attributes["href"].Value.ShouldBe("/doc.pdf");
     }
 
     [Fact]
@@ -121,41 +121,41 @@ public class FileFieldTagHelperFixture : IDisposable
         HtmlNode? downloadLink4 = sectionNode.ChildNodes[15];
 
         // Assert
-        downloadLink1.InnerHtml.Should().Contain("Download link text");
-        downloadLink1.Attributes.Should().HaveCount(6);
-        downloadLink1.Attributes["type"].Value.Should().Be("application/pdf");
-        downloadLink1.Attributes["title"].Value.Should().Be("Download link description");
-        downloadLink1.Attributes["href"].Value.Should().Be("/doc.pdf");
-        downloadLink1.Attributes["class"].Value.Should().Be("test-class");
-        downloadLink1.Attributes["target"].Value.Should().Be("_blank");
-        downloadLink1.Attributes["custom-attribute"].Value.Should().Be("test-custom-attribute");
+        downloadLink1.InnerHtml.ShouldContain("Download link text");
+        downloadLink1.Attributes.Count.ShouldBe(6);
+        downloadLink1.Attributes["type"].Value.ShouldBe("application/pdf");
+        downloadLink1.Attributes["title"].Value.ShouldBe("Download link description");
+        downloadLink1.Attributes["href"].Value.ShouldBe("/doc.pdf");
+        downloadLink1.Attributes["class"].Value.ShouldBe("test-class");
+        downloadLink1.Attributes["target"].Value.ShouldBe("_blank");
+        downloadLink1.Attributes["custom-attribute"].Value.ShouldBe("test-custom-attribute");
 
-        downloadLink2.InnerHtml.Should().Contain("Download link text");
-        downloadLink2.Attributes.Should().HaveCount(6);
-        downloadLink2.Attributes["type"].Value.Should().Be("application/pdf");
-        downloadLink2.Attributes["title"].Value.Should().Be("Download link description");
-        downloadLink2.Attributes["href"].Value.Should().Be("/doc.pdf");
-        downloadLink2.Attributes["class"].Value.Should().Be("test-class");
-        downloadLink2.Attributes["target"].Value.Should().Be("_blank");
-        downloadLink2.Attributes["custom-attribute"].Value.Should().Be("test-custom-attribute");
+        downloadLink2.InnerHtml.ShouldContain("Download link text");
+        downloadLink2.Attributes.Count.ShouldBe(6);
+        downloadLink2.Attributes["type"].Value.ShouldBe("application/pdf");
+        downloadLink2.Attributes["title"].Value.ShouldBe("Download link description");
+        downloadLink2.Attributes["href"].Value.ShouldBe("/doc.pdf");
+        downloadLink2.Attributes["class"].Value.ShouldBe("test-class");
+        downloadLink2.Attributes["target"].Value.ShouldBe("_blank");
+        downloadLink2.Attributes["custom-attribute"].Value.ShouldBe("test-custom-attribute");
 
-        downloadLink3.InnerHtml.Should().Contain("Download link text");
-        downloadLink3.Attributes.Should().HaveCount(6);
-        downloadLink3.Attributes["type"].Value.Should().Be("application/pdf");
-        downloadLink3.Attributes["title"].Value.Should().Be("Download link description");
-        downloadLink3.Attributes["href"].Value.Should().Be("/doc.pdf");
-        downloadLink3.Attributes["class"].Value.Should().Be("test-class");
-        downloadLink3.Attributes["target"].Value.Should().Be("_blank");
-        downloadLink3.Attributes["custom-attribute"].Value.Should().Be("test-custom-attribute");
+        downloadLink3.InnerHtml.ShouldContain("Download link text");
+        downloadLink3.Attributes.Count.ShouldBe(6);
+        downloadLink3.Attributes["type"].Value.ShouldBe("application/pdf");
+        downloadLink3.Attributes["title"].Value.ShouldBe("Download link description");
+        downloadLink3.Attributes["href"].Value.ShouldBe("/doc.pdf");
+        downloadLink3.Attributes["class"].Value.ShouldBe("test-class");
+        downloadLink3.Attributes["target"].Value.ShouldBe("_blank");
+        downloadLink3.Attributes["custom-attribute"].Value.ShouldBe("test-custom-attribute");
 
-        downloadLink4.InnerHtml.Should().Contain("Download link text");
-        downloadLink4.Attributes.Should().HaveCount(6);
-        downloadLink4.Attributes["type"].Value.Should().Be("application/pdf");
-        downloadLink4.Attributes["title"].Value.Should().Be("Download link description");
-        downloadLink4.Attributes["href"].Value.Should().Be("/doc.pdf");
-        downloadLink4.Attributes["class"].Value.Should().Be("test-class");
-        downloadLink4.Attributes["target"].Value.Should().Be("_blank");
-        downloadLink4.Attributes["custom-attribute"].Value.Should().Be("test-custom-attribute");
+        downloadLink4.InnerHtml.ShouldContain("Download link text");
+        downloadLink4.Attributes.Count.ShouldBe(6);
+        downloadLink4.Attributes["type"].Value.ShouldBe("application/pdf");
+        downloadLink4.Attributes["title"].Value.ShouldBe("Download link description");
+        downloadLink4.Attributes["href"].Value.ShouldBe("/doc.pdf");
+        downloadLink4.Attributes["class"].Value.ShouldBe("test-class");
+        downloadLink4.Attributes["target"].Value.ShouldBe("_blank");
+        downloadLink4.Attributes["custom-attribute"].Value.ShouldBe("test-custom-attribute");
     }
 
     [Fact]
@@ -182,29 +182,29 @@ public class FileFieldTagHelperFixture : IDisposable
         HtmlNode? downloadLink4 = sectionNode.ChildNodes[23];
 
         // Assert
-        downloadLink1.InnerHtml.Should().Contain("Custom Download Link");
-        downloadLink1.Attributes.Should().HaveCount(3);
-        downloadLink1.Attributes["type"].Value.Should().Be("application/custom");
-        downloadLink1.Attributes["title"].Value.Should().Be("custom-title");
-        downloadLink1.Attributes["href"].Value.Should().Be("/customLink");
+        downloadLink1.InnerHtml.ShouldContain("Custom Download Link");
+        downloadLink1.Attributes.Count.ShouldBe(3);
+        downloadLink1.Attributes["type"].Value.ShouldBe("application/custom");
+        downloadLink1.Attributes["title"].Value.ShouldBe("custom-title");
+        downloadLink1.Attributes["href"].Value.ShouldBe("/customLink");
 
-        downloadLink2.InnerHtml.Should().Contain("Custom Download Link");
-        downloadLink2.Attributes.Should().HaveCount(3);
-        downloadLink2.Attributes["type"].Value.Should().Be("application/custom");
-        downloadLink2.Attributes["title"].Value.Should().Be("custom-title");
-        downloadLink2.Attributes["href"].Value.Should().Be("/customLink");
+        downloadLink2.InnerHtml.ShouldContain("Custom Download Link");
+        downloadLink2.Attributes.Count.ShouldBe(3);
+        downloadLink2.Attributes["type"].Value.ShouldBe("application/custom");
+        downloadLink2.Attributes["title"].Value.ShouldBe("custom-title");
+        downloadLink2.Attributes["href"].Value.ShouldBe("/customLink");
 
-        downloadLink3.InnerHtml.Should().Contain("Custom Download Link");
-        downloadLink3.Attributes.Should().HaveCount(3);
-        downloadLink3.Attributes["type"].Value.Should().Be("application/custom");
-        downloadLink3.Attributes["title"].Value.Should().Be("custom-title");
-        downloadLink3.Attributes["href"].Value.Should().Be("/customLink");
+        downloadLink3.InnerHtml.ShouldContain("Custom Download Link");
+        downloadLink3.Attributes.Count.ShouldBe(3);
+        downloadLink3.Attributes["type"].Value.ShouldBe("application/custom");
+        downloadLink3.Attributes["title"].Value.ShouldBe("custom-title");
+        downloadLink3.Attributes["href"].Value.ShouldBe("/customLink");
 
-        downloadLink4.InnerHtml.Should().Contain("Custom Download Link");
-        downloadLink4.Attributes.Should().HaveCount(3);
-        downloadLink4.Attributes["type"].Value.Should().Be("application/custom");
-        downloadLink4.Attributes["title"].Value.Should().Be("custom-title");
-        downloadLink4.Attributes["href"].Value.Should().Be("/customLink");
+        downloadLink4.InnerHtml.ShouldContain("Custom Download Link");
+        downloadLink4.Attributes.Count.ShouldBe(3);
+        downloadLink4.Attributes["type"].Value.ShouldBe("application/custom");
+        downloadLink4.Attributes["title"].Value.ShouldBe("custom-title");
+        downloadLink4.Attributes["href"].Value.ShouldBe("/customLink");
     }
 
     [Fact]
@@ -231,10 +231,10 @@ public class FileFieldTagHelperFixture : IDisposable
         HtmlNode? downloadLink4 = sectionNode.ChildNodes[31];
 
         // Assert
-        downloadLink1.InnerHtml.Should().Contain("<h1>Inner html</h1>");
-        downloadLink2.InnerHtml.Should().Contain("<h1>Inner html</h1>");
-        downloadLink3.InnerHtml.Should().Contain("<h1>Inner html</h1>");
-        downloadLink4.InnerHtml.Should().Contain("<h1>Inner html</h1>");
+        downloadLink1.InnerHtml.ShouldContain("<h1>Inner html</h1>");
+        downloadLink2.InnerHtml.ShouldContain("<h1>Inner html</h1>");
+        downloadLink3.InnerHtml.ShouldContain("<h1>Inner html</h1>");
+        downloadLink4.InnerHtml.ShouldContain("<h1>Inner html</h1>");
     }
 
     public void Dispose()

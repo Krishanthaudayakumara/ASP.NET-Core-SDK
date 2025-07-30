@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -52,7 +52,7 @@ public class RequestExtensionsFixture : IDisposable
         SitecoreLayoutResponse result = await layoutService.Request(request);
 
         result.Request.Should().ContainKey("item");
-        result.Request["item"].Should().Be("UsingGlobalMiddleware");
+        result.Request["item"].ShouldBe("UsingGlobalMiddleware");
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class RequestExtensionsFixture : IDisposable
         SitecoreLayoutResponse result = await layoutService.Request(request);
 
         result.Request.Should().ContainKey("sc_lang");
-        result.Request["sc_lang"].Should().Be("en");
+        result.Request["sc_lang"].ShouldBe("en");
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class RequestExtensionsFixture : IDisposable
         SitecoreLayoutResponse result = await layoutService.Request(request);
 
         result.Request.Should().ContainKey("sc_apikey");
-        result.Request["sc_apikey"].Should().Be("123");
+        result.Request["sc_apikey"].ShouldBe("123");
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public class RequestExtensionsFixture : IDisposable
         SitecoreLayoutResponse result = await layoutService.Request(request);
 
         result.Request.Should().ContainKey("sc_site");
-        result.Request["sc_site"].Should().Be("name");
+        result.Request["sc_site"].ShouldBe("name");
     }
 
     public void Dispose()

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Interfaces;
@@ -21,7 +21,7 @@ public class ComponentHolderFixture
         _ = new ComponentHolder(context, testComponent);
 
         // Arrange
-        context.Component.Should().Be(testComponent);
+        context.Component.ShouldBe(testComponent);
     }
 
     [Fact]
@@ -37,6 +37,6 @@ public class ComponentHolderFixture
         holder.Dispose();
 
         // Arrange
-        context.Component.Should().Be(testComponent);
+        context.Component.ShouldBe(testComponent);
     }
 }

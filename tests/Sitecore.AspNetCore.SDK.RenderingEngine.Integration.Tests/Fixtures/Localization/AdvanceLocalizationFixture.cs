@@ -1,6 +1,6 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
-using FluentAssertions;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -81,7 +81,7 @@ public class AdvanceLocalizationFixture : IDisposable
         // Act
         await client.GetStringAsync(new Uri("content/da/UsingGlobalMiddleware", UriKind.Relative));
 
-        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.Should().Contain("sc_lang=da");
+        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.ShouldContain("sc_lang=da");
     }
 
     [Fact]
@@ -104,8 +104,8 @@ public class AdvanceLocalizationFixture : IDisposable
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes.First(n => n.HasClass("component-4"));
         HtmlAttribute? attribute = sectionNode.Attributes.SingleOrDefault(a => a.Name == "data-language");
 
-        attribute.Should().NotBeNull();
-        attribute!.Value.Should().Be("en");
+        attribute.ShouldNotBeNull();
+        attribute!.Value.ShouldBe("en");
     }
 
     [Fact]
@@ -128,8 +128,8 @@ public class AdvanceLocalizationFixture : IDisposable
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes.First(n => n.HasClass("component-4"));
         HtmlAttribute? attribute = sectionNode.Attributes.SingleOrDefault(a => a.Name == "data-language");
 
-        attribute.Should().NotBeNull();
-        attribute!.Value.Should().Be("da");
+        attribute.ShouldNotBeNull();
+        attribute!.Value.ShouldBe("da");
     }
 
     public void Dispose()

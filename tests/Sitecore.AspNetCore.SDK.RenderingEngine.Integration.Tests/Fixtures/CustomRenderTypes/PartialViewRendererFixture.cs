@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -68,7 +68,7 @@ public class PartialViewRendererFixture : IDisposable
 
         // Assert
         sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerHtml
-            .Should().Be(TestConstants.TestFieldValue + " from Component-6");
+            .ShouldBe(TestConstants.TestFieldValue + " from Component-6");
     }
 
     public void Dispose()

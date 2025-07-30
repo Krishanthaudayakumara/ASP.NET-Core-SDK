@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Xunit;
 
@@ -13,7 +13,7 @@ public class EncodingExtensionsFixture
         string result = string.Empty.EncodeControlCharacters();
 
         // Assert
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
@@ -23,20 +23,20 @@ public class EncodingExtensionsFixture
         string result = EncodingExtensions.EncodeControlCharacters(null!);
 
         // Assert
-        result.Should().BeEmpty();
+        result.ShouldBeEmpty();
     }
 
     [Fact]
     public void EncodeControlCharacters_WithSpecialCharactersInValue_ReturnsUnencodedValue()
     {
         // Arrange
-        const string value = "!\"£$%^&*()_-=@~#><,./?";
+        const string value = "!\"�$%^&*()_-=@~#><,./?";
 
         // Act
         string result = value.EncodeControlCharacters();
 
         // Assert
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class EncodingExtensionsFixture
         string result = value.EncodeControlCharacters();
 
         // Assert
-        result.Should().Be(encodedLineBreak + "test");
+        result.ShouldBe(encodedLineBreak + "test");
     }
 
     [Fact]
@@ -64,6 +64,6 @@ public class EncodingExtensionsFixture
         string result = value.EncodeControlCharacters();
 
         // Assert
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 }

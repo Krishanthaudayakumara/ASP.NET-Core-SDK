@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Xunit;
 
@@ -13,8 +13,8 @@ public class SitecoreDataFixture
         SitecoreData sut = new();
 
         // Act / Assert
-        sut.Context.Should().Be(default);
-        sut.Route.Should().Be(default);
-        sut.Devices.Should().BeEmpty();
+        sut.Context.ShouldBe(default);
+        sut.Route.ShouldBe(default);
+        sut.Devices.ShouldBeEmpty();
     }
 }

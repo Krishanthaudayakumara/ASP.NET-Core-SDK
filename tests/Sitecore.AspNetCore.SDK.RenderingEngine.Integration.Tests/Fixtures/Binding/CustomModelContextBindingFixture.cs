@@ -1,6 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json.Nodes;
-using FluentAssertions;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -84,27 +84,27 @@ public class CustomModelContextBindingFixture : IDisposable
 
         // Assert
         sectionNode.ChildNodes.First(n => n.Id.Equals("singleProp", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("SinglePropertyData");
+            .ShouldBe("SinglePropertyData");
         sectionNode.ChildNodes.First(n => n.Id.Equals("class1string", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("stringExample");
+            .ShouldBe("stringExample");
         sectionNode.ChildNodes.First(n => n.Id.Equals("class1date", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().NotBeNullOrWhiteSpace();
+            .ShouldNotBeNullOrWhiteSpace();
         sectionNode.ChildNodes.First(n => n.Id.Equals("class1int", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("123");
+            .ShouldBe("123");
         sectionNode.ChildNodes.First(n => n.Id.Equals("class2string", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("stringExample2");
+            .ShouldBe("stringExample2");
         sectionNode.ChildNodes.First(n => n.Id.Equals("class2int", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("1234");
+            .ShouldBe("1234");
         sectionNode.ChildNodes.First(n => n.Id.Equals("class1Indint", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("123");
+            .ShouldBe("123");
         sectionNode.ChildNodes.First(n => n.Id.Equals("class1Indstr", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("stringExample");
+            .ShouldBe("stringExample");
         sectionNode.ChildNodes.First(n => n.Id.Equals("customCtxIndInt", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("123");
+            .ShouldBe("123");
         sectionNode.ChildNodes.First(n => n.Id.Equals("customCtxIndStr", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("stringExample");
+            .ShouldBe("stringExample");
         sectionNode.ChildNodes.First(n => n.Id.Equals("individualProperty", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().Be("SinglePropertyData");
+            .ShouldBe("SinglePropertyData");
     }
 
     public void Dispose()

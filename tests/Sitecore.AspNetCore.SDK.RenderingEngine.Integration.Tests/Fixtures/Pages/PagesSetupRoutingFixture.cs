@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;
 
@@ -20,8 +20,8 @@ public class PagesSetupRoutingFixture(TestWebApplicationFactory<TestPagesProgram
         HttpResponseMessage? response = await client.GetAsync(url);
 
         // Assert
-        response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -35,8 +35,8 @@ public class PagesSetupRoutingFixture(TestWebApplicationFactory<TestPagesProgram
         HttpResponseMessage? response = await client.GetAsync(url);
 
         // Assert
-        response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -51,8 +51,8 @@ public class PagesSetupRoutingFixture(TestWebApplicationFactory<TestPagesProgram
         HttpResponseMessage? response = await client.GetAsync(url);
 
         // Assert
-        response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -67,13 +67,13 @@ public class PagesSetupRoutingFixture(TestWebApplicationFactory<TestPagesProgram
         HttpResponseMessage? response = await client.GetAsync(url);
 
         // Assert
-        response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.Content.Headers.ContentType.Should().NotBeNull();
-        response.Content.Headers.ContentType?.MediaType.Should().Be("application/json");
-        response.Headers.NonValidated["Content-Security-Policy"].Should().BeEquivalentTo("frame-ancestors 'self'  https://pages.sitecorecloud.io");
-        response.Headers.NonValidated["Access-Control-Allow-Origin"].Should().BeEquivalentTo("https://pages.sitecorecloud.io");
-        response.Headers.NonValidated["Access-Control-Allow-Methods"].Should().BeEquivalentTo("GET, POST, OPTIONS, PUT, PATCH, DELETE");
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.Content.Headers.ContentType.ShouldNotBeNull();
+        response.Content.Headers.ContentType?.MediaType.ShouldBe("application/json");
+        response.Headers.NonValidated["Content-Security-Policy"].ShouldBe("frame-ancestors 'self'  https://pages.sitecorecloud.io");
+        response.Headers.NonValidated["Access-Control-Allow-Origin"].ShouldBe("https://pages.sitecorecloud.io");
+        response.Headers.NonValidated["Access-Control-Allow-Methods"].ShouldBe("GET, POST, OPTIONS, PUT, PATCH, DELETE");
     }
 
     [Fact]
@@ -87,8 +87,8 @@ public class PagesSetupRoutingFixture(TestWebApplicationFactory<TestPagesProgram
         HttpResponseMessage? response = await client.GetAsync(url);
 
         // Assert
-        response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -102,8 +102,8 @@ public class PagesSetupRoutingFixture(TestWebApplicationFactory<TestPagesProgram
         HttpResponseMessage? response = await client.GetAsync(url);
 
         // Assert
-        response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
 
     [Fact]
@@ -125,7 +125,7 @@ public class PagesSetupRoutingFixture(TestWebApplicationFactory<TestPagesProgram
         HttpResponseMessage? response = await client.GetAsync(url);
 
         // Assert
-        response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.Redirect);
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.Redirect);
     }
 }

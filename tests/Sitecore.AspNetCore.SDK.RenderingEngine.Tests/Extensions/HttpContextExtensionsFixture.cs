@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
@@ -27,7 +27,7 @@ public class HttpContextExtensionsFixture
         Func<ISitecoreRenderingContext?> act =
             () => HttpContextExtensions.GetSitecoreRenderingContext(null!);
 
-        act.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually;
     }
 
     [Theory]

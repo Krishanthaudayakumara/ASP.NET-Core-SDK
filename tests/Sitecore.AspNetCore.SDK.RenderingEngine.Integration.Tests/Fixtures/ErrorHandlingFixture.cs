@@ -1,6 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using AutoFixture;
-using FluentAssertions;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
@@ -109,9 +109,9 @@ public class ErrorHandlingFixture
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.HasErrors.Should().BeTrue();
-        response.Errors.Should().ContainSingle(e => e.GetType() == typeof(SitecoreLayoutServiceMessageConfigurationException));
+        response.ShouldNotBeNull();
+        response.HasErrors.ShouldBeTrue();
+        response.Errors.Single(e => e.GetType().ShouldNotBeNull() == typeof(SitecoreLayoutServiceMessageConfigurationException));
     }
 
     [Theory]
@@ -128,9 +128,9 @@ public class ErrorHandlingFixture
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.HasErrors.Should().BeTrue();
-        response.Errors.Should().ContainSingle(e => e.GetType() == typeof(CouldNotContactSitecoreLayoutServiceClientException));
+        response.ShouldNotBeNull();
+        response.HasErrors.ShouldBeTrue();
+        response.Errors.Single(e => e.GetType().ShouldNotBeNull() == typeof(CouldNotContactSitecoreLayoutServiceClientException));
     }
 
     [Theory]
@@ -169,17 +169,17 @@ public class ErrorHandlingFixture
             SitecoreLayoutResponse response = await layoutClient.Request(request);
 
             // Assert
-            response.Should().NotBeNull();
-            response.HasErrors.Should().BeTrue();
-            response.Errors.Should().ContainSingle(e => e.GetType() == typeof(InvalidResponseSitecoreLayoutServiceClientException));
+            response.ShouldNotBeNull();
+            response.HasErrors.ShouldBeTrue();
+            response.Errors.Single(e => e.GetType().ShouldNotBeNull() == typeof(InvalidResponseSitecoreLayoutServiceClientException));
 
             SitecoreLayoutServiceClientException exception = response.Errors.First();
-            exception.Should().NotBeNull();
-            exception.Data.Values.Count.Should().BePositive();
-            exception.Data[HttpStatusCodeKeyName].Should().Be((int)responseStatus);
+            exception.ShouldNotBeNull();
+            exception.Data.Values.Count.ShouldBePositive();
+            exception.Data[HttpStatusCodeKeyName].ShouldBe((int)responseStatus);
 
-            exception.InnerException.Should().NotBeNull();
-            exception.InnerException!.GetType().Should().Be(typeof(SitecoreLayoutServiceServerException));
+            exception.InnerException.ShouldNotBeNull();
+            exception.InnerException!.GetType().ShouldBe(typeof(SitecoreLayoutServiceServerException));
         }
     }
 
@@ -234,14 +234,14 @@ public class ErrorHandlingFixture
             SitecoreLayoutResponse response = await layoutClient.Request(request);
 
             // Assert
-            response.Should().NotBeNull();
-            response.HasErrors.Should().BeTrue();
-            response.Errors.Should().ContainSingle(e => e.GetType() == typeof(InvalidRequestSitecoreLayoutServiceClientException));
+            response.ShouldNotBeNull();
+            response.HasErrors.ShouldBeTrue();
+            response.Errors.Single(e => e.GetType().ShouldNotBeNull() == typeof(InvalidRequestSitecoreLayoutServiceClientException));
 
             SitecoreLayoutServiceClientException exception = response.Errors.First();
-            exception.Should().NotBeNull();
-            exception.Data.Values.Count.Should().BePositive();
-            exception.Data[HttpStatusCodeKeyName].Should().Be((int)responseStatus);
+            exception.ShouldNotBeNull();
+            exception.Data.Values.Count.ShouldBePositive();
+            exception.Data[HttpStatusCodeKeyName].ShouldBe((int)responseStatus);
         }
     }
 
@@ -267,16 +267,16 @@ public class ErrorHandlingFixture
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.HasErrors.Should().BeTrue();
-        response.Errors.Should().ContainSingle(e => e.GetType() == typeof(ItemNotFoundSitecoreLayoutServiceClientException));
+        response.ShouldNotBeNull();
+        response.HasErrors.ShouldBeTrue();
+        response.Errors.Single(e => e.GetType().ShouldNotBeNull() == typeof(ItemNotFoundSitecoreLayoutServiceClientException));
 
-        response.Content.Should().NotBeNull();
+        response.Content.ShouldNotBeNull();
 
         SitecoreLayoutServiceClientException exception = response.Errors.First();
-        exception.Should().NotBeNull();
-        exception.Data.Values.Count.Should().BePositive();
-        exception.Data[HttpStatusCodeKeyName].Should().Be((int)responseStatus);
+        exception.ShouldNotBeNull();
+        exception.Data.Values.Count.ShouldBePositive();
+        exception.Data[HttpStatusCodeKeyName].ShouldBe((int)responseStatus);
     }
 
     [Theory]
@@ -301,9 +301,9 @@ public class ErrorHandlingFixture
         SitecoreLayoutResponse response = await layoutClient.Request(request);
 
         // Assert
-        response.Should().NotBeNull();
-        response.HasErrors.Should().BeTrue();
-        response.Errors.Should().ContainSingle(e => e.GetType() == typeof(InvalidResponseSitecoreLayoutServiceClientException));
+        response.ShouldNotBeNull();
+        response.HasErrors.ShouldBeTrue();
+        response.Errors.Single(e => e.GetType().ShouldNotBeNull() == typeof(InvalidResponseSitecoreLayoutServiceClientException));
     }
 
     [Theory]
@@ -335,14 +335,14 @@ public class ErrorHandlingFixture
             SitecoreLayoutResponse response = await layoutClient.Request(request);
 
             // Assert
-            response.Should().NotBeNull();
-            response.HasErrors.Should().BeTrue();
-            response.Errors.Should().ContainSingle(e => e.GetType() == typeof(SitecoreLayoutServiceClientException));
+            response.ShouldNotBeNull();
+            response.HasErrors.ShouldBeTrue();
+            response.Errors.Single(e => e.GetType().ShouldNotBeNull() == typeof(SitecoreLayoutServiceClientException));
 
             SitecoreLayoutServiceClientException exception = response.Errors.First();
-            exception.Should().NotBeNull();
-            exception.Data.Values.Count.Should().BePositive();
-            exception.Data[HttpStatusCodeKeyName].Should().Be((int)responseStatus);
+            exception.ShouldNotBeNull();
+            exception.Data.Values.Count.ShouldBePositive();
+            exception.Data[HttpStatusCodeKeyName].ShouldBe((int)responseStatus);
         }
     }
 
@@ -385,14 +385,14 @@ public class ErrorHandlingFixture
             SitecoreLayoutResponse response = await layoutClient.Request(request);
 
             // Assert
-            response.Should().NotBeNull();
-            response.HasErrors.Should().BeTrue();
-            response.Errors.Should().ContainSingle(e => e.GetType() == typeof(SitecoreLayoutServiceClientException));
+            response.ShouldNotBeNull();
+            response.HasErrors.ShouldBeTrue();
+            response.Errors.Single(e => e.GetType().ShouldNotBeNull() == typeof(SitecoreLayoutServiceClientException));
 
             SitecoreLayoutServiceClientException exception = response.Errors.First();
-            exception.Should().NotBeNull();
-            exception.Data.Values.Count.Should().BePositive();
-            exception.Data[HttpStatusCodeKeyName].Should().Be((int)responseStatus);
+            exception.ShouldNotBeNull();
+            exception.Data.Values.Count.ShouldBePositive();
+            exception.Data[HttpStatusCodeKeyName].ShouldBe((int)responseStatus);
         }
     }
 

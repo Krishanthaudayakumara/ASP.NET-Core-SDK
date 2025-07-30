@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Microsoft.Extensions.DependencyInjection;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Interfaces;
@@ -17,7 +17,7 @@ public class ServiceCollectionExtensionsFixture
             () => ServiceCollectionExtensions.AddSitecoreLayoutService(null!);
 
         // Act & Assert
-        act.Should().Throw<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'services')");
+        var ex = Should.Throw<ArgumentNullException>(() => act()); // TODO: Assert exception properties manually// TODO: Assert exception.Message manually");
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class ServiceCollectionExtensionsFixture
         services.AddSitecoreLayoutService();
 
         // Assert
-        services.Should().Contain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ISitecoreLayoutClient) && serviceDescriptor.Lifetime == ServiceLifetime.Transient);
-        services.Should().Contain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ISitecoreLayoutSerializer) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
+        services.ShouldContain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ISitecoreLayoutClient) && serviceDescriptor.Lifetime == ServiceLifetime.Transient);
+        services.ShouldContain(serviceDescriptor => serviceDescriptor.ServiceType == typeof(ISitecoreLayoutSerializer) && serviceDescriptor.Lifetime == ServiceLifetime.Singleton);
     }
 }

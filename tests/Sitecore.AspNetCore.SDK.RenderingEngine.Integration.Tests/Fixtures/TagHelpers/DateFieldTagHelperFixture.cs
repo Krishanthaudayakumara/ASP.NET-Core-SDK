@@ -1,6 +1,6 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
-using FluentAssertions;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -70,7 +70,7 @@ public class DateFieldTagHelperFixture : IDisposable
 
         // Assert
         // check scenario that DateTagHelper does not reset values of nested helpers.
-        text.InnerHtml.Should().Contain(TestConstants.TestFieldValue);
+        text.InnerHtml.ShouldContain(TestConstants.TestFieldValue);
     }
 
     [Fact]
@@ -93,10 +93,10 @@ public class DateFieldTagHelperFixture : IDisposable
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes.First(n => n.HasClass("component-with-dates"));
 
         // Assert
-        sectionNode.ChildNodes[1].InnerHtml.Should().Be("05/04/2012");
-        sectionNode.ChildNodes[3].InnerHtml.Should().Be("05/04/2012 00:00:00");
-        sectionNode.ChildNodes[5].InnerHtml.Should().Be(TestConstants.DateTimeValue.ToString(CultureInfo.CurrentCulture));
-        sectionNode.ChildNodes[9].InnerHtml.Should().Contain("04.05.2012");
+        sectionNode.ChildNodes[1].InnerHtml.ShouldBe("05/04/2012");
+        sectionNode.ChildNodes[3].InnerHtml.ShouldBe("05/04/2012 00:00:00");
+        sectionNode.ChildNodes[5].InnerHtml.ShouldBe(TestConstants.DateTimeValue.ToString(CultureInfo.CurrentCulture));
+        sectionNode.ChildNodes[9].InnerHtml.ShouldContain("04.05.2012");
     }
 
     public void Dispose()

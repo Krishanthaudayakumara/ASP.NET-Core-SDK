@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -89,8 +89,8 @@ public class TrackingFixture : IDisposable
         // Asserts
         string content = await response.Content.ReadAsStringAsync();
 
-        content.Should().Contain("<meta name=\"VIcurrentDateTime\" content=\"");
-        content.Should().Contain("<meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
+        content.ShouldContain("<meta name=\"VIcurrentDateTime\" content=\"");
+        content.ShouldContain("<meta name=\"VirtualFolder\" content=\"\\\"/><script type='text/javascript' src='/layouts/system/VisitorIdentification.js'></script>");
     }
 
     [Fact]
@@ -120,8 +120,8 @@ public class TrackingFixture : IDisposable
         HttpResponseMessage response = await client.SendAsync(browserRequest);
 
         // Assert
-        response.Headers.GetValues("Set-Cookie").Should().Contain(i => i.StartsWith("ASP.NET_SessionId=", StringComparison.OrdinalIgnoreCase));
-        response.Headers.GetValues("Set-Cookie").Should().Contain(i => i.StartsWith("SC_ANALYTICS_GLOBAL_COOKIE=", StringComparison.OrdinalIgnoreCase));
+        response.Headers.GetValues("Set-Cookie").ShouldContain(i => i.StartsWith("ASP.NET_SessionId=", StringComparison.OrdinalIgnoreCase));
+        response.Headers.GetValues("Set-Cookie").ShouldContain(i => i.StartsWith("SC_ANALYTICS_GLOBAL_COOKIE=", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
@@ -144,9 +144,9 @@ public class TrackingFixture : IDisposable
         HttpRequestMessage lsRequest = _mockClientHandler.Requests.First();
 
         // Assert
-        lsRequest.Headers.GetValues("Cookie").Should().HaveCount(2);
-        lsRequest.Headers.GetValues("Cookie").Should().Contain(i => i.Contains("ASP.NET_SessionId=", StringComparison.OrdinalIgnoreCase));
-        lsRequest.Headers.GetValues("Cookie").Should().Contain(i => i.Contains("SC_ANALYTICS_GLOBAL_COOKIE=", StringComparison.OrdinalIgnoreCase));
+        lsRequest.Headers.GetValues("Cookie").Count.ShouldBe(2);
+        lsRequest.Headers.GetValues("Cookie").ShouldContain(i => i.Contains("ASP.NET_SessionId=", StringComparison.OrdinalIgnoreCase));
+        lsRequest.Headers.GetValues("Cookie").ShouldContain(i => i.Contains("SC_ANALYTICS_GLOBAL_COOKIE=", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
@@ -167,9 +167,9 @@ public class TrackingFixture : IDisposable
         await client.SendAsync(request);
         HttpRequestMessage lsRequest = _mockClientHandler.Requests.First();
 
-        lsRequest.Headers.GetValues("X-Forwarded-For").Should().ContainSingle();
-        lsRequest.Headers.Contains("X-Forwarded-For").Should().BeTrue();
-        lsRequest.Headers.GetValues("X-Forwarded-For").Should().BeEquivalentTo("172.217.16.14");
+        lsRequest.Headers.GetValues("X-Forwarded-For").Count.ShouldBe(1);
+        lsRequest.Headers.Contains("X-Forwarded-For").ShouldBeTrue();
+        lsRequest.Headers.GetValues("X-Forwarded-For").ShouldBe("172.217.16.14");
     }
 
     [Fact]
@@ -193,9 +193,9 @@ public class TrackingFixture : IDisposable
         HttpResponseMessage response = await client.GetAsync(new Uri("/", UriKind.Relative));
 
         // Assert
-        response.Headers.GetValues("Set-Cookie").Should().HaveCount(2);
-        response.Headers.GetValues("Set-Cookie").Should().Contain(i => i.StartsWith("ASP.NET_SessionId=", StringComparison.OrdinalIgnoreCase));
-        response.Headers.GetValues("Set-Cookie").Should().Contain(i => i.StartsWith("SC_ANALYTICS_GLOBAL_COOKIE=", StringComparison.OrdinalIgnoreCase));
+        response.Headers.GetValues("Set-Cookie").Count.ShouldBe(2);
+        response.Headers.GetValues("Set-Cookie").ShouldContain(i => i.StartsWith("ASP.NET_SessionId=", StringComparison.OrdinalIgnoreCase));
+        response.Headers.GetValues("Set-Cookie").ShouldContain(i => i.StartsWith("SC_ANALYTICS_GLOBAL_COOKIE=", StringComparison.OrdinalIgnoreCase));
     }
 
     public void Dispose()

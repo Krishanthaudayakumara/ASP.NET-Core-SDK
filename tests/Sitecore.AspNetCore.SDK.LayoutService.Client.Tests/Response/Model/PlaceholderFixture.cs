@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Xunit;
 
@@ -13,6 +13,6 @@ public class PlaceholderFixture
         Placeholder sut = [];
 
         // Assert
-        sut.Should().BeEmpty();
+        sut.ShouldBeEmpty();
     }
 }

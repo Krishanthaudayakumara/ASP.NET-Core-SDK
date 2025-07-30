@@ -1,6 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.ExperienceEditor.Extensions;
@@ -58,8 +58,8 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().NotContain("{\"html\":\"{");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldNotContain("{\"html\":\"{");
     }
 
     [Fact]
@@ -73,8 +73,8 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().NotContain("{\"html\":\"{");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldNotContain("{\"html\":\"{");
     }
 
     [Fact]
@@ -89,8 +89,8 @@ public class ExperienceEditorFixture : IDisposable
             .PostAsync(TestConstants.EEMiddlewarePostEndpoint, content);
         string responseString = await response.Content.ReadAsStringAsync();
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        responseString.Should().NotContain("{\"html\":\"{");
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        responseString.ShouldNotContain("{\"html\":\"{");
     }
 
     [Fact]
@@ -104,8 +104,8 @@ public class ExperienceEditorFixture : IDisposable
             .PostAsync(TestConstants.EEMiddlewarePostEndpoint, content);
         string responseString = await response.Content.ReadAsStringAsync();
 
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        responseString.Should().NotContain("{\"html\":\"{");
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        responseString.ShouldNotContain("{\"html\":\"{");
     }
 
     [Fact]
@@ -124,9 +124,9 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Contain("null");
-        responseString.Should().NotContain("{\"html\":\"{");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldContain("null");
+        responseString.ShouldNotContain("{\"html\":\"{");
         await layoutClient.Received().Request(Arg.Is<SitecoreLayoutRequest>(x => x.Any()));
         await layoutClient.Received().Request(Arg.Is<SitecoreLayoutRequest>(x => x.Path() == TestConstants.SampleEndPoint));
     }
@@ -145,14 +145,14 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.Should().NotBeNull();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.ReasonPhrase.Should().Be("OK");
+        response.ShouldNotBeNull();
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.ReasonPhrase.ShouldBe("OK");
         response.Content.Headers.ContentType!.MediaType = "application/json";
         response.Content.Headers.ContentType.CharSet = "utf-8";
-        responseString.Should().Contain("{\"html\":\"{");
+        responseString.ShouldContain("{\"html\":\"{");
         responseString.Should().EndWith("}");
-        responseString.Should().Be(TestConstants.SampleResponseForEE);
+        responseString.ShouldBe(TestConstants.SampleResponseForEE);
     }
 
     [Fact]
@@ -169,11 +169,11 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.ReasonPhrase.Should().Be("OK");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        response.ReasonPhrase.ShouldBe("OK");
         responseString.Should().StartWith("{\"html\":\"{");
         responseString.Should().EndWith("}");
-        responseString.Should().Be(TestConstants.SampleResponseForEE);
+        responseString.ShouldBe(TestConstants.SampleResponseForEE);
     }
 
     [Fact]
@@ -190,7 +190,7 @@ public class ExperienceEditorFixture : IDisposable
         response.EnsureSuccessStatusCode();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
         await layoutClient.DidNotReceive().Request(Arg.Is<SitecoreLayoutRequest>(x => x.Any()));
     }
 
@@ -207,7 +207,7 @@ public class ExperienceEditorFixture : IDisposable
         response.EnsureSuccessStatusCode();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
         await layoutClient.Received().Request(Arg.Is<SitecoreLayoutRequest>(x => x.Any()));
         await layoutClient.Received().Request(Arg.Is<SitecoreLayoutRequest>(x => x.Path() == TestConstants.EEMiddlewarePostEndpoint));
@@ -226,7 +226,7 @@ public class ExperienceEditorFixture : IDisposable
             .PostAsync(TestConstants.SampleEndPoint, content);
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
         await layoutClient.Received().Request(Arg.Is<SitecoreLayoutRequest>(x => x.Any()));
     }
 
@@ -241,7 +241,7 @@ public class ExperienceEditorFixture : IDisposable
         HttpResponseMessage response = await client.PostAsync(TestConstants.SampleEndPoint, new StringContent(string.Empty, Encoding.UTF8, "application/json"));
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
         await layoutClient.Received().Request(Arg.Is<SitecoreLayoutRequest>(x => x.Any()));
     }
 
@@ -258,7 +258,7 @@ public class ExperienceEditorFixture : IDisposable
         HttpResponseMessage response = await client.PostAsync(TestConstants.SampleEndPoint, content);
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
         await layoutClient.Received().Request(Arg.Is<SitecoreLayoutRequest>(x => x.Any()));
     }
 
@@ -276,8 +276,8 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Be("""{"html":"\u0022GET\u0022"}""");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldBe("""{"html":"\u0022GET\u0022"}""");
     }
 
     [Fact]
@@ -294,9 +294,9 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().NotContain("GET");
-        responseString.Should().Contain("POST");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldNotContain("GET");
+        responseString.ShouldContain("POST");
     }
 
     [Theory]
@@ -317,8 +317,8 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().NotContain("{\"html\":\"{");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldNotContain("{\"html\":\"{");
     }
 
     [Theory]
@@ -338,9 +338,9 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Contain("{\"html\":\"{");
-        responseString.Should().Be(TestConstants.SampleResponseForEE);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldContain("{\"html\":\"{");
+        responseString.ShouldBe(TestConstants.SampleResponseForEE);
     }
 
     [Fact]
@@ -357,9 +357,9 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        responseString.Should().Be("""{"html":"\u0022success\u0022"}""");
+        responseString.ShouldBe("""{"html":"\u0022success\u0022"}""");
     }
 
     [Fact]
@@ -376,8 +376,8 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Contain("POST");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldContain("POST");
     }
 
     [Fact]
@@ -394,8 +394,8 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Contain("POST");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldContain("POST");
     }
 
     [Fact]
@@ -412,8 +412,8 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Contain("success");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldContain("success");
     }
 
     [Fact]
@@ -429,8 +429,8 @@ public class ExperienceEditorFixture : IDisposable
         await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        response.ReasonPhrase.Should().Be("Bad Request");
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        response.ReasonPhrase.ShouldBe("Bad Request");
     }
 
     [Fact]
@@ -446,8 +446,8 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Be("""{"html":"\u0022success\u0022"}""");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldBe("""{"html":"\u0022success\u0022"}""");
     }
 
     [Fact]
@@ -463,8 +463,8 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseString.Should().Be("""{"html":"\u0022success\u0022"}""");
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        responseString.ShouldBe("""{"html":"\u0022success\u0022"}""");
     }
 
     [Fact]
@@ -480,8 +480,8 @@ public class ExperienceEditorFixture : IDisposable
         await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        response.ReasonPhrase.Should().Be("Bad Request");
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        response.ReasonPhrase.ShouldBe("Bad Request");
     }
 
     [Fact]
@@ -497,9 +497,9 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        responseString.Should().Be("""{"html":"\u0022GET\u0022"}""");
+        responseString.ShouldBe("""{"html":"\u0022GET\u0022"}""");
     }
 
     [Fact]
@@ -515,9 +515,9 @@ public class ExperienceEditorFixture : IDisposable
         string responseString = await response.Content.ReadAsStringAsync();
 
         // Asserts
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        responseString.Should().Contain("POST");
+        responseString.ShouldContain("POST");
     }
 
     [Fact]
@@ -532,8 +532,8 @@ public class ExperienceEditorFixture : IDisposable
             .PostAsync(TestConstants.EEMiddlewarePostEndpoint, content);
         string responseString = await response.Content.ReadAsStringAsync();
 
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        responseString.Should().NotContain("{\"html\":\"{");
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        responseString.ShouldNotContain("{\"html\":\"{");
     }
 
     [Fact]
@@ -548,8 +548,8 @@ public class ExperienceEditorFixture : IDisposable
             .PostAsync(TestConstants.EEMiddlewarePostEndpoint, content);
         string responseString = await response.Content.ReadAsStringAsync();
 
-        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
-        responseString.Should().NotContain("{\"html\":\"{");
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        responseString.ShouldNotContain("{\"html\":\"{");
     }
 
     public void Dispose()

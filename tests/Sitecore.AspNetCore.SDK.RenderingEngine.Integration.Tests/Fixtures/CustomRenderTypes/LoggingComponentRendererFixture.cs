@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -69,9 +69,9 @@ public class LoggingComponentRendererFixture : IDisposable
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes.FirstOrDefault(n => n.HasClass("component-6"));
 
         // Assert
-        sectionNode.Should().BeNull();
+        sectionNode.ShouldBeNull();
 
-        InMemoryLog.Log.Should().Contain("LoggingComponentRenderer: Render method called. Component name: Component-6");
+        InMemoryLog.Log.ShouldContain("LoggingComponentRenderer: Render method called. Component name: Component-6");
     }
 
     public void Dispose()

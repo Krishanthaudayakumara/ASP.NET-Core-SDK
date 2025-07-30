@@ -1,8 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -63,9 +63,9 @@ public class DateTagHelperFixture
         Action contextNull =
             () => sut.Process(null!, tagHelperOutput);
 
-        allNull.Should().Throw<ArgumentNullException>();
-        outputNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => outputNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -83,7 +83,7 @@ public class DateTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -101,7 +101,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(CultureInfo.CurrentCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(_date.ToString(CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -119,7 +119,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -139,7 +139,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(dateFormat, CultureInfo.InvariantCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(_date.ToString(dateFormat, CultureInfo.InvariantCulture));
     }
 
     [Theory]
@@ -159,7 +159,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(CultureInfo.CreateSpecificCulture(culture)));
+        tagHelperOutput.Content.GetContent().ShouldBe(_date.ToString(CultureInfo.CreateSpecificCulture(culture)));
     }
 
     [Theory]
@@ -177,7 +177,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(CultureInfo.CurrentCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(_date.ToString(CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -199,7 +199,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Editable);
+        tagHelperOutput.Content.GetContent().ShouldBe(Editable);
     }
 
     #region asp-date attribute
@@ -218,7 +218,7 @@ public class DateTagHelperFixture
         await sut.ProcessAsync(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -236,7 +236,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(CultureInfo.CurrentCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(_date.ToString(CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -254,7 +254,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(string.Empty);
+        tagHelperOutput.Content.GetContent().ShouldBe(string.Empty);
     }
 
     [Theory]
@@ -274,7 +274,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(dateFormat, CultureInfo.InvariantCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(_date.ToString(dateFormat, CultureInfo.InvariantCulture));
     }
 
     [Theory]
@@ -294,7 +294,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(CultureInfo.CreateSpecificCulture(culture)));
+        tagHelperOutput.Content.GetContent().ShouldBe(_date.ToString(CultureInfo.CreateSpecificCulture(culture)));
     }
 
     [Theory]
@@ -312,7 +312,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(CultureInfo.CurrentCulture));
+        tagHelperOutput.Content.GetContent().ShouldBe(_date.ToString(CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -334,7 +334,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(Editable);
+        tagHelperOutput.Content.GetContent().ShouldBe(Editable);
     }
     #endregion
 
@@ -362,7 +362,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Contain(Editable);
+        tagHelperOutput.Content.GetContent().ShouldContain(Editable);
         chromeRenderer.Received().Render(openingChrome);
         chromeRenderer.Received().Render(closingChrome);
     }

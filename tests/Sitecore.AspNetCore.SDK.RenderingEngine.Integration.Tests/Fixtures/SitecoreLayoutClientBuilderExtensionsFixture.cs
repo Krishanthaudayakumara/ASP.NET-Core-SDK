@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Options;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -45,7 +45,7 @@ public class SitecoreLayoutClientBuilderExtensionsFixture : IDisposable
         IOptions<SitecoreLayoutClientOptions> layoutService = _server.Services.GetRequiredService<IOptions<SitecoreLayoutClientOptions>>();
 
         // Assert
-        layoutService.Value.DefaultHandler.Should().Be("otherMock");
+        layoutService.Value.DefaultHandler.ShouldBe("otherMock");
     }
 
     public void Dispose()

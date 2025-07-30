@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Routing;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Routing;
@@ -14,7 +14,7 @@ public class LanguageRouteConstraintFixture
     {
         bool match = stu.Match(null, null, "path", [], RouteDirection.IncomingRequest);
 
-        match.Should().BeFalse();
+        match.ShouldBeFalse();
     }
 
     [Theory]
@@ -28,7 +28,7 @@ public class LanguageRouteConstraintFixture
 
         bool match = stu.Match(null, null, "path", values, RouteDirection.IncomingRequest);
 
-        match.Should().BeTrue();
+        match.ShouldBeTrue();
     }
 
     [Theory]
@@ -42,6 +42,6 @@ public class LanguageRouteConstraintFixture
 
         bool match = stu.Match(null, null, "path", values, RouteDirection.IncomingRequest);
 
-        match.Should().BeFalse();
+        match.ShouldBeFalse();
     }
 }

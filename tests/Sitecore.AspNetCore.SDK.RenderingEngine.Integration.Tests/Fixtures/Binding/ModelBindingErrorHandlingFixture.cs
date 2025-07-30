@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
@@ -69,13 +69,13 @@ public class ModelBindingErrorHandlingFixture : IDisposable
 
         // Assert
         sectionNode.ChildNodes.Single(n => n.Id.Equals("textField", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
 
         sectionNode.ChildNodes.Single(n => n.Id.Equals("routeProperty", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
 
         sectionNode.ChildNodes.Single(n => n.Id.Equals("routeField", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
 
         sectionNode.ChildNodes.Single(n => n.Id.Equals("contextProperty", StringComparison.OrdinalIgnoreCase)).InnerText.
             Should().BeEmpty();
@@ -84,10 +84,10 @@ public class ModelBindingErrorHandlingFixture : IDisposable
             Should().BeEmpty();
 
         nestedSectionNode.ChildNodes.Single(n => n.Id.Equals("nestedTextField", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
 
         nestedSectionNode.ChildNodes.Single(n => n.Id.Equals("nestedComponentId", StringComparison.OrdinalIgnoreCase)).InnerText
-            .Should().BeEmpty();
+            .ShouldBeEmpty();
     }
 
     public void Dispose()

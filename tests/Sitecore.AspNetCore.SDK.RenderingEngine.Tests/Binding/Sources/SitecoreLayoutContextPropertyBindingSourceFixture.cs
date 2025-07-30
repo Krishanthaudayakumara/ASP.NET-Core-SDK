@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response;
@@ -56,13 +56,13 @@ public class SitecoreLayoutContextPropertyBindingSourceFixture
             () => sut.GetModel(serviceProvider, modelBindingContext, null!);
 
         // Act & Assert
-        allNull.Should().Throw<ArgumentNullException>();
-        serviceProviderNull.Should().Throw<ArgumentNullException>();
-        firstAndSecondArgsNull.Should().Throw<ArgumentNullException>();
-        firstAndThirdArgsNull.Should().Throw<ArgumentNullException>();
-        secondAndThirdArgsNull.Should().Throw<ArgumentNullException>();
-        bindingContextNull.Should().Throw<ArgumentNullException>();
-        contextNull.Should().Throw<ArgumentNullException>();
+        var ex = Should.Throw<ArgumentNullException>(() => allNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => serviceProviderNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => firstAndSecondArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => firstAndThirdArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => secondAndThirdArgsNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => bindingContextNull()); // TODO: Assert exception properties manually;
+        var ex = Should.Throw<ArgumentNullException>(() => contextNull()); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -80,7 +80,7 @@ public class SitecoreLayoutContextPropertyBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     [Theory]
@@ -99,7 +99,7 @@ public class SitecoreLayoutContextPropertyBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     [Theory]
@@ -118,7 +118,7 @@ public class SitecoreLayoutContextPropertyBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     [Theory]
@@ -137,8 +137,8 @@ public class SitecoreLayoutContextPropertyBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().NotBeNull();
-        model.Should().Be("en");
+        model.ShouldNotBeNull();
+        model.ShouldBe("en");
     }
 
     [Theory]
@@ -157,8 +157,8 @@ public class SitecoreLayoutContextPropertyBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().NotBeNull();
-        model.Should().Be("en");
+        model.ShouldNotBeNull();
+        model.ShouldBe("en");
     }
 
     [Theory]
@@ -177,7 +177,7 @@ public class SitecoreLayoutContextPropertyBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().BeNull();
+        model.ShouldBeNull();
     }
 
     [Theory]
@@ -195,7 +195,7 @@ public class SitecoreLayoutContextPropertyBindingSourceFixture
         object? model = sut.GetModel(serviceProvider, modelBindingContext, renderingContext);
 
         // Assert
-        model.Should().NotBeNull();
-        model.Should().Be("en");
+        model.ShouldNotBeNull();
+        model.ShouldBe("en");
     }
 }

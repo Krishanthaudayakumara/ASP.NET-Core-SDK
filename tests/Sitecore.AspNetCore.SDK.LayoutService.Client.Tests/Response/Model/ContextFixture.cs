@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Xunit;
 
@@ -13,9 +13,9 @@ public class ContextFixture
         Context sut = new();
 
         // Assert
-        sut.IsEditing.Should().Be(default);
-        sut.Site.Should().Be(default);
-        sut.PageState.Should().BeNull();
-        sut.Language.Should().Be(string.Empty);
+        sut.IsEditing.ShouldBe(default);
+        sut.Site.ShouldBe(default);
+        sut.PageState.ShouldBeNull();
+        sut.Language.ShouldBe(string.Empty);
     }
 }

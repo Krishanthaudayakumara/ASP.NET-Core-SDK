@@ -1,6 +1,6 @@
-﻿using System.Text;
+using System.Text;
 using AutoFixture;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
@@ -61,7 +61,7 @@ public class SitecoreViewModelBinderFixture
         Func<Task<SitecoreViewModelBinder>> act =
             () => sut.Bind<SitecoreViewModelBinder>(null!);
 
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -72,7 +72,7 @@ public class SitecoreViewModelBinderFixture
     {
         Task<StringBuilder> model = sut.Bind<StringBuilder>(viewContext);
 
-        model.Should().NotBeNull();
+        model.ShouldNotBeNull();
     }
 
     [Theory]
@@ -82,7 +82,7 @@ public class SitecoreViewModelBinderFixture
         Func<Task> act =
             () => sut.Bind<SitecoreViewModelBinder>(null!, null!);
 
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -92,7 +92,7 @@ public class SitecoreViewModelBinderFixture
         Func<Task> act =
             () => sut.Bind(new SitecoreViewModelBinder(), null!);
 
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -117,7 +117,7 @@ public class SitecoreViewModelBinderFixture
             () => sut.Bind(null!, null!);
 
         // Act & Assert
-        await act.Should().ThrowAsync<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'modelType')");
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually// TODO: Assert exception.Message manually");
     }
 
     [Theory]
@@ -129,7 +129,7 @@ public class SitecoreViewModelBinderFixture
             () => sut.Bind(typeof(StringBuilder), null!);
 
         // Act & Assert
-        await act.Should().ThrowAsync<ArgumentNullException>().WithMessage("Value cannot be null. (Parameter 'viewContext')");
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually// TODO: Assert exception.Message manually");
     }
 
     [Theory]

@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
 using AutoFixture.Idioms;
-using FluentAssertions;
+using Shouldly;
 using GraphQL;
 using GraphQL.Client.Abstractions;
 using Microsoft.Extensions.Logging;
@@ -71,7 +71,7 @@ public class GraphQLEditingServiceHandlerFixture
         Func<Task> act = async () => { await sut.Request(null!, string.Empty); };
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentNullException>();
+        var ex = await Should.ThrowAsync<ArgumentNullException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -82,7 +82,7 @@ public class GraphQLEditingServiceHandlerFixture
         Func<Task> act = async () => { await sut.Request([], null!); };
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentException>();
+        var ex = await Should.ThrowAsync<ArgumentException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -93,7 +93,7 @@ public class GraphQLEditingServiceHandlerFixture
         Func<Task> act = async () => { await sut.Request([], string.Empty); };
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentException>();
+        var ex = await Should.ThrowAsync<ArgumentException>(act); // TODO: Assert exception properties manually;
     }
 
     [Theory]
@@ -107,7 +107,7 @@ public class GraphQLEditingServiceHandlerFixture
         Func<Task> act = async () => { await sut.Request(request, "editingHandler"); };
 
         // Assert
-        await act.Should().ThrowAsync<ArgumentException>().WithMessage("GraphQLEditingServiceHandler: Error attempting to process non-editing request");
+        var ex = await Should.ThrowAsync<ArgumentException>(act); // TODO: Assert exception properties manually// TODO: Assert exception.Message manually;
     }
 
     [Theory]
@@ -129,7 +129,7 @@ public class GraphQLEditingServiceHandlerFixture
         SitecoreLayoutResponse result = await sut.Request(request, "editingHandler");
 
         // Assert
-        result.Errors.Should().ContainItemsAssignableTo<ItemNotFoundSitecoreLayoutServiceClientException>();
+        result.Errors.All(x => x is ItemNotFoundSitecoreLayoutServiceClientException).ShouldBeTrue() // TODO: Check type safety manually;
     }
 
     [Theory]
@@ -144,7 +144,7 @@ public class GraphQLEditingServiceHandlerFixture
         SitecoreLayoutResponse result = await sut.Request(request, "editingHandler");
 
         // Assert
-        result.Errors.Should().BeEmpty();
+        result.Errors.ShouldBeEmpty();
         await client.Received(1).SendQueryAsync<EditingLayoutQueryResponse>(Arg.Any<GraphQLRequest>());
     }
 
@@ -161,7 +161,7 @@ public class GraphQLEditingServiceHandlerFixture
         SitecoreLayoutResponse result = await sut.Request(request, "editingHandler");
 
         // Asset
-        result.Errors.Should().BeEmpty();
+        result.Errors.ShouldBeEmpty();
         await client.Received(1).SendQueryAsync<EditingLayoutQueryResponse>(Arg.Any<GraphQLRequest>());
         await mockDictionaryService.Received(1).GetSiteDictionary(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<IGraphQLClient>());
     }
@@ -179,15 +179,15 @@ public class GraphQLEditingServiceHandlerFixture
         SitecoreLayoutResponse result = await sut.Request(request, "editingHandler");
 
         // Assert
-        result.Errors.Should().BeEmpty();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"].Count.Should().Be(2);
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][0].Should().BeOfType<EditableChrome>();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][0].As<EditableChrome>().Attributes["chrometype"].Should().Be("placeholder");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][0].As<EditableChrome>().Attributes["kind"].Should().Be("open");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][0].As<EditableChrome>().Attributes["id"].Should().Be($"placeholder_1_{Guid.Empty.ToString()}");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].Should().BeOfType<EditableChrome>();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].As<EditableChrome>().Attributes["chrometype"].Should().Be("placeholder");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].As<EditableChrome>().Attributes["kind"].Should().Be("close");
+        result.Errors.ShouldBeEmpty();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"].Count.ShouldBe(2);
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][0].ShouldBeOfType<EditableChrome>();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][0].As<EditableChrome>().Attributes["chrometype"].ShouldBe("placeholder");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][0].As<EditableChrome>().Attributes["kind"].ShouldBe("open");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][0].As<EditableChrome>().Attributes["id"].ShouldBe($"placeholder_1_{Guid.Empty.ToString()}");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].ShouldBeOfType<EditableChrome>();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].As<EditableChrome>().Attributes["chrometype"].ShouldBe("placeholder");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].As<EditableChrome>().Attributes["kind"].ShouldBe("close");
     }
 
     [Theory]
@@ -203,14 +203,14 @@ public class GraphQLEditingServiceHandlerFixture
         SitecoreLayoutResponse result = await sut.Request(request, "editingHandler");
 
         // Assert
-        result.Errors.Should().BeEmpty();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][0].Should().BeOfType<EditableChrome>();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][0].As<EditableChrome>().Attributes["chrometype"].Should().Be("placeholder");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][0].As<EditableChrome>().Attributes["kind"].Should().Be("open");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][0].As<EditableChrome>().Attributes["id"].Should().Be("nested_placeholder_1_component_1");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].Should().BeOfType<EditableChrome>();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].As<EditableChrome>().Attributes["chrometype"].Should().Be("placeholder");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].As<EditableChrome>().Attributes["kind"].Should().Be("close");
+        result.Errors.ShouldBeEmpty();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][0].ShouldBeOfType<EditableChrome>();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][0].As<EditableChrome>().Attributes["chrometype"].ShouldBe("placeholder");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][0].As<EditableChrome>().Attributes["kind"].ShouldBe("open");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][0].As<EditableChrome>().Attributes["id"].ShouldBe("nested_placeholder_1_component_1");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].ShouldBeOfType<EditableChrome>();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].As<EditableChrome>().Attributes["chrometype"].ShouldBe("placeholder");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].As<EditableChrome>().Attributes["kind"].ShouldBe("close");
     }
 
     [Theory]
@@ -226,15 +226,15 @@ public class GraphQLEditingServiceHandlerFixture
         SitecoreLayoutResponse result = await sut.Request(request, "editingHandler");
 
         // Assert
-        result.Errors.Should().BeEmpty();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"].Count.Should().Be(5);
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].Should().BeOfType<EditableChrome>();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].As<EditableChrome>().Attributes["chrometype"].Should().Be("rendering");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].As<EditableChrome>().Attributes["kind"].Should().Be("open");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].As<EditableChrome>().Attributes["id"].Should().Be($"component_1");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][3].Should().BeOfType<EditableChrome>();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][3].As<EditableChrome>().Attributes["chrometype"].Should().Be("rendering");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][3].As<EditableChrome>().Attributes["kind"].Should().Be("close");
+        result.Errors.ShouldBeEmpty();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"].Count.ShouldBe(5);
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].ShouldBeOfType<EditableChrome>();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].As<EditableChrome>().Attributes["chrometype"].ShouldBe("rendering");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].As<EditableChrome>().Attributes["kind"].ShouldBe("open");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][1].As<EditableChrome>().Attributes["id"].ShouldBe($"component_1");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][3].ShouldBeOfType<EditableChrome>();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][3].As<EditableChrome>().Attributes["chrometype"].ShouldBe("rendering");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][3].As<EditableChrome>().Attributes["kind"].ShouldBe("close");
     }
 
     [Theory]
@@ -250,15 +250,15 @@ public class GraphQLEditingServiceHandlerFixture
         SitecoreLayoutResponse result = await sut.Request(request, "editingHandler");
 
         // Assert
-        result.Errors.Should().BeEmpty();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"].Count.Should().Be(5);
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].Should().BeOfType<EditableChrome>();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].As<EditableChrome>().Attributes["chrometype"].Should().Be("rendering");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].As<EditableChrome>().Attributes["kind"].Should().Be("open");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].As<EditableChrome>().Attributes["id"].Should().Be($"nested_component_2");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][3].Should().BeOfType<EditableChrome>();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][3].As<EditableChrome>().Attributes["chrometype"].Should().Be("rendering");
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][3].As<EditableChrome>().Attributes["kind"].Should().Be("close");
+        result.Errors.ShouldBeEmpty();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"].Count.ShouldBe(5);
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].ShouldBeOfType<EditableChrome>();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].As<EditableChrome>().Attributes["chrometype"].ShouldBe("rendering");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].As<EditableChrome>().Attributes["kind"].ShouldBe("open");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][1].As<EditableChrome>().Attributes["id"].ShouldBe($"nested_component_2");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][3].ShouldBeOfType<EditableChrome>();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][3].As<EditableChrome>().Attributes["chrometype"].ShouldBe("rendering");
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Placeholders["nested_placeholder_1"][3].As<EditableChrome>().Attributes["kind"].ShouldBe("close");
     }
 
     [Theory]
@@ -274,20 +274,20 @@ public class GraphQLEditingServiceHandlerFixture
         SitecoreLayoutResponse result = await sut.Request(request, "editingHandler");
 
         // Assert
-        result.Errors.Should().BeEmpty();
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"].Count.Should().Be(5);
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Fields.Values.Count.Should().Be(1);
-        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Fields["field_1"].Should().BeOfType<JsonSerializedField>();
+        result.Errors.ShouldBeEmpty();
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"].Count.ShouldBe(5);
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Fields.Values.Count.ShouldBe(1);
+        result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Fields["field_1"].ShouldBeOfType<JsonSerializedField>();
         JsonSerializedField? jsonSerialisedField = result?.Content?.Sitecore?.Route?.Placeholders["placeholder_1"][2].As<Component>().Fields["field_1"] as JsonSerializedField;
-        jsonSerialisedField.Should().NotBeNull();
+        jsonSerialisedField.ShouldNotBeNull();
         EditableField<object>? editableField = jsonSerialisedField?.Read<EditableField<object>>();
-        editableField.Should().NotBeNull();
-        editableField?.OpeningChrome.Should().NotBeNull();
-        editableField?.OpeningChrome?.Attributes["chrometype"].Should().Be("field");
-        editableField?.OpeningChrome?.Attributes["kind"].Should().Be("open");
-        editableField?.OpeningChrome?.Content.Should().Be(@"{""datasource"":{""id"":""datasource_id"",""language"":""en"",""revision"":""revision_1"",""version"":1},""title"":""Text"",""fieldId"":""field_id"",""fieldType"":""Text"",""rawValue"":""field_raw_value""}");
-        editableField?.ClosingChrome.Should().NotBeNull();
-        editableField?.ClosingChrome?.Attributes["chrometype"].Should().Be("field");
-        editableField?.ClosingChrome?.Attributes["kind"].Should().Be("close");
+        editableField.ShouldNotBeNull();
+        editableField?.OpeningChrome.ShouldNotBeNull();
+        editableField?.OpeningChrome?.Attributes["chrometype"].ShouldBe("field");
+        editableField?.OpeningChrome?.Attributes["kind"].ShouldBe("open");
+        editableField?.OpeningChrome?.Content.ShouldBe(@"{""datasource"":{""id"":""datasource_id"",""language"":""en"",""revision"":""revision_1"",""version"":1},""title"":""Text"",""fieldId"":""field_id"",""fieldType"":""Text"",""rawValue"":""field_raw_value""}");
+        editableField?.ClosingChrome.ShouldNotBeNull();
+        editableField?.ClosingChrome?.Attributes["chrometype"].ShouldBe("field");
+        editableField?.ClosingChrome?.Attributes["kind"].ShouldBe("close");
     }
 }

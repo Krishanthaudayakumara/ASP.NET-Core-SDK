@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -57,7 +57,7 @@ public class GlobalMiddlewareFixture : IDisposable
         HttpClient client = _server.CreateClient();
         await client.GetAsync(GlobalMiddlewareController);
 
-        _mockClientHandler.WasInvoked.Should().BeTrue();
+        _mockClientHandler.WasInvoked.ShouldBeTrue();
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class GlobalMiddlewareFixture : IDisposable
         HttpClient client = _server.CreateClient();
         string response = await client.GetStringAsync(GlobalMiddlewareController);
 
-        response.Should().Be("\"success\"");
+        response.ShouldBe("\"success\"");
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class GlobalMiddlewareFixture : IDisposable
         HttpClient client = _server.CreateClient();
         string response = await client.GetStringAsync("WithRoute");
 
-        response.Should().Contain("ComponentIsMissing");
+        response.ShouldContain("ComponentIsMissing");
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class GlobalMiddlewareFixture : IDisposable
         HttpClient client = _server.CreateClient();
         HttpResponseMessage response = await client.GetAsync(GlobalMiddlewareController);
 
-        response.Headers.Contains(CustomHeaderName).Should().BeTrue();
+        response.Headers.Contains(CustomHeaderName).ShouldBeTrue();
     }
 
     public void Dispose()

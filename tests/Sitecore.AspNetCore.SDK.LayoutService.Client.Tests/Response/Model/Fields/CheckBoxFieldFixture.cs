@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Fields;
 using Xunit;
 
@@ -13,8 +13,8 @@ public class CheckBoxFieldFixture : FieldFixture<CheckboxField>
         CheckboxField instance = new();
 
         // Assert
-        instance.Value.Should().Be(default);
-        instance.EditableMarkup.Should().BeEmpty();
+        instance.Value.ShouldBe(default);
+        instance.EditableMarkup.ShouldBeEmpty();
     }
 
     [Theory]
@@ -26,7 +26,7 @@ public class CheckBoxFieldFixture : FieldFixture<CheckboxField>
         CheckboxField instance = new(value);
 
         // Assert
-        instance.Value.Should().Be(value);
-        instance.EditableMarkup.Should().BeEmpty();
+        instance.Value.ShouldBe(value);
+        instance.EditableMarkup.ShouldBeEmpty();
     }
 }

@@ -1,5 +1,5 @@
-﻿using System.Net;
-using FluentAssertions;
+using System.Net;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -50,13 +50,13 @@ public class ModelBindingFixture : IDisposable
         string response = await client.GetStringAsync("WithBoundSitecoreRoute");
 
         // assert that the SitecoreRouteProperty attribute binding worked
-        response.Should().Contain(TestConstants.DatabaseName);
+        response.ShouldContain(TestConstants.DatabaseName);
 
         // assert that the SitecoreRouteField attribute binding worked
-        response.Should().Contain(TestConstants.PageTitle);
+        response.ShouldContain(TestConstants.PageTitle);
 
         // assert that the SitecoreRoute model binding worked
-        response.Should().Contain(TestConstants.TestItemId);
+        response.ShouldContain(TestConstants.TestItemId);
     }
 
     [Fact]
@@ -72,11 +72,11 @@ public class ModelBindingFixture : IDisposable
         string response = await client.GetStringAsync("WithBoundSitecoreContext");
 
         // assert that the SitecoreContextProperty attribute binding worked
-        response.Should().Contain(TestConstants.Language);
-        response.Should().Contain("False");
+        response.ShouldContain(TestConstants.Language);
+        response.ShouldContain("False");
 
         // assert that the SitecoreContext model binding worked
-        response.Should().Contain(PageState.Normal.ToString());
+        response.ShouldContain(PageState.Normal.ToString());
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class ModelBindingFixture : IDisposable
         string response = await client.GetStringAsync("WithBoundSitecoreResponse");
 
         // assert that the SitecoreLayoutResponse attribute binding worked
-        response.Should().Contain(TestConstants.DatabaseName);
+        response.ShouldContain(TestConstants.DatabaseName);
     }
 
     public void Dispose()

@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Exceptions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model;
 using Xunit;
@@ -28,7 +28,7 @@ public abstract class FieldFixture<TField>
         TField? result = _sut.Read<TField>();
 
         // Assert
-        result.Should().BeSameAs(_sut);
+        result.ShouldBeSameAs(_sut);
     }
 
     [Fact]
@@ -38,8 +38,8 @@ public abstract class FieldFixture<TField>
         bool result = _sut.TryRead(out Field<object>? instance);
 
         // Assert
-        result.Should().BeFalse();
-        instance.Should().BeNull();
+        result.ShouldBeFalse();
+        instance.ShouldBeNull();
     }
 
     [Fact]
@@ -49,8 +49,8 @@ public abstract class FieldFixture<TField>
         bool result = _sut.TryRead(out TField? instance);
 
         // Assert
-        result.Should().BeTrue();
-        instance.Should().BeSameAs(_sut);
+        result.ShouldBeTrue();
+        instance.ShouldBeSameAs(_sut);
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public abstract class FieldFixture<TField>
         object? result = _sut.Read(typeof(TField));
 
         // Assert
-        result.Should().BeSameAs(_sut);
+        result.ShouldBeSameAs(_sut);
     }
 
     [Fact]
@@ -80,8 +80,8 @@ public abstract class FieldFixture<TField>
         bool result = _sut.TryRead(typeof(Tuple), out IField? instance);
 
         // Assert
-        result.Should().BeFalse();
-        instance.Should().BeNull();
+        result.ShouldBeFalse();
+        instance.ShouldBeNull();
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public abstract class FieldFixture<TField>
         bool result = _sut.TryRead(typeof(TField), out IField? instance);
 
         // Assert
-        result.Should().BeTrue();
-        instance.Should().BeSameAs(_sut);
+        result.ShouldBeTrue();
+        instance.ShouldBeSameAs(_sut);
     }
 }

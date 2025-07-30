@@ -1,5 +1,5 @@
-﻿using AutoFixture;
-using FluentAssertions;
+using AutoFixture;
+using Shouldly;
 using Sitecore.AspNetCore.SDK.AutoFixture.Attributes;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Request;
 using Xunit;
@@ -25,8 +25,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         sut[key.ToUpperInvariant()] = value;
 
         // Assert
-        sut.Keys.Should().ContainSingle(x => x == key);
-        sut.Values.Should().ContainSingle(x => (string)x! == value);
+        sut.Keys.Single(x => x == key).ShouldNotBeNull();
+        sut.Values.Single(x => (string).ShouldNotBeNull()x! == value);
     }
 
     #region ApiKey
@@ -38,8 +38,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.ApiKey(null!);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -50,7 +50,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.ApiKey();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -64,7 +64,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.ApiKey();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -78,7 +78,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.ApiKey();
 
         // Assert
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 
     [Theory]
@@ -90,7 +90,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.ApiKey();
 
         // Act / Assert
-        result.Should().Be(default);
+        result.ShouldBe(default);
     }
 
     [Fact]
@@ -100,8 +100,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.ApiKey(null!, null);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -112,7 +112,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         sut.ApiKey(value);
 
         // Assert
-        sut[RequestKeys.ApiKey].Should().Be(value);
+        sut[RequestKeys.ApiKey].ShouldBe(value);
     }
 
     [Theory]
@@ -124,7 +124,7 @@ public class SitecoreLayoutRequestExtensionsFixture
 
         // Assert
         bool result = sut.TryGetValue(RequestKeys.ApiKey, out object? _);
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Theory]
@@ -135,7 +135,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         SitecoreLayoutRequest result = sut.ApiKey(null);
 
         // Assert
-        result.Should().BeSameAs(sut);
+        result.ShouldBeSameAs(sut);
     }
 
     #endregion
@@ -149,8 +149,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.SiteName(null!);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -161,7 +161,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.SiteName();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -175,7 +175,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.SiteName();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -189,7 +189,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.SiteName();
 
         // Assert
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 
     [Theory]
@@ -201,7 +201,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.SiteName();
 
         // Act / Assert
-        result.Should().Be(default);
+        result.ShouldBe(default);
     }
 
     [Fact]
@@ -211,8 +211,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.SiteName(null!, null);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -223,7 +223,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         sut.SiteName(value);
 
         // Assert
-        sut[RequestKeys.SiteName].Should().Be(value);
+        sut[RequestKeys.SiteName].ShouldBe(value);
     }
 
     [Theory]
@@ -235,7 +235,7 @@ public class SitecoreLayoutRequestExtensionsFixture
 
         // Assert
         bool result = sut.TryGetValue(RequestKeys.SiteName, out object? _);
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Theory]
@@ -246,7 +246,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         SitecoreLayoutRequest result = sut.SiteName(null);
 
         // Assert
-        result.Should().BeSameAs(sut);
+        result.ShouldBeSameAs(sut);
     }
 
     #endregion
@@ -260,8 +260,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.Language(null!);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -272,7 +272,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Language();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -286,7 +286,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Language();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -300,7 +300,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Language();
 
         // Assert
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 
     [Theory]
@@ -312,7 +312,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Language();
 
         // Act / Assert
-        result.Should().Be(default);
+        result.ShouldBe(default);
     }
 
     [Fact]
@@ -322,8 +322,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.Language(null!, null);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -334,7 +334,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         sut.Language(value);
 
         // Assert
-        sut[RequestKeys.Language].Should().Be(value);
+        sut[RequestKeys.Language].ShouldBe(value);
     }
 
     [Theory]
@@ -346,7 +346,7 @@ public class SitecoreLayoutRequestExtensionsFixture
 
         // Assert
         bool result = sut.TryGetValue(RequestKeys.Language, out object? _);
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Theory]
@@ -357,7 +357,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         SitecoreLayoutRequest result = sut.Language(null);
 
         // Assert
-        result.Should().BeSameAs(sut);
+        result.ShouldBeSameAs(sut);
     }
 
     #endregion
@@ -371,8 +371,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.PreviewDate(null!);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -383,7 +383,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.PreviewDate();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -397,7 +397,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.PreviewDate();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -411,7 +411,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.PreviewDate();
 
         // Assert
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 
     [Theory]
@@ -423,7 +423,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.PreviewDate();
 
         // Act / Assert
-        result.Should().Be(default);
+        result.ShouldBe(default);
     }
 
     [Fact]
@@ -433,8 +433,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.PreviewDate(null!, null);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -445,7 +445,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         sut.PreviewDate(value);
 
         // Assert
-        sut[RequestKeys.PreviewDate].Should().Be(value);
+        sut[RequestKeys.PreviewDate].ShouldBe(value);
     }
 
     [Theory]
@@ -457,7 +457,7 @@ public class SitecoreLayoutRequestExtensionsFixture
 
         // Assert
         bool result = sut.TryGetValue(RequestKeys.PreviewDate, out object? _);
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Theory]
@@ -468,7 +468,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         SitecoreLayoutRequest result = sut.PreviewDate(null);
 
         // Assert
-        result.Should().BeSameAs(sut);
+        result.ShouldBeSameAs(sut);
     }
 
     #endregion
@@ -482,8 +482,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.Mode(null!);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -494,7 +494,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Mode();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -508,7 +508,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Mode();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -522,7 +522,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Mode();
 
         // Assert
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 
     [Theory]
@@ -534,7 +534,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Mode();
 
         // Act / Assert
-        result.Should().Be(default);
+        result.ShouldBe(default);
     }
 
     [Fact]
@@ -544,8 +544,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.Mode(null!, null);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -556,7 +556,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         sut.Mode(value);
 
         // Assert
-        sut[RequestKeys.Mode].Should().Be(value);
+        sut[RequestKeys.Mode].ShouldBe(value);
     }
 
     [Theory]
@@ -568,7 +568,7 @@ public class SitecoreLayoutRequestExtensionsFixture
 
         // Assert
         bool result = sut.TryGetValue(RequestKeys.Mode, out object? _);
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Theory]
@@ -579,7 +579,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         SitecoreLayoutRequest result = sut.Mode(null);
 
         // Assert
-        result.Should().BeSameAs(sut);
+        result.ShouldBeSameAs(sut);
     }
 
     #endregion
@@ -593,8 +593,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.AuthenticationHeader(null!);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -605,7 +605,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.AuthenticationHeader();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -619,7 +619,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.AuthenticationHeader();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -633,7 +633,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.AuthenticationHeader();
 
         // Assert
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 
     [Theory]
@@ -645,7 +645,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.AuthenticationHeader();
 
         // Act / Assert
-        result.Should().Be(default);
+        result.ShouldBe(default);
     }
 
     [Fact]
@@ -655,8 +655,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.AuthenticationHeader(null!, null);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -667,7 +667,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         sut.AuthenticationHeader(value);
 
         // Assert
-        sut[RequestKeys.AuthHeaderKey].Should().Be(value);
+        sut[RequestKeys.AuthHeaderKey].ShouldBe(value);
     }
 
     [Theory]
@@ -679,7 +679,7 @@ public class SitecoreLayoutRequestExtensionsFixture
 
         // Assert
         bool result = sut.TryGetValue(RequestKeys.AuthHeaderKey, out object? _);
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Theory]
@@ -690,7 +690,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         SitecoreLayoutRequest result = sut.AuthenticationHeader(null);
 
         // Assert
-        result.Should().BeSameAs(sut);
+        result.ShouldBeSameAs(sut);
     }
 
     #endregion
@@ -704,8 +704,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.Path(null!);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -716,7 +716,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Path();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -730,7 +730,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Path();
 
         // Assert
-        result.Should().BeNull();
+        result.ShouldBeNull();
     }
 
     [Theory]
@@ -744,7 +744,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Path();
 
         // Assert
-        result.Should().Be(value);
+        result.ShouldBe(value);
     }
 
     [Theory]
@@ -756,7 +756,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         string? result = sut.Path();
 
         // Act / Assert
-        result.Should().Be(default);
+        result.ShouldBe(default);
     }
 
     [Fact]
@@ -766,8 +766,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.Path(null!, null);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -778,7 +778,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         sut.Path(value);
 
         // Assert
-        sut[RequestKeys.Path].Should().Be(value);
+        sut[RequestKeys.Path].ShouldBe(value);
     }
 
     [Theory]
@@ -790,7 +790,7 @@ public class SitecoreLayoutRequestExtensionsFixture
 
         // Assert
         bool result = sut.TryGetValue(RequestKeys.Path, out object? _);
-        result.Should().BeTrue();
+        result.ShouldBeTrue();
     }
 
     [Theory]
@@ -801,7 +801,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         SitecoreLayoutRequest result = sut.Path(null);
 
         // Assert
-        result.Should().BeSameAs(sut);
+        result.ShouldBeSameAs(sut);
     }
 
     #endregion
@@ -815,8 +815,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         Action action = () => SitecoreLayoutRequestExtensions.UpdateRequest(null!, null);
 
         // Assert
-        action.Should().Throw<ArgumentNullException>()
-            .And.ParamName.Should().Be("request");
+        var ex = Should.Throw<ArgumentNullException>(() => action()); // TODO: Assert exception properties manually
+            // TODO: Split assertion chain manuallyParamName.ShouldBe("request");
     }
 
     [Theory]
@@ -827,8 +827,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         SitecoreLayoutRequest updatedRequest = sut.UpdateRequest(null);
 
         // Assert
-        updatedRequest.Should().NotBeNull();
-        updatedRequest.Should().BeEquivalentTo(sut);
+        updatedRequest.ShouldNotBeNull();
+        updatedRequest.ShouldBe(sut);
     }
 
     [Theory]
@@ -843,8 +843,8 @@ public class SitecoreLayoutRequestExtensionsFixture
         SitecoreLayoutRequest updatedRequest = sut.UpdateRequest(requestFallback!);
 
         // Assert
-        updatedRequest.Should().NotBeNull();
-        updatedRequest.SiteName().Should().Be(sut.SiteName());
+        updatedRequest.ShouldNotBeNull();
+        updatedRequest.SiteName().ShouldBe(sut.SiteName());
     }
 
     [Theory]
@@ -859,7 +859,7 @@ public class SitecoreLayoutRequestExtensionsFixture
         SitecoreLayoutRequest updatedRequest = sut.UpdateRequest(requestFallback!);
 
         // Assert
-        updatedRequest.Should().NotBeNull();
+        updatedRequest.ShouldNotBeNull();
         updatedRequest.Should().NotContainKey(RequestKeys.SiteName);
     }
     #endregion

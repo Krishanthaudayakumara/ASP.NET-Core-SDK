@@ -1,6 +1,6 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http.Headers;
-using FluentAssertions;
+using Shouldly;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
@@ -56,8 +56,8 @@ public class RequestsFixture
         _ = await sut.Request([]);
 
         // Assert
-        result.Requests.Should().ContainSingle();
-        result.Requests.Single().RequestUri!.Query.Should().Contain(contextId);
+        result.Requests.Count.ShouldBe(1);
+        result.Requests.Single().RequestUri!.Query.ShouldContain(contextId);
     }
 
     [Theory]
@@ -103,16 +103,16 @@ public class RequestsFixture
         _ = await sut.Request(new SitecoreLayoutRequest { { RequestKeys.SiteName, site2Name } }, handler2Name);
 
         // Assert
-        result.Requests.Should().HaveCount(3);
+        result.Requests.Count.ShouldBe(3);
         string req1 = await result.Requests[0].Content!.ReadAsStringAsync();
-        req1.Should().Contain(site1Name);
+        req1.ShouldContain(site1Name);
         string req2 = await result.Requests[1].Content!.ReadAsStringAsync();
-        req2.Should().Contain(site1Name);
+        req2.ShouldContain(site1Name);
         string req3 = await result.Requests[2].Content!.ReadAsStringAsync();
-        req3.Should().Contain(site2Name);
+        req3.ShouldContain(site2Name);
 
         // Since we replace the client we validate the original
-        originalClient.HttpClient.DefaultRequestHeaders.Single(h => h.Key == "sc_apikey").Value.Single().Should().Be(apiKey);
+        originalClient.HttpClient.DefaultRequestHeaders.Single(h => h.Key == "sc_apikey").Value.Single().ShouldBe(apiKey);
     }
 
     private static HttpResponseMessage GenerateGqlResponse(string json)

@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture;
-using FluentAssertions;
+using Shouldly;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using NSubstitute;
@@ -37,8 +37,9 @@ public class GraphQLHttpRequestWithHeadersFixture
         HttpRequestMessage result = sut.ToHttpRequestMessage(options, serializer);
 
         // Assert
-        result.Should().NotBeNull();
-        result.Headers.GetValues("key1").Should().Contain("value1");
-        result.Headers.GetValues("key2").Should().Contain("value2");
+        result.ShouldNotBeNull();
+        result.Headers.GetValues("key1").ShouldContain("value1");
+        result.Headers.GetValues("key2").ShouldContain("value2");
     }
 }
+

@@ -1,6 +1,6 @@
-﻿using System.Dynamic;
+using System.Dynamic;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Microsoft.AspNetCore.TestHost;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.ExperienceEditor.Configuration;
@@ -46,7 +46,7 @@ public class ExperienceEditorParsePathByItemIdFixture : IDisposable
         string? actualPath = json?.html.ToString();
 
         // Asserts
-        actualPath.Should().Be("/graphql/sample-1");
+        actualPath.ShouldBe("/graphql/sample-1");
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class ExperienceEditorParsePathByItemIdFixture : IDisposable
         string? actualPath = json?.html.ToString();
 
         // Asserts
-        actualPath.Should().Be("/", "Expecting it to return Path value instead of itemPath.");
+        actualPath.ShouldBe("/", "Expecting it to return Path value instead of itemPath.");
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public class ExperienceEditorParsePathByItemIdFixture : IDisposable
         string? actualPath = json?.html.ToString();
 
         // Asserts
-        actualPath.Should().Be("/", "Expecting it to return Path value instead of itemPath.");
+        actualPath.ShouldBe("/", "Expecting it to return Path value instead of itemPath.");
     }
 
     public void Dispose()
