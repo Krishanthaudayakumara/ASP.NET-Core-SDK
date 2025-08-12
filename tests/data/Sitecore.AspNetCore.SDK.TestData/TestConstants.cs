@@ -15,7 +15,6 @@ public static class TestConstants
     public const string RichTextFieldValue1 = "<p>This is a test</p>";
     public const string RichTextFieldValue2 = "<p>This is another test</p>";
     public const string LinkFieldValue = "<a class=\"sample\" href=\"/\" rel=\"noopener noreferrer\" target=\"_blank\" title=\"title\">Sample Link</a>";
-    public const string DateFieldValue = "05/04/2012";
     public const string ImageFieldValue = "<img alt=\"sample\" src=\"sample.png\">";
     public const string AllFieldsImageValue = "<img src=\"sample.png\" alt=\"sample\">";
     public const string MediaLibraryItemImageFieldValue = "<figure style='background-image: url(https://cdinstance/en/-/jssmedia/094AED0302E7486880CB19926661FB77.ashx?mw=100&amp;mh=50)'>Text</figure>";
@@ -90,6 +89,9 @@ public static class TestConstants
     public const string HeadlessSxaLayoutId = "96e5f4ba-a2cf-4a4c-a4e7-64da88226362";
 
     public const string PagesSampleConfigRequest = "{}";
+    public static readonly DateTime DateFieldValueAsDateTime = new DateTime(2012, 5, 4);
+
+    public static string DateFieldValue => DateTimeValue.ToString("d", CultureInfo.CurrentCulture);
 
     public static GraphQLResponse<EditingLayoutQueryResponse> SimpleEditingLayoutQueryResponse
     {
