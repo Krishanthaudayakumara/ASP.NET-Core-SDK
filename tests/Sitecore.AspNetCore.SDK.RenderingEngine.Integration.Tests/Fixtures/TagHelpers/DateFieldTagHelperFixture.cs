@@ -92,11 +92,14 @@ public class DateFieldTagHelperFixture : IDisposable
         doc.LoadHtml(response);
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes.First(n => n.HasClass("component-with-dates"));
 
-        // Assert
-        sectionNode.ChildNodes[1].InnerHtml.Should().Be("05/04/2012");
-        sectionNode.ChildNodes[3].InnerHtml.Should().Be("05/04/2012 00:00:00");
+        // Assert - Use culture-aware date formatting instead of hardcoded values
+        sectionNode.ChildNodes[1].InnerHtml.Should().Be(TestConstants.DateTimeValue.ToString("d", CultureInfo.CurrentCulture));
+        sectionNode.ChildNodes[3].InnerHtml.Should().Be(TestConstants.DateTimeValue.ToString("G", CultureInfo.CurrentCulture));
         sectionNode.ChildNodes[5].InnerHtml.Should().Be(TestConstants.DateTimeValue.ToString(CultureInfo.CurrentCulture));
-        sectionNode.ChildNodes[9].InnerHtml.Should().Contain("04.05.2012");
+
+        // For the custom format, use the specific culture format expected
+        string expectedCustomFormat = TestConstants.DateTimeValue.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
+        sectionNode.ChildNodes[9].InnerHtml.Should().Contain(expectedCustomFormat);
     }
 
     public void Dispose()

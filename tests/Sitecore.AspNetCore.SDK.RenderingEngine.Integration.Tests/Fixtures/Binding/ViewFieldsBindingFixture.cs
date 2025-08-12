@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using FluentAssertions;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
@@ -59,6 +60,8 @@ public class ViewFieldsBindingFixture : IDisposable
 
         HttpClient client = _server.CreateClient();
 
+        string expectedFormattedDate = DateTime.Parse("12.12.19", CultureInfo.InvariantCulture).ToString("d", CultureInfo.CurrentCulture);
+
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
 
@@ -75,7 +78,7 @@ public class ViewFieldsBindingFixture : IDisposable
         sectionNode.ChildNodes.First(n => n.Name.Equals("p", StringComparison.OrdinalIgnoreCase)).InnerText
             .Should().BeEmpty();
 
-        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain("12/12/2019");
+        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain(expectedFormattedDate);
 
         sectionNode.ChildNodes.First(n => n.Name.Equals("span", StringComparison.OrdinalIgnoreCase)).InnerHtml
             .Should().Be(TestConstants.TestMultilineFieldValue.Replace(Environment.NewLine, "<br>", StringComparison.OrdinalIgnoreCase));
