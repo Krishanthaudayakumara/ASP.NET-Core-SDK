@@ -39,13 +39,6 @@ public class DateFieldTagHelperFixture : IDisposable
             .Configure(app =>
             {
                 app.UseRouting();
-                app.UseRequestLocalization(options =>
-                {
-                    var culture = new CultureInfo("en-US");
-                    options.DefaultRequestCulture = new RequestCulture(culture);
-                    options.SupportedCultures = [culture];
-                    options.SupportedUICultures = [culture];
-                });
                 app.UseSitecoreRenderingEngine();
                 app.UseEndpoints(endpoints =>
                 {
@@ -103,7 +96,7 @@ public class DateFieldTagHelperFixture : IDisposable
         // Assert
         sectionNode.ChildNodes[1].InnerHtml.Should().Be("05/04/2012");
         sectionNode.ChildNodes[3].InnerHtml.Should().Be("05/04/2012 00:00:00");
-        sectionNode.ChildNodes[5].InnerHtml.Should().Be(TestConstants.DateTimeValue.ToString(new CultureInfo("en-US")));
+        sectionNode.ChildNodes[5].InnerHtml.Should().Be(TestConstants.DateTimeValue.ToString(CultureInfo.CurrentCulture));
         sectionNode.ChildNodes[9].InnerHtml.Should().Contain("04.05.2012");
     }
 

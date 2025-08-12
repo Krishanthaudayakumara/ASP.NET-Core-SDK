@@ -39,13 +39,6 @@ public class ViewFieldsBindingFixture : IDisposable
             .Configure(app =>
             {
                 app.UseRouting();
-                app.UseRequestLocalization(options =>
-                {
-                    var culture = new CultureInfo("en-US");
-                    options.DefaultRequestCulture = new RequestCulture(culture);
-                    options.SupportedCultures = [culture];
-                    options.SupportedUICultures = [culture];
-                });
                 app.UseSitecoreRenderingEngine();
                 app.UseEndpoints(endpoints =>
                 {
@@ -75,6 +68,10 @@ public class ViewFieldsBindingFixture : IDisposable
         doc.LoadHtml(response);
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes.First(n => n.HasClass("component-5"));
 
+        // Get the expected date from test data and format it according to current culture
+        DateTime expectedDate = DateTime.Parse("12.12.19", CultureInfo.InvariantCulture);
+        string expectedFormattedDate = expectedDate.ToString("d", CultureInfo.CurrentCulture);
+
         // Assert
         sectionNode.ChildNodes.First(n => n.Name.Equals("h1", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Be(TestConstants.TestFieldValue);
 
@@ -84,7 +81,7 @@ public class ViewFieldsBindingFixture : IDisposable
         sectionNode.ChildNodes.First(n => n.Name.Equals("p", StringComparison.OrdinalIgnoreCase)).InnerText
             .Should().BeEmpty();
 
-        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain("12/12/2019");
+        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain(expectedFormattedDate);
 
         sectionNode.ChildNodes.First(n => n.Name.Equals("span", StringComparison.OrdinalIgnoreCase)).InnerHtml
             .Should().Be(TestConstants.TestMultilineFieldValue.Replace(Environment.NewLine, "<br>", StringComparison.OrdinalIgnoreCase));
