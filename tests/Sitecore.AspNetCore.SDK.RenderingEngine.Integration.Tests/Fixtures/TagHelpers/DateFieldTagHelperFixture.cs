@@ -2,7 +2,6 @@
 using System.Net;
 using FluentAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;

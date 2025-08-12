@@ -2,7 +2,6 @@
 using System.Net;
 using FluentAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -61,16 +60,16 @@ public class ViewFieldsBindingFixture : IDisposable
 
         HttpClient client = _server.CreateClient();
 
+        // Set the expected date according to current culture
+        DateTime expectedDate = DateTime.Parse("12.12.19", CultureInfo.InvariantCulture);
+        string expectedFormattedDate = expectedDate.ToString("d", CultureInfo.CurrentCulture);
+
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
 
         HtmlDocument doc = new();
         doc.LoadHtml(response);
         HtmlNode? sectionNode = doc.DocumentNode.ChildNodes.First(n => n.HasClass("component-5"));
-
-        // Get the expected date from test data and format it according to current culture
-        DateTime expectedDate = DateTime.Parse("12.12.19", CultureInfo.InvariantCulture);
-        string expectedFormattedDate = expectedDate.ToString("d", CultureInfo.CurrentCulture);
 
         // Assert
         sectionNode.ChildNodes.First(n => n.Name.Equals("h1", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Be(TestConstants.TestFieldValue);
