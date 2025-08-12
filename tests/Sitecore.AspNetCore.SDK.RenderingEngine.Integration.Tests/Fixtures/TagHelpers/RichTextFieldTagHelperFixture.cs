@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using System.Text.Encodings.Web;
 using FluentAssertions;
 using HtmlAgilityPack;
@@ -61,6 +62,11 @@ public class RichTextFieldTagHelperFixture : IDisposable
 
         HttpClient client = _server.CreateClient();
 
+        // Set the expected date according to current culture
+        DateTime expectedDate = DateTime.Parse("12.12.19", CultureInfo.InvariantCulture);
+        string expectedFormattedDate = expectedDate.ToString("d", CultureInfo.CurrentCulture);
+
+
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
 
@@ -70,7 +76,7 @@ public class RichTextFieldTagHelperFixture : IDisposable
 
         // Assert
         // check scenario that RichTextTagHelper does not reset values of another helpers.
-        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain("12/12/2019");
+        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain(expectedFormattedDate);
     }
 
     [Fact]
