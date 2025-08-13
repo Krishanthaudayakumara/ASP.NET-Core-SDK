@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Globalization;
+using System.Net;
 using System.Text.Encodings.Web;
 using FluentAssertions;
 using HtmlAgilityPack;
@@ -70,7 +71,7 @@ public class RichTextFieldTagHelperFixture : IDisposable
 
         // Assert
         // check scenario that RichTextTagHelper does not reset values of another helpers.
-        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain("12/12/2019");
+        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain("12/12/2019".Replace("/", CultureInfo.CurrentCulture.DateTimeFormat.DateSeparator));
     }
 
     [Fact]
