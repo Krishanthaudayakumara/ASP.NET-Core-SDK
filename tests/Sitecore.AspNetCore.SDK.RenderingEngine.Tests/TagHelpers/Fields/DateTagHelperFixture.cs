@@ -139,7 +139,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(dateFormat, CultureInfo.InvariantCulture));
+        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(dateFormat, CultureInfo.CurrentCulture));
     }
 
     [Theory]
@@ -274,7 +274,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(dateFormat, CultureInfo.InvariantCulture));
+        tagHelperOutput.Content.GetContent().Should().Be(_date.ToString(dateFormat, CultureInfo.CurrentCulture));
     }
 
     [Theory]
