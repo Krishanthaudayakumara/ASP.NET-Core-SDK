@@ -123,13 +123,12 @@ public class DateTagHelperFixture
     }
 
     [Theory]
-    [InlineData("en-US")]
-    [InlineData("da-DK")]
-    [InlineData("uk-UA")]
-    public void Process_ScDateTagWithCustomFormat_GeneratesCustomDateFormatOutput(string cultureName)
+    [InlineData("en-US", "05/04/2012 5:30")]
+    [InlineData("da-DK", "05-04-2012 5:30")]
+    [InlineData("uk-UA", "05.04.2012 5:30")]
+    public void Process_ScDateTagWithCustomFormat_GeneratesCustomDateFormatOutput(string cultureName, string expectedResult)
     {
         // Arrange
-        CultureInfo testCulture = new CultureInfo(cultureName);
         const string dateFormat = "MM/dd/yyyy H:mm";
 
         DateTagHelper sut = new DateTagHelper(new EditableChromeRenderer());
@@ -149,8 +148,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        string expected = _date.ToString(dateFormat, testCulture);
-        tagHelperOutput.Content.GetContent().Should().Be(expected);
+        tagHelperOutput.Content.GetContent().Should().Be(expectedResult);
     }
 
     [Theory]
@@ -269,13 +267,12 @@ public class DateTagHelperFixture
     }
 
     [Theory]
-    [InlineData("en-US")]
-    [InlineData("da-DK")]
-    [InlineData("uk-UA")]
-    public void Process_ScDateTagWithAspDataAttributeWithCustomFormat_GeneratesCustomDateFormatOutput(string cultureName)
+    [InlineData("en-US", "05/04/2012 5:30")]
+    [InlineData("da-DK", "05-04-2012 5:30")]
+    [InlineData("uk-UA", "05.04.2012 5:30")]
+    public void Process_ScDateTagWithAspDataAttributeWithCustomFormat_GeneratesCustomDateFormatOutput(string cultureName, string expectedResult)
     {
         // Arrange
-        CultureInfo testCulture = new CultureInfo(cultureName);
         string dateFormat = "MM/dd/yyyy H:mm";
 
         DateTagHelper sut = new DateTagHelper(new EditableChromeRenderer());
@@ -295,8 +292,7 @@ public class DateTagHelperFixture
         sut.Process(tagHelperContext, tagHelperOutput);
 
         // Assert
-        string expected = _date.ToString(dateFormat, testCulture);
-        tagHelperOutput.Content.GetContent().Should().Be(expected);
+        tagHelperOutput.Content.GetContent().Should().Be(expectedResult);
     }
 
     [Theory]
