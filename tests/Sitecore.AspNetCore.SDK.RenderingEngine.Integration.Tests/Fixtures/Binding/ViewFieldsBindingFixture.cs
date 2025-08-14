@@ -76,7 +76,7 @@ public class ViewFieldsBindingFixture : IDisposable
         sectionNode.ChildNodes.First(n => n.Name.Equals("p", StringComparison.OrdinalIgnoreCase)).InnerText
             .Should().BeEmpty();
 
-        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain("12/12/2019".Replace("/", CultureInfo.CurrentCulture.DateTimeFormat.DateSeparator));
+        sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerText.Should().Contain(DateTime.Parse("2019-12-12").ToString("d", CultureInfo.CurrentCulture));
 
         sectionNode.ChildNodes.First(n => n.Name.Equals("span", StringComparison.OrdinalIgnoreCase)).InnerHtml
             .Should().Be(TestConstants.TestMultilineFieldValue.Replace(Environment.NewLine, "<br>", StringComparison.OrdinalIgnoreCase));
