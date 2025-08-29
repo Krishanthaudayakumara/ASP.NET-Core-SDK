@@ -45,19 +45,19 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                            options.HandlerRegistry["mock"] = serviceProvider =>
                            {
                                HttpClient client = new HttpClient(MockClientHandler) { BaseAddress = LayoutServiceUri };
-                               
+
                                // Create mock options since IOptionsSnapshot is scoped
                                var mockOptions = Substitute.For<IOptionsSnapshot<HttpLayoutRequestHandlerOptions>>();
                                var handlerOptions = new HttpLayoutRequestHandlerOptions();
                                mockOptions.Get(Arg.Any<string>()).Returns(handlerOptions);
-                               
+
                                return new HttpLayoutRequestHandler(
                                    client,
                                    serviceProvider.GetRequiredService<ISitecoreLayoutSerializer>(),
                                    mockOptions,
                                    serviceProvider.GetRequiredService<ILogger<HttpLayoutRequestHandler>>());
                            };
-                           
+
                            // For Pages tests, also add a "pages" handler
                            if (typeof(T).Name.Contains("Pages"))
                            {

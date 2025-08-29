@@ -8,18 +8,16 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Bin
 
 public class ModelBindingFixture(TestWebApplicationFactory<TestModelBindingProgram> factory) : IClassFixture<TestWebApplicationFactory<TestModelBindingProgram>>
 {
-    private readonly TestWebApplicationFactory<TestModelBindingProgram> _factory = factory;
-
     [Fact]
     public async Task SitecoreRouteModelBinding_ReturnsCorrectData()
     {
-        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
+        factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _factory.CreateClient();
+        HttpClient client = factory.CreateClient();
         string response = await client.GetStringAsync("WithBoundSitecoreRoute");
 
         // assert that the SitecoreRouteProperty attribute binding worked
@@ -35,13 +33,13 @@ public class ModelBindingFixture(TestWebApplicationFactory<TestModelBindingProgr
     [Fact]
     public async Task SitecoreContextModelBinding_ReturnsCorrectData()
     {
-        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
+        factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _factory.CreateClient();
+        HttpClient client = factory.CreateClient();
         string response = await client.GetStringAsync("WithBoundSitecoreContext");
 
         // assert that the SitecoreContextProperty attribute binding worked
@@ -55,13 +53,13 @@ public class ModelBindingFixture(TestWebApplicationFactory<TestModelBindingProgr
     [Fact]
     public async Task SitecoreResponseModelBinding_ReturnsCorrectData()
     {
-        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
+        factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _factory.CreateClient();
+        HttpClient client = factory.CreateClient();
         string response = await client.GetStringAsync("WithBoundSitecoreResponse");
 
         // assert that the SitecoreLayoutResponse attribute binding worked
