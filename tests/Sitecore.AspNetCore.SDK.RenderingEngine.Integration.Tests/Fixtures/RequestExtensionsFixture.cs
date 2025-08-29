@@ -1,26 +1,26 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Interfaces;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Request;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures;
 
-public class RequestExtensionsFixture : IDisposable
+public class RequestExtensionsFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
     private readonly MockHttpMessageHandler _clientHandler;
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestPagesProgram> _factory;
 
-    public RequestExtensionsFixture()
+    public RequestExtensionsFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
+        _factory = factory;
         _clientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -32,8 +32,6 @@ public class RequestExtensionsFixture : IDisposable
             {
                 app.UseSitecoreRenderingEngine();
             });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
     }
 
     [Fact]
@@ -44,7 +42,7 @@ public class RequestExtensionsFixture : IDisposable
             StatusCode = HttpStatusCode.OK
         });
 
-        ISitecoreLayoutClient layoutService = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutService = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new SitecoreLayoutRequest()
             .Path("UsingGlobalMiddleware");
@@ -63,7 +61,7 @@ public class RequestExtensionsFixture : IDisposable
             StatusCode = HttpStatusCode.OK
         });
 
-        ISitecoreLayoutClient layoutService = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutService = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new SitecoreLayoutRequest()
             .Path("UsingGlobalMiddleware")
@@ -83,7 +81,7 @@ public class RequestExtensionsFixture : IDisposable
             StatusCode = HttpStatusCode.OK
         });
 
-        ISitecoreLayoutClient layoutService = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutService = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new SitecoreLayoutRequest()
             .Path("UsingGlobalMiddleware")
@@ -103,7 +101,7 @@ public class RequestExtensionsFixture : IDisposable
             StatusCode = HttpStatusCode.OK
         });
 
-        ISitecoreLayoutClient layoutService = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutService = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new SitecoreLayoutRequest()
             .Path("UsingGlobalMiddleware")
@@ -113,12 +111,5 @@ public class RequestExtensionsFixture : IDisposable
 
         result.Request.Should().ContainKey("sc_site");
         result.Request["sc_site"].Should().Be("name");
-    }
-
-    public void Dispose()
-    {
-        _clientHandler.Dispose();
-        _server.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

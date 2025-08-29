@@ -1,28 +1,28 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Encodings.Web;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;
 
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.TagHelpers;
 
-public class TextFieldTagHelperFixture : IDisposable
+public class TextFieldTagHelperFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
-    private readonly TestServer _server;
+    private readonly WebApplicationFactory<TestPagesProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public TextFieldTagHelperFixture()
+    public TextFieldTagHelperFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory = factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -45,8 +45,6 @@ public class TextFieldTagHelperFixture : IDisposable
                     endpoints.MapDefaultControllerRoute();
                 });
             });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
     }
 
     [Fact]
@@ -59,7 +57,7 @@ public class TextFieldTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -94,7 +92,7 @@ public class TextFieldTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.HorizonEditablePage))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -118,12 +116,5 @@ public class TextFieldTagHelperFixture : IDisposable
         // EmptyField is NOT editable
         sectionNode.ChildNodes.First(n => n.Name.Equals("div", StringComparison.OrdinalIgnoreCase)).InnerHtml
             .Should().Be(string.Empty);
-    }
-
-    public void Dispose()
-    {
-        _mockClientHandler.Dispose();
-        _server.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

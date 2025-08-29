@@ -1,26 +1,26 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.CustomRenderTypes;
 
-public class PartialViewRendererFixture : IDisposable
+public class PartialViewRendererFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
-    private readonly TestServer _server;
+    private readonly WebApplicationFactory<TestPagesProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public PartialViewRendererFixture()
+    public PartialViewRendererFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory = factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -43,8 +43,6 @@ public class PartialViewRendererFixture : IDisposable
                     endpoints.MapDefaultControllerRoute();
                 });
             });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
     }
 
     [Fact]
@@ -57,7 +55,7 @@ public class PartialViewRendererFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -69,12 +67,5 @@ public class PartialViewRendererFixture : IDisposable
         // Assert
         sectionNode.ChildNodes.First(n => n.Name.Equals("textarea", StringComparison.OrdinalIgnoreCase)).InnerHtml
             .Should().Be(TestConstants.TestFieldValue + " from Component-6");
-    }
-
-    public void Dispose()
-    {
-        _mockClientHandler.Dispose();
-        _server.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

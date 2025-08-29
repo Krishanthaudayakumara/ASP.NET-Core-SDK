@@ -1,8 +1,9 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -11,17 +12,17 @@ using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.TagHelpers;
 
-public class DateFieldTagHelperFixture : IDisposable
+public class DateFieldTagHelperFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
-    private readonly TestServer _server;
+    private readonly WebApplicationFactory<TestPagesProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public DateFieldTagHelperFixture()
+    public DateFieldTagHelperFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
+        _factory = factory;
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory = factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -43,10 +44,7 @@ public class DateFieldTagHelperFixture : IDisposable
                 {
                     endpoints.MapDefaultControllerRoute();
                 });
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
+            });}
 
     [Fact]
     public async Task DateTagHelper_DoesNotResetOtherTagHelperOutput()
@@ -58,7 +56,7 @@ public class DateFieldTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -83,7 +81,7 @@ public class DateFieldTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -97,12 +95,5 @@ public class DateFieldTagHelperFixture : IDisposable
         sectionNode.ChildNodes[3].InnerHtml.Should().Be("05/04/2012 00:00:00");
         sectionNode.ChildNodes[5].InnerHtml.Should().Be(TestConstants.DateTimeValue.ToString(CultureInfo.CurrentCulture));
         sectionNode.ChildNodes[9].InnerHtml.Should().Contain("04.05.2012");
-    }
-
-    public void Dispose()
-    {
-        _mockClientHandler.Dispose();
-        _server.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

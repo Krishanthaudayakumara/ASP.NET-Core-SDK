@@ -1,9 +1,10 @@
-﻿using System.Net;
+using System.Net;
 using AutoFixture.Xunit2;
 using AwesomeAssertions;
 using GraphQL;
 using GraphQL.Client.Abstractions;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -15,18 +16,18 @@ using Xunit;
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Multisite;
 
-public class MultisiteFixture : IDisposable
+public class MultisiteFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
     private const string DefaultSiteName = "defaultSiteName";
-    private readonly TestServer _server;
+    private readonly WebApplicationFactory<TestPagesProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public MultisiteFixture()
+    public MultisiteFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
+        _factory = factory;
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory = factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -84,9 +85,7 @@ public class MultisiteFixture : IDisposable
         _mockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK
-        });
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
+        });}
 
     [Theory]
     [InlineData("host1", "siteForHost1")]
@@ -100,7 +99,7 @@ public class MultisiteFixture : IDisposable
     public async Task Multisite_Should_Resolve_SiteName_ByHostName(string hostname, string expectedSiteName)
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         client.BaseAddress = new Uri($"http://{hostname}");
 
         // Act
@@ -116,7 +115,7 @@ public class MultisiteFixture : IDisposable
     public async Task Multisite_Should_Resolve_SiteName_ByQueryParam()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         const string expectedSiteName = "siteNameFromQueryString";
 
         // Act
@@ -133,7 +132,7 @@ public class MultisiteFixture : IDisposable
     public async Task Multisite_Should_FallBacks_To_DefaultSite_If_Site_Is_NotResolved(string hostname)
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         client.BaseAddress = new Uri($"http://{hostname}");
 
         // Act
@@ -150,7 +149,7 @@ public class MultisiteFixture : IDisposable
     public async Task Multisite_Should_FallBacks_To_DefaultSite_If_Site_Is_NotResolved_OnSecondRequest(string hostnameFirstRequest, string hostnameSecondRequest, string resolvedFirsSite)
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         HttpRequestMessage msg = new()
         {
@@ -171,12 +170,5 @@ public class MultisiteFixture : IDisposable
         responseStringFirst.Should().Be($"\"{resolvedFirsSite}\"");
         responseSecond.StatusCode.Should().Be(HttpStatusCode.OK);
         responseStringSecond.Should().Be($"\"{DefaultSiteName}\"");
-    }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

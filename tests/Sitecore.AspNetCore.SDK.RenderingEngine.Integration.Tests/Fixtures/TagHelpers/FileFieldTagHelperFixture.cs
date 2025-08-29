@@ -1,7 +1,8 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -10,17 +11,17 @@ using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.TagHelpers;
 
-public class FileFieldTagHelperFixture : IDisposable
+public class FileFieldTagHelperFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
-    private readonly TestServer _server;
+    private readonly WebApplicationFactory<TestPagesProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public FileFieldTagHelperFixture()
+    public FileFieldTagHelperFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
+        _factory = factory;
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory = factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -42,10 +43,7 @@ public class FileFieldTagHelperFixture : IDisposable
                 {
                     endpoints.MapDefaultControllerRoute();
                 });
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
+            });}
 
     [Fact]
     public async Task FileTagHelper_RendersAttributeFromModel()
@@ -57,7 +55,7 @@ public class FileFieldTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -107,7 +105,7 @@ public class FileFieldTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -168,7 +166,7 @@ public class FileFieldTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -217,7 +215,7 @@ public class FileFieldTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -235,12 +233,5 @@ public class FileFieldTagHelperFixture : IDisposable
         downloadLink2.InnerHtml.Should().Contain("<h1>Inner html</h1>");
         downloadLink3.InnerHtml.Should().Contain("<h1>Inner html</h1>");
         downloadLink4.InnerHtml.Should().Contain("<h1>Inner html</h1>");
-    }
-
-    public void Dispose()
-    {
-        _mockClientHandler.Dispose();
-        _server.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

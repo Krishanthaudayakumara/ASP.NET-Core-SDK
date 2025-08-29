@@ -1,7 +1,8 @@
-﻿using System.Net;
+using System.Net;
 using System.Text;
 using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.ExperienceEditor.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Interfaces;
@@ -13,15 +14,14 @@ using Xunit;
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.ExperienceEditor;
 
-public class ExperienceEditorFixture : IDisposable
+public class ExperienceEditorFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestPagesProgram> _factory;
 
-    public ExperienceEditorFixture()
+    public ExperienceEditorFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
-        _ = testHostBuilder
-            .ConfigureServices(builder =>
+        _factory = factory;
+        _ = _factory.ConfigureServices(builder =>
             {
                 builder.AddSingleton(Substitute.For<ISitecoreLayoutClient>());
                 builder.AddSitecoreRenderingEngine(options =>
@@ -42,16 +42,13 @@ public class ExperienceEditorFixture : IDisposable
                 {
                     endpoints.MapFallbackToController("Default", "Home");
                 });
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
+            });}
 
     [Fact]
     public async Task EEEndpoint_SendsNonWrappedResponse_WhenGetRequest()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         HttpResponseMessage response = await client.GetAsync(TestConstants.EEMiddlewarePostEndpoint);
@@ -66,7 +63,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_SendsNonWrappedResponse_WhenGetRequestInSampleEndPoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         HttpResponseMessage response = await client.GetAsync(TestConstants.SampleEndPoint);
@@ -81,7 +78,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_Sends400ErrorCodeInResponse_WhenEmptyStringSentInRequestBody()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(string.Empty, Encoding.UTF8, "application/json");
 
         // Act
@@ -97,7 +94,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_Sends400ErrorCodeInResponse_WhenInvalidRequestBody()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new("abcnnmkksmvkdmfvkdkvmkdmv");
 
         HttpResponseMessage response = await client
@@ -112,9 +109,9 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_SendsNonWrappedResponse_WhenPostedToNonEEEndpoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRequest);
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         // Act
         HttpResponseMessage response = await client
@@ -135,7 +132,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_SendsCorrectResponse_WhenCorrectDataSentInRequestBody()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRequest);
 
         // Act
@@ -159,7 +156,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_SendsCorrectResponse_WhenLargeDataSentInRequestBody()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EELargeRequest);
 
         // Act
@@ -180,9 +177,9 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_ByPassesLayoutServiceRequest_WhenCorrectDataSentInRequestBody()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRequest);
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         // Act
         HttpResponseMessage response = await client
@@ -198,8 +195,8 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_MakeLayoutServiceRequest_WhenGetRequest()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        HttpClient client = _factory.CreateClient();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         // Act
         HttpResponseMessage response = await client
@@ -217,9 +214,9 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_MakesLayoutServiceRequest_WhenInvalidRequest_SendToSampleEEndPoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new("invalidPostRequest");
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         // Act
         HttpResponseMessage response = await client
@@ -234,8 +231,8 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_MakesLayoutServiceRequest_WhenPostedToNonEEEndpoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        HttpClient client = _factory.CreateClient();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         // Act
         HttpResponseMessage response = await client.PostAsync(TestConstants.SampleEndPoint, new StringContent(string.Empty, Encoding.UTF8, "application/json"));
@@ -249,10 +246,10 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_MakesLayoutServiceRequest_WhenValidRequest_SendToSampleEndPoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRequest);
 
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         // Act
         HttpResponseMessage response = await client.PostAsync(TestConstants.SampleEndPoint, content);
@@ -266,7 +263,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_ChangePostToGet_WhenPostedToEEEndpoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRoutingRequest);
 
         // Act
@@ -284,7 +281,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_NotChangePostToGet_WhenPostedToNonEEEndpoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRoutingRequest);
 
         // Act
@@ -307,7 +304,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_SendsInvalidResponse_WhenPostedToNonEEEndpoint(string invalidEndPoint)
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRequest);
 
         // Act
@@ -328,7 +325,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_SendsCorrectResponse_withoutCaseSensitiveEndPoint(string validEndPoint)
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRequest);
 
         // Act
@@ -347,7 +344,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_ReturnSuccess_WhenRequestContainEmptyPath()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EEEmptyRoutingRequest);
 
         // Act
@@ -366,7 +363,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_NotChangeToGET_WhenRequestSendToDefaultRouting_ToSampleRoutingPoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EEDefaultRoutingRequest);
 
         // Act
@@ -384,7 +381,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_NotChangeToGet_whenInvalidRequest_SendToSampleRoutingEndPoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new("InvalidPost");
 
         // Act
@@ -402,7 +399,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task ReturnSuccess_whenRequestSendWithoutPath_ToSampleRoutingEndPoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EmptyPathRequest);
 
         // Act
@@ -420,7 +417,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_Send400ErrorCode_WhenIncompleteRequest_EEEndPoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EEIncompleteRequest);
 
         // Act
@@ -437,7 +434,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEndpoint_ReturnSuccess_WhenRequestContainDefaultPath()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EEDefaultRoutingRequest);
 
         // Act
@@ -454,7 +451,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_SendsWrappedResponse_WhenRequestContainLongPath()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EELongPathRequest);
 
         // Act
@@ -471,7 +468,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_Sends400Error_WhenRequestDoesNotHaveItemPath()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EmptyPathRequest);
 
         // Act
@@ -488,7 +485,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_ChangePostToGet_WhenRequestHaveCaseSensitivePath()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.CaseSensitiveItemPathRequest);
 
         // Act
@@ -506,7 +503,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task NotChangeToGet_WhenRequestContainCaseSensitivePath_PostToNonEEEndPoint()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.CaseSensitiveItemPathRequest);
 
         // Act
@@ -524,7 +521,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_SendsUnauthorizedErrorCodeInResponse_WhenWrongSecret()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRequestWithWrongRequestedSecret, Encoding.UTF8, "application/json");
 
         // Act
@@ -540,7 +537,7 @@ public class ExperienceEditorFixture : IDisposable
     public async Task EEEndpoint_SendsUnauthorizedErrorCodeInResponse_WhenNoSecret()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRequestWithNoSecret, Encoding.UTF8, "application/json");
 
         // Act
@@ -551,10 +548,5 @@ public class ExperienceEditorFixture : IDisposable
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
         responseString.Should().NotContain("{\"html\":\"{");
     }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        GC.SuppressFinalize(this);
-    }
 }
+

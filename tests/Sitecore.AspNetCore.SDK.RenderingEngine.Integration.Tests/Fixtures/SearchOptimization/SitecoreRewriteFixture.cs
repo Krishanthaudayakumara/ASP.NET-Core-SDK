@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Caching.Memory;
@@ -213,7 +213,7 @@ public class SitecoreRewriteFixture
     [InlineData("path/(.*)", "path?value=$1", RedirectType.REDIRECT_301, true, null, "path/value", "/path?value=value")]
     [InlineData("path/(.*)", "path?param=$1", RedirectType.REDIRECT_301, true, null, "path/value?param1=OtherValue", "/path?param1=OtherValue&param=value")]
     [InlineData("path/(.*)", "http://example.com/pathBase/path?param=$1", RedirectType.REDIRECT_301, true, "http://example.com/pathBase", "path/value?param1=OtherValue", "http://example.com/pathBase/path?param1=OtherValue&param=value")]
-    [InlineData("path/(.*)", "http://hoψst.com/pÂthBase/path?parãm=$1", RedirectType.REDIRECT_301, true, "http://example.com/pathBase", "path/value?päram1=OtherValüe", "http://xn--host-cpd.com/p%C3%82thBase/path?p%C3%A4ram1=OtherVal%C3%BCe&parãm=value")]
+    [InlineData("path/(.*)", "http://ho?st.com/p�thBase/path?par�m=$1", RedirectType.REDIRECT_301, true, "http://example.com/pathBase", "path/value?p�ram1=OtherVal�e", "http://xn--host-cpd.com/p%C3%82thBase/path?p%C3%A4ram1=OtherVal%C3%BCe&par�m=value")]
     [InlineData("(.*)", "http://example.com/$1", RedirectType.REDIRECT_302, true, null, "path", "http://example.com/path")]
     [InlineData("^/ab[cd]/$", "graphql", RedirectType.REDIRECT_301, true, null, "abc", "/graphql")]
     [InlineData("/bro/", "graphql", RedirectType.REDIRECT_301, true, null, "bro", "/graphql")]
@@ -271,3 +271,4 @@ public class SitecoreRewriteFixture
         response.Headers.Location!.OriginalString.Should().Be(expectedUrl);
     }
 }
+

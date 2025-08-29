@@ -1,23 +1,23 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.ExperienceEditor.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Interfaces;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.ExperienceEditor;
 
-public class ExperienceEditorCustomRoutingFixture : IDisposable
+public class ExperienceEditorCustomRoutingFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
-    private readonly TestServer _server;
+    private readonly WebApplicationFactory<TestPagesProgram> _factory;
 
-    public ExperienceEditorCustomRoutingFixture()
+    public ExperienceEditorCustomRoutingFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
-        _ = testHostBuilder
+        _factory = factory
             .ConfigureServices(builder =>
             {
                 builder.AddSingleton(Substitute.For<ISitecoreLayoutClient>());
@@ -43,21 +43,13 @@ public class ExperienceEditorCustomRoutingFixture : IDisposable
                     endpoints.MapFallbackToController("Default", "Home");
                 });
             });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        GC.SuppressFinalize(this);
     }
 
     [Fact]
     public async Task EECustomRoute_MapsToCorrectRoute_WhenCustomRouteSetInOptions()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         StringContent content = new(TestConstants.EESampleRequest);
 
         // Act

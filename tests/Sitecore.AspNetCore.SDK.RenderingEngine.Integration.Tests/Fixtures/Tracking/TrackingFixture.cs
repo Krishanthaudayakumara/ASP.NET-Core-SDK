@@ -1,7 +1,8 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -13,7 +14,7 @@ using Xunit;
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Tracking;
 
-public class TrackingFixture : IDisposable
+public class TrackingFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
     private static readonly string[] AspSessionId =
     [
@@ -25,7 +26,7 @@ public class TrackingFixture : IDisposable
         "SC_ANALYTICS_GLOBAL_COOKIE=0f82f53555ce4304a1ee8ae99ab9f9a8|False; expires = Fri, 15 - Mar - 2030 13:15:08 GMT; path =/; HttpOnly"
     ];
 
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestPagesProgram> _factory;
 
     private readonly MockHttpMessageHandler _mockClientHandler;
 
@@ -33,13 +34,12 @@ public class TrackingFixture : IDisposable
 
     private readonly Uri _cmInstanceUri = new("http://layout.service");
 
-    public TrackingFixture()
+    public TrackingFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
+        _factory = factory;
         _mockClientHandler = new MockHttpMessageHandler();
 
-        _ = testHostBuilder
-            .ConfigureServices(builder =>
+        _ = _factory.ConfigureServices(builder =>
             {
                 builder.Configure<ForwardedHeadersOptions>(options =>
                 {
@@ -65,10 +65,7 @@ public class TrackingFixture : IDisposable
                 app.UseForwardedHeaders();
                 app.UseSitecoreVisitorIdentification();
                 app.UseSitecoreRenderingEngine();
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
+            });}
 
     [Fact]
     public async Task SitecoreResponse_WithRobotDetection_MustIncludeVisitorIdentificationJs()
@@ -80,7 +77,7 @@ public class TrackingFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithVisitorIdentificationLayoutPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         HttpRequestMessage request = new(HttpMethod.Get, new Uri("/", UriKind.Relative));
 
         // Act
@@ -108,7 +105,7 @@ public class TrackingFixture : IDisposable
             }
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         HttpRequestMessage browserRequest = new(HttpMethod.Get, new Uri("/", UriKind.Relative));
@@ -134,7 +131,7 @@ public class TrackingFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         HttpRequestMessage browserRequest = new(HttpMethod.Get, new Uri("/", UriKind.Relative));
         browserRequest.Headers.Add("Cookie", ["ASP.NET_SessionId=rku2oxmotbrkwkfxe0cpfrvn; path=/; HttpOnly; SameSite=Lax", "SC_ANALYTICS_GLOBAL_COOKIE=0f82f53555ce4304a1ee8ae99ab9f9a8|False; expires = Fri, 15 - Mar - 2030 13:15:08 GMT; path =/; HttpOnly"]);
 
@@ -159,7 +156,7 @@ public class TrackingFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         HttpRequestMessage request = new(HttpMethod.Get, new Uri("/", UriKind.Relative));
         request.Headers.Add("X-Forwarded-For", "192.168.1.0, 172.217.16.14");
 
@@ -187,7 +184,7 @@ public class TrackingFixture : IDisposable
             }
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         HttpResponseMessage response = await client.GetAsync(new Uri("/", UriKind.Relative));
@@ -196,12 +193,5 @@ public class TrackingFixture : IDisposable
         response.Headers.GetValues("Set-Cookie").Should().HaveCount(2);
         response.Headers.GetValues("Set-Cookie").Should().Contain(i => i.StartsWith("ASP.NET_SessionId=", StringComparison.OrdinalIgnoreCase));
         response.Headers.GetValues("Set-Cookie").Should().Contain(i => i.StartsWith("SC_ANALYTICS_GLOBAL_COOKIE=", StringComparison.OrdinalIgnoreCase));
-    }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

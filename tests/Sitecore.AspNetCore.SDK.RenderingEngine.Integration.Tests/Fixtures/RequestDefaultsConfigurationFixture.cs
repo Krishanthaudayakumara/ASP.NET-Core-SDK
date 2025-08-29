@@ -1,5 +1,6 @@
-﻿using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
+using AwesomeAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Interfaces;
@@ -11,17 +12,15 @@ using Xunit;
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures;
 
-public class RequestDefaultsConfigurationFixture : IDisposable
+public class RequestDefaultsConfigurationFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
     private readonly MockHttpMessageHandler _clientHandler;
-    private readonly TestServer _server;
+    private readonly WebApplicationFactory<TestPagesProgram> _factory;
 
-    public RequestDefaultsConfigurationFixture()
+    public RequestDefaultsConfigurationFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
         _clientHandler = new MockHttpMessageHandler();
-
-        testHostBuilder
+        _factory = factory
             .ConfigureServices(builder =>
             {
                 ISitecoreLayoutClientBuilder lsc = builder
@@ -48,16 +47,13 @@ public class RequestDefaultsConfigurationFixture : IDisposable
             .Configure(app =>
             {
                 app.UseSitecoreRenderingEngine();
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
+            });}
 
     [Fact]
     public async Task Request_OnlyGlobalOptionsProvided_FinalRequestUsesGlobalOptions()
     {
         // Arrange
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new SitecoreLayoutRequest()
             .Path("test");
@@ -74,7 +70,7 @@ public class RequestDefaultsConfigurationFixture : IDisposable
     public async Task Request_OnlyHandlerOptionsProvided_FinalRequestUsesHandlerOptions()
     {
         // Arrange
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = [];
 
@@ -90,7 +86,7 @@ public class RequestDefaultsConfigurationFixture : IDisposable
     public async Task Request_OnlyRequestParameterProvided_FinalRequestUsesRequestParameter()
     {
         // Arrange
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new()
         {
@@ -109,7 +105,7 @@ public class RequestDefaultsConfigurationFixture : IDisposable
     public async Task Request_GlobalAndHandlerOptionsProvided_FinalRequestUsesHandlerOptions()
     {
         // Arrange
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = [];
 
@@ -125,7 +121,7 @@ public class RequestDefaultsConfigurationFixture : IDisposable
     public async Task Request_GlobalOptionsAndRequestParametersProvided_FinalRequestUsesRequestParameters()
     {
         // Arrange
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new() { { "key2", "requestvalue" } };
 
@@ -141,7 +137,7 @@ public class RequestDefaultsConfigurationFixture : IDisposable
     public async Task Request_GlobalAndHandlerOptionsAndRequestParametersProvided_FinalRequestUsesRequestParameters()
     {
         // Arrange
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new() { { "key1", "requestvalue" } };
 
@@ -157,7 +153,7 @@ public class RequestDefaultsConfigurationFixture : IDisposable
     public async Task Request_GlobalAndHandlerAndRequestSetDifferentParameters_FinalRequestUsesAllParameters()
     {
         // Arrange
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new() { { "requestKey", "requestValue" } };
 
@@ -175,7 +171,7 @@ public class RequestDefaultsConfigurationFixture : IDisposable
     public async Task Request_GlobalOptionsProvidedRequestSetsParameterToNull_FinalRequestExcludesParameter()
     {
         // Arrange
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new()
         {
@@ -194,7 +190,7 @@ public class RequestDefaultsConfigurationFixture : IDisposable
     public async Task Request_HandlerOptionsProvidedRequestSetsParameterToNull_FinalRequestExcludesParameter()
     {
         // Arrange
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        ISitecoreLayoutClient layoutClient = _factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new()
         {
@@ -207,12 +203,4 @@ public class RequestDefaultsConfigurationFixture : IDisposable
         // Assert
         response.Should().NotBeNull();
         response.Request.Should().NotContainKey("key3");
-    }
-
-    public void Dispose()
-    {
-        _clientHandler.Dispose();
-        _server.Dispose();
-        GC.SuppressFinalize(this);
-    }
-}
+    }}

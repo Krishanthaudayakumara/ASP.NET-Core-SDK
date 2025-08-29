@@ -1,13 +1,17 @@
 ﻿using GraphQL.Client.Abstractions;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using NSubstitute;
 
-namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
-{
-    public class TestWebApplicationFactory<T> : WebApplicationFactory<T>
-        where T : class
+namespace Sitecore.AspNetCore.SDK.RenderingEngine.Benchmarks;
+
+public class TestWebApplicationFactory<T> : WebApplicationFactory<T>
+    where T : class
     {
         private readonly List<Action<IServiceCollection>> _serviceConfigurations = new();
         private readonly List<Action<IApplicationBuilder>> _appConfigurations = new();
@@ -43,7 +47,6 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseContentRoot(Path.GetFullPath(Directory.GetCurrentDirectory()));
-            builder.UseEnvironment("Test");
 
             // Apply settings
             foreach (var setting in _settings)
@@ -59,7 +62,7 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
 
             builder.ConfigureTestServices(services =>
             {
-                // Apply service configurations first (before replacing services)
+                // Apply service configurations
                 foreach (var serviceConfig in _serviceConfigurations)
                 {
                     serviceConfig(services);
@@ -83,4 +86,3 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
             }
         }
     }
-}

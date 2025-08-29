@@ -1,7 +1,8 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -11,17 +12,16 @@ using Xunit;
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
-public class CustomResolverBindingFixture : IDisposable
+public class CustomResolverBindingFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
-    private readonly TestServer _server;
+    private readonly WebApplicationFactory<TestPagesProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public CustomResolverBindingFixture()
+    public CustomResolverBindingFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory = factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -45,8 +45,6 @@ public class CustomResolverBindingFixture : IDisposable
                     endpoints.MapDefaultControllerRoute();
                 });
             });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
     }
 
     [Fact]
@@ -60,7 +58,7 @@ public class CustomResolverBindingFixture : IDisposable
             Content = new StringContent(json)
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -76,12 +74,5 @@ public class CustomResolverBindingFixture : IDisposable
 
         sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes["ul"].ChildNodes.Count(c => c.Name.Equals("li")).Should().Be(1);
         sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes["ul"].ChildNodes["li"].ChildNodes["span"].InnerText.Should().Be("About");
-    }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

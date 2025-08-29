@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;

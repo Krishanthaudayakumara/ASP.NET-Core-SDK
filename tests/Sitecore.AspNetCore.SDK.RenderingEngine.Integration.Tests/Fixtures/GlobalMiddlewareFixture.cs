@@ -1,31 +1,31 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures;
 
-public class GlobalMiddlewareFixture : IDisposable
+public class GlobalMiddlewareFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
     private const string CustomHeaderName = "CustomHeader";
 
     private const string GlobalMiddlewareController = "UsingGlobalMiddleware";
 
-    private readonly TestServer _server;
+    private readonly WebApplicationFactory<TestPagesProgram> _factory;
 
     private readonly MockHttpMessageHandler _mockClientHandler;
 
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public GlobalMiddlewareFixture()
+    public GlobalMiddlewareFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory = factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -42,8 +42,6 @@ public class GlobalMiddlewareFixture : IDisposable
             {
                 app.UseSitecoreRenderingEngine();
             });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
     }
 
     [Fact]
@@ -54,7 +52,7 @@ public class GlobalMiddlewareFixture : IDisposable
             StatusCode = HttpStatusCode.OK
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         await client.GetAsync(GlobalMiddlewareController);
 
         _mockClientHandler.WasInvoked.Should().BeTrue();
@@ -65,7 +63,7 @@ public class GlobalMiddlewareFixture : IDisposable
     {
         _mockClientHandler.Responses.Push(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         string response = await client.GetStringAsync(GlobalMiddlewareController);
 
         response.Should().Be("\"success\"");
@@ -76,7 +74,7 @@ public class GlobalMiddlewareFixture : IDisposable
     {
         _mockClientHandler.Responses.Push(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         await client.GetAsync(GlobalMiddlewareController);
 
         _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.Should()
@@ -92,7 +90,7 @@ public class GlobalMiddlewareFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithMissingComponent))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         string response = await client.GetStringAsync("WithRoute");
 
         response.Should().Contain("ComponentIsMissing");
@@ -106,16 +104,9 @@ public class GlobalMiddlewareFixture : IDisposable
             StatusCode = HttpStatusCode.OK
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         HttpResponseMessage response = await client.GetAsync(GlobalMiddlewareController);
 
         response.Headers.Contains(CustomHeaderName).Should().BeTrue();
-    }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

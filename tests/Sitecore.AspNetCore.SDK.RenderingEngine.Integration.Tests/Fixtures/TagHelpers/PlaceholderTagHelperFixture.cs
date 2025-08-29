@@ -1,6 +1,7 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -10,17 +11,17 @@ using Xunit;
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.TagHelpers;
 
-public class PlaceholderTagHelperFixture : IDisposable
+public class PlaceholderTagHelperFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
-    private readonly TestServer _server;
+    private readonly WebApplicationFactory<TestPagesProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public PlaceholderTagHelperFixture()
+    public PlaceholderTagHelperFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
+        _factory = factory;
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory = factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -43,10 +44,7 @@ public class PlaceholderTagHelperFixture : IDisposable
                 {
                     endpoints.MapDefaultControllerRoute();
                 });
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
+            });}
 
     [Fact]
     public async Task PageInNormalMode_WithNestedPlaceholderComponent_ComponentIsRenderedCorrectly()
@@ -58,7 +56,7 @@ public class PlaceholderTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -77,7 +75,7 @@ public class PlaceholderTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.EditablePage))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -104,7 +102,7 @@ public class PlaceholderTagHelperFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.HorizonEditablePage))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -119,12 +117,5 @@ public class PlaceholderTagHelperFixture : IDisposable
         response.Should().Contain("<code type='text/sitecore' chrometype='rendering' kind='close' id='scEnclosingTag_r_' hintkey='Component 1' class='scpm'></code>");
         response.Should().Contain("<code type='text/sitecore' chrometype='placeholder' kind='close' id='scEnclosingTag_' hintname='Placeholder-2' class='scpm'></code>");
         response.Should().Contain("<code type='text/sitecore' chrometype='placeholder' kind='close' id='scEnclosingTag_' hintname='Placeholder-1' class='scpm'></code>");
-    }
-
-    public void Dispose()
-    {
-        _mockClientHandler.Dispose();
-        _server.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

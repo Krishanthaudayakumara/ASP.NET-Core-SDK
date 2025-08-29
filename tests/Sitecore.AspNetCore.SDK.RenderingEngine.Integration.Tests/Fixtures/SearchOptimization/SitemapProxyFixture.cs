@@ -1,6 +1,7 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Mocks;
 using Sitecore.AspNetCore.SDK.SearchOptimization.Extensions;
@@ -8,22 +9,21 @@ using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.SearchOptimization;
 
-public class SitemapProxyFixture : IDisposable
+public class SitemapProxyFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestPagesProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler = new();
     private readonly Uri _cdInstanceUri = new("http://cd");
 
-    public SitemapProxyFixture()
+    public SitemapProxyFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
         _mockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK
         });
 
-        TestServerBuilder testHostBuilder = new();
-        _ = testHostBuilder
-            .ConfigureServices(builder =>
+        _factory = factory;
+        _ = _factory.ConfigureServices(builder =>
             {
                 builder.AddSingleton<IHttpClientFactory>(_ =>
                 {
@@ -37,16 +37,13 @@ public class SitemapProxyFixture : IDisposable
             .Configure(app =>
             {
                 app.UseSitemap();
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
+            });}
 
     [Fact]
     public async Task SitemapRequest_MustBeProxied()
     {
         // Arrange
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         HttpRequestMessage request = new(HttpMethod.Get, new Uri("/sitemap.xml", UriKind.Relative));
 
         // Act
@@ -58,11 +55,5 @@ public class SitemapProxyFixture : IDisposable
         _mockClientHandler.Requests[0].RequestUri!.Scheme.Should().Be(_cdInstanceUri.Scheme);
         _mockClientHandler.Requests[0].RequestUri!.PathAndQuery.Should().Be("/sitemap.xml");
     }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
-    }
 }
+

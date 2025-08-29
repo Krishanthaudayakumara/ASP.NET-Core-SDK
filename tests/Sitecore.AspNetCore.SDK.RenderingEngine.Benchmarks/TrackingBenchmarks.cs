@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using BenchmarkDotNet.Attributes;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +21,7 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Benchmarks;
 [ExcludeFromCodeCoverage]
 public class TrackingBenchmarks : IDisposable
 {
-    private TestServer? _server;
+    private TestWebApplicationFactory<TestProgram>? _factory;
     private HttpClient? _client;
     private MockHttpMessageHandler? _mockClientHandler;
     private RenderingEngineBenchmarks? _baseLineTestInstance;
@@ -29,9 +29,9 @@ public class TrackingBenchmarks : IDisposable
     [GlobalSetup(Target = nameof(RegularHomePageRequestWithTracking))]
     public void TrackingBenchmarksSetup()
     {
-        TestServerBuilder testHostBuilder = new();
+        _factory = new TestWebApplicationFactory<TestProgram>();
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory
             .ConfigureServices(builder =>
             {
                 builder.Configure<ForwardedHeadersOptions>(options =>
@@ -79,9 +79,7 @@ public class TrackingBenchmarks : IDisposable
                 app.UseSitecoreRenderingEngine();
             });
 
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-
-        _client = _server.CreateClient();
+        _client = _factory.CreateClient();
     }
 
     [GlobalSetup(Target = nameof(RegularHomePageRequest))]
@@ -119,7 +117,7 @@ public class TrackingBenchmarks : IDisposable
 
     public void Dispose()
     {
-        _server?.Dispose();
+        _factory?.Dispose();
         _client?.Dispose();
         _mockClientHandler?.Dispose();
         _baseLineTestInstance?.Dispose();

@@ -1,28 +1,28 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json.Nodes;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;
 
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
-public class CustomModelContextBindingFixture : IDisposable
+public class CustomModelContextBindingFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestPagesProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public CustomModelContextBindingFixture()
+    public CustomModelContextBindingFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
+        _factory = factory;
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -45,8 +45,6 @@ public class CustomModelContextBindingFixture : IDisposable
                     endpoints.MapDefaultControllerRoute();
                 });
             });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
     }
 
     [Fact]
@@ -73,7 +71,7 @@ public class CustomModelContextBindingFixture : IDisposable
             Content = new StringContent(jObject!.ToJsonString(Serializer.GetOptions()))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -105,12 +103,5 @@ public class CustomModelContextBindingFixture : IDisposable
             .Should().Be("stringExample");
         sectionNode.ChildNodes.First(n => n.Id.Equals("individualProperty", StringComparison.OrdinalIgnoreCase)).InnerText
             .Should().Be("SinglePropertyData");
-    }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

@@ -1,29 +1,29 @@
-﻿using System.Net;
+using System.Net;
 using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures;
 
-public class ControllerMiddlewareFixture : IDisposable
+public class ControllerMiddlewareFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
     private const string MiddlewareController = "ControllerMiddleware";
 
     private const string GlobalMiddlewareController = "GlobalMiddleware";
 
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestPagesProgram> _factory;
 
     private readonly MockHttpMessageHandler _mockClientHandler;
 
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public ControllerMiddlewareFixture()
+    public ControllerMiddlewareFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
+        _factory = factory;
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory
             .ConfigureServices(builder =>
             {
                 builder
@@ -37,8 +37,6 @@ public class ControllerMiddlewareFixture : IDisposable
                     .AsDefaultHandler();
             })
             .Configure(_ => { });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
     }
 
     [Fact]
@@ -49,7 +47,7 @@ public class ControllerMiddlewareFixture : IDisposable
             StatusCode = HttpStatusCode.OK
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         await client.GetAsync(MiddlewareController);
 
         _mockClientHandler.WasInvoked.Should().BeTrue();
@@ -63,7 +61,7 @@ public class ControllerMiddlewareFixture : IDisposable
             StatusCode = HttpStatusCode.OK
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         await client.GetAsync(GlobalMiddlewareController);
 
         _mockClientHandler.WasInvoked.Should().BeFalse();
@@ -77,7 +75,7 @@ public class ControllerMiddlewareFixture : IDisposable
             StatusCode = HttpStatusCode.OK
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         string response = await client.GetStringAsync(GlobalMiddlewareController);
 
         response.Should().Be("\"success\"");
@@ -91,17 +89,10 @@ public class ControllerMiddlewareFixture : IDisposable
             StatusCode = HttpStatusCode.OK
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         await client.GetAsync(MiddlewareController);
 
         _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.Should()
             .BeEquivalentTo($"{_layoutServiceUri.AbsoluteUri}?item=%2f{MiddlewareController}");
-    }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

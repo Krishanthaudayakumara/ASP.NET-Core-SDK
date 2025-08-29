@@ -1,25 +1,25 @@
-﻿using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
+using AwesomeAssertions;
 using Microsoft.Extensions.Options;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Configuration;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Interfaces;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures;
 
-public class SitecoreLayoutClientBuilderExtensionsFixture : IDisposable
+public class SitecoreLayoutClientBuilderExtensionsFixture : IClassFixture<TestWebApplicationFactory<TestPagesProgram>>
 {
     private readonly MockHttpMessageHandler _messageHandler;
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestPagesProgram> _factory;
 
-    public SitecoreLayoutClientBuilderExtensionsFixture()
+    public SitecoreLayoutClientBuilderExtensionsFixture(TestWebApplicationFactory<TestPagesProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
+        _factory = factory;
         _messageHandler = new MockHttpMessageHandler();
-        testHostBuilder
+        _factory
             .ConfigureServices(builder =>
             {
                 ISitecoreLayoutClientBuilder lsc = builder
@@ -34,24 +34,15 @@ public class SitecoreLayoutClientBuilderExtensionsFixture : IDisposable
             {
                 app.UseSitecoreRenderingEngine();
             });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
     }
 
     [Fact]
     public void DefaultHandler_SetsSitecoreLayoutServiceOptions()
     {
         // Act
-        IOptions<SitecoreLayoutClientOptions> layoutService = _server.Services.GetRequiredService<IOptions<SitecoreLayoutClientOptions>>();
+        IOptions<SitecoreLayoutClientOptions> layoutService = _factory.Services.GetRequiredService<IOptions<SitecoreLayoutClientOptions>>();
 
         // Assert
         layoutService.Value.DefaultHandler.Should().Be("otherMock");
-    }
-
-    public void Dispose()
-    {
-        _messageHandler.Dispose();
-        _server.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

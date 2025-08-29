@@ -1,5 +1,6 @@
-﻿using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
+using AwesomeAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Interfaces;
@@ -10,17 +11,14 @@ using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures;
 
-public class RequestHeadersValidationFixture : IDisposable
+public class RequestHeadersValidationFixture
 {
-    private MockHttpMessageHandler _clientHandler = new();
-    private TestServer _server = null!;
-
     [Fact]
     public async Task Request_WithNonValidatedHeaders_HeadersAreProperlyValidated()
     {
         // Arrange
-        ConfigureServices(["User-Agent"]);
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        using TestWebApplicationFactory<TestPagesProgram> factory = CreateFactory(["User-Agent"]);
+        ISitecoreLayoutClient layoutClient = factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new SitecoreLayoutRequest()
             .Path("test");
@@ -41,8 +39,8 @@ public class RequestHeadersValidationFixture : IDisposable
     public async Task Request_WithoutNonValidatedHeaders_ErrorThrown()
     {
         // Arrange
-        ConfigureServices([]);
-        ISitecoreLayoutClient layoutClient = _server.Services.GetRequiredService<ISitecoreLayoutClient>();
+        using TestWebApplicationFactory<TestPagesProgram> factory = CreateFactory([]);
+        ISitecoreLayoutClient layoutClient = factory.Services.GetRequiredService<ISitecoreLayoutClient>();
 
         SitecoreLayoutRequest request = new SitecoreLayoutRequest()
             .Path("test");
@@ -55,29 +53,21 @@ public class RequestHeadersValidationFixture : IDisposable
         response.Errors.FirstOrDefault(error => error.InnerException!.Message == "The format of value 'site;core' is invalid.").Should().NotBe(null);
     }
 
-    public void Dispose()
+    private static TestWebApplicationFactory<TestPagesProgram> CreateFactory(string[] nonValidatedHeaders)
     {
-        _clientHandler.Dispose();
-        _server.Dispose();
-        GC.SuppressFinalize(this);
-    }
-
-    private void ConfigureServices(string[] nonValidatedHeaders)
-    {
-        TestServerBuilder testHostBuilder = new();
-        _clientHandler = new MockHttpMessageHandler();
+        MockHttpMessageHandler clientHandler = new();
         Dictionary<string, string[]> headers = new()
         {
             { "User-Agent", ["site;core"] }
         };
 
-        testHostBuilder
+        return new TestWebApplicationFactory<TestPagesProgram>()
             .ConfigureServices(builder =>
             {
                 ISitecoreLayoutClientBuilder lsc = builder
                     .AddSitecoreLayoutService();
 
-                lsc.AddHttpHandler("mock", _ => new HttpClient(_clientHandler) { BaseAddress = new Uri("http://layout.service") }, nonValidatedHeaders)
+                lsc.AddHttpHandler("mock", _ => new HttpClient(clientHandler) { BaseAddress = new Uri("http://layout.service") }, nonValidatedHeaders)
                     .WithRequestOptions(request =>
                     {
                         request["sc_request_headers_key"] = headers;
@@ -92,7 +82,5 @@ public class RequestHeadersValidationFixture : IDisposable
             {
                 app.UseSitecoreRenderingEngine();
             });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
     }
 }
