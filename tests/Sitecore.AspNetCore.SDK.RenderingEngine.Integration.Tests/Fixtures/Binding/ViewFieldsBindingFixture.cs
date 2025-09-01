@@ -1,63 +1,43 @@
 ﻿using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
-using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
-using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
-using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
-public class ViewFieldsBindingFixture : IDisposable
+/// <summary>
+/// Integration tests for Sitecore layout model binders with view fields.
+/// </summary>
+public class ViewFieldsBindingFixture : IClassFixture<TestWebApplicationFactory<TestModelBindingProgram>>
 {
-    private readonly TestServer _server;
-    private readonly MockHttpMessageHandler _mockClientHandler;
-    private readonly Uri _layoutServiceUri = new("http://layout.service");
+    private readonly TestWebApplicationFactory<TestModelBindingProgram> _factory;
 
-    public ViewFieldsBindingFixture()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ViewFieldsBindingFixture"/> class.
+    /// </summary>
+    /// <param name="factory">The test web application factory.</param>
+    public ViewFieldsBindingFixture(TestWebApplicationFactory<TestModelBindingProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
-        _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
-            .ConfigureServices(builder =>
-            {
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
-                    .AsDefaultHandler();
-                builder.AddSitecoreRenderingEngine(options =>
-                {
-                    options
-                        .AddModelBoundView<ComponentModels.Component5>(name => name.Equals("Component-5", StringComparison.OrdinalIgnoreCase), "Component5")
-                        .AddDefaultComponentRenderer();
-                });
-            })
-            .Configure(app =>
-            {
-                app.UseRouting();
-                app.UseSitecoreRenderingEngine();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapDefaultControllerRoute();
-                });
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
+        _factory = factory;
     }
 
+    /// <summary>
+    /// Tests that Sitecore layout model binders bind data correctly for view fields.
+    /// </summary>
+    /// <returns>A task representing the asynchronous test operation.</returns>
     [Fact]
     public async Task SitecoreLayoutModelBinders_BindDataCorrectly()
     {
         // Arrange
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -79,12 +59,5 @@ public class ViewFieldsBindingFixture : IDisposable
 
         sectionNode.ChildNodes.First(n => n.Name.Equals("span", StringComparison.OrdinalIgnoreCase)).InnerHtml
             .Should().Be(TestConstants.TestMultilineFieldValue.Replace(Environment.NewLine, "<br>", StringComparison.OrdinalIgnoreCase));
-    }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Reflection;
 using GraphQL.Client.Abstractions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -31,6 +32,19 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
         public MockHttpMessageHandler MockClientHandler { get; set; } = new();
 
         public Uri LayoutServiceUri { get; set; } = new("http://layout.service");
+
+        protected override IHostBuilder? CreateHostBuilder()
+        {
+            // Use reflection to call the test program's CreateHostBuilder method
+            var createHostBuilderMethod = typeof(T).GetMethod("CreateHostBuilder", BindingFlags.Public | BindingFlags.Static);
+            if (createHostBuilderMethod != null)
+            {
+                return createHostBuilderMethod.Invoke(null, new object[] { Array.Empty<string>() }) as IHostBuilder;
+            }
+
+            // Fall back to default behavior if no CreateHostBuilder method found
+            return base.CreateHostBuilder();
+        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -100,14 +114,9 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                        }
                        else
                        {
-                           services.AddRouting()
-                                   .AddMvc();
-
-                           services.AddSitecoreLayoutService()
-                                   .AddHttpHandler("mock", _ => new HttpClient() { BaseAddress = new Uri("http://layout.service") })
-                                   .AsDefaultHandler();
-
-                           services.AddSitecoreRenderingEngine();
+                           // For standard tests, let the test program handle its own configuration
+                           // Only add essential services that might be needed
+                           // Don't override the rendering engine configuration
                        }
                    })
                    .Configure(app =>
