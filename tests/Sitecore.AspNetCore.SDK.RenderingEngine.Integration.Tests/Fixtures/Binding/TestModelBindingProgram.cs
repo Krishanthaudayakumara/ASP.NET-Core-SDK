@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Hosting;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Interfaces;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
 /// <summary>
 /// Test program class for model binding scenarios.
 /// </summary>
-public class TestModelBindingProgram
+public class TestModelBindingProgram : IStandardTestProgram
 {
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)

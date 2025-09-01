@@ -15,6 +15,7 @@ using Sitecore.AspNetCore.SDK.Pages.Extensions;
 using Sitecore.AspNetCore.SDK.Pages.Request.Handlers.GraphQL;
 using Sitecore.AspNetCore.SDK.Pages.Services;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Interfaces;
 using Sitecore.AspNetCore.SDK.TestData;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
@@ -23,6 +24,8 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
         : WebApplicationFactory<T>
         where T : class
     {
+        private bool IsPagesTest => typeof(IPagesTestProgram).IsAssignableFrom(typeof(T));
+        
         public IGraphQLClient MockGraphQLClient { get; set; } = Substitute.For<IGraphQLClient>();
 
         public MockHttpMessageHandler MockClientHandler { get; set; } = new();
@@ -59,7 +62,7 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                            };
 
                            // For Pages tests, also add a "pages" handler
-                           if (typeof(T).Name.Contains("Pages"))
+                           if (IsPagesTest)
                            {
                                options.HandlerRegistry["pages"] = serviceProvider =>
                                {
@@ -79,7 +82,7 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                        });
 
                        // Check if we're configuring for Pages tests
-                       if (typeof(T).Name.Contains("Pages"))
+                       if (IsPagesTest)
                        {
                            // Pages-specific configuration
                            services.AddRouting()
@@ -116,7 +119,7 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                    .Configure(app =>
                    {
                        // Check if we're configuring for Pages tests
-                       if (typeof(T).Name.Contains("Pages"))
+                       if (IsPagesTest)
                        {
                            // Pages-specific middleware pipeline
                            app.UseMiddleware<Sitecore.AspNetCore.SDK.Pages.Middleware.PagesRenderMiddleware>();

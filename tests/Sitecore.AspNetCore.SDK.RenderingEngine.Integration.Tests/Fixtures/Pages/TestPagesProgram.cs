@@ -3,6 +3,7 @@ using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.Pages.Configuration;
 using Sitecore.AspNetCore.SDK.Pages.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Interfaces;
 using Sitecore.AspNetCore.SDK.TestData;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -43,6 +44,6 @@ app.Run();
 /// <summary>
 /// Partial class allowing this TestProgram to be created by a WebApplicationFactory for integration testing.
 /// </summary>
-public partial class TestPagesProgram
+public partial class TestPagesProgram : IPagesTestProgram
 {
 }
