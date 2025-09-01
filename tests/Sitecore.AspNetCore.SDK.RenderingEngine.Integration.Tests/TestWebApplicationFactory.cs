@@ -25,7 +25,7 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
         where T : class
     {
         private bool IsPagesTest => typeof(IPagesTestProgram).IsAssignableFrom(typeof(T));
-        
+
         public IGraphQLClient MockGraphQLClient { get; set; } = Substitute.For<IGraphQLClient>();
 
         public MockHttpMessageHandler MockClientHandler { get; set; } = new();
@@ -43,13 +43,11 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                        // Configure mock layout service handlers
                        services.PostConfigure<SitecoreLayoutClientOptions>(options =>
                        {
-                           // Clear all existing handlers and set up our mock as the default
                            options.HandlerRegistry.Clear();
                            options.HandlerRegistry["mock"] = serviceProvider =>
                            {
                                HttpClient client = new HttpClient(MockClientHandler) { BaseAddress = LayoutServiceUri };
 
-                               // Create mock options since IOptionsSnapshot is scoped
                                var mockOptions = Substitute.For<IOptionsSnapshot<HttpLayoutRequestHandlerOptions>>();
                                var handlerOptions = new HttpLayoutRequestHandlerOptions();
                                mockOptions.Get(Arg.Any<string>()).Returns(handlerOptions);
@@ -61,7 +59,6 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                                    serviceProvider.GetRequiredService<ILogger<HttpLayoutRequestHandler>>());
                            };
 
-                           // For Pages tests, also add a "pages" handler
                            if (IsPagesTest)
                            {
                                options.HandlerRegistry["pages"] = serviceProvider =>
@@ -81,10 +78,8 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                            }
                        });
 
-                       // Check if we're configuring for Pages tests
                        if (IsPagesTest)
                        {
-                           // Pages-specific configuration
                            services.AddRouting()
                                    .AddMvc();
 
@@ -105,7 +100,6 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                        }
                        else
                        {
-                           // Standard configuration for other tests
                            services.AddRouting()
                                    .AddMvc();
 
@@ -118,10 +112,8 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                    })
                    .Configure(app =>
                    {
-                       // Check if we're configuring for Pages tests
                        if (IsPagesTest)
                        {
-                           // Pages-specific middleware pipeline
                            app.UseMiddleware<Sitecore.AspNetCore.SDK.Pages.Middleware.PagesRenderMiddleware>();
                            app.UseRouting();
                            app.UseEndpoints(endpoints =>
@@ -146,7 +138,6 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                        }
                        else
                        {
-                           // Standard middleware pipeline
                            app.UseRouting();
                            app.UseSitecoreRenderingEngine();
                            app.UseEndpoints(configure =>
