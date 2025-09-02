@@ -90,6 +90,25 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                                            }
                                        }
                                    }
+
+                                   // Forward X-Forwarded-For header if available (for IP address tracking)
+                                   if (httpContextAccessor?.HttpContext?.Request.Headers.ContainsKey("X-Forwarded-For") == true)
+                                   {
+                                       var forwardedForHeaders = httpContextAccessor.HttpContext.Request.Headers["X-Forwarded-For"];
+                                       foreach (var forwardedForHeader in forwardedForHeaders)
+                                       {
+                                           if (!string.IsNullOrEmpty(forwardedForHeader))
+                                           {
+                                               // Extract the last IP address from the comma-separated list
+                                               var ips = forwardedForHeader.Split(',');
+                                               var lastIp = ips.LastOrDefault()?.Trim();
+                                               if (!string.IsNullOrEmpty(lastIp))
+                                               {
+                                                   message.Headers.Add("X-Forwarded-For", lastIp);
+                                               }
+                                           }
+                                       }
+                                   }
                                });
 
                                mockOptions.Get(Arg.Any<string>()).Returns(handlerOptions);
