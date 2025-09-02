@@ -2,51 +2,23 @@
 using System.Text.Json.Nodes;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
-using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
-using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
-using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;
 
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
-public class CustomModelContextBindingFixture : IDisposable
+public class CustomModelContextBindingFixture : IClassFixture<TestWebApplicationFactory<TestCustomModelContextBindingProgram>>, IDisposable
 {
-    private readonly TestServer _server;
-    private readonly MockHttpMessageHandler _mockClientHandler;
-    private readonly Uri _layoutServiceUri = new("http://layout.service");
+    private readonly TestWebApplicationFactory<TestCustomModelContextBindingProgram> _factory;
 
-    public CustomModelContextBindingFixture()
+    public CustomModelContextBindingFixture(TestWebApplicationFactory<TestCustomModelContextBindingProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
-        _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
-            .ConfigureServices(builder =>
-            {
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
-                    .AsDefaultHandler();
-                builder.AddSitecoreRenderingEngine(options =>
-                {
-                    options
-                        .AddModelBoundView<ComponentModels.CustomModelContextComponent>(name => name.Equals("Custom-Model-Context-Component", StringComparison.OrdinalIgnoreCase), "CustomModelContextComponent")
-                        .AddDefaultComponentRenderer();
-                });
-            })
-            .Configure(app =>
-            {
-                app.UseRouting();
-                app.UseSitecoreRenderingEngine();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapDefaultControllerRoute();
-                });
-            });
+        _factory = factory;
 
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
+        // Clear any previous state
+        _factory.MockClientHandler.Requests.Clear();
+        _factory.MockClientHandler.Responses.Clear();
     }
 
     [Fact]
@@ -67,13 +39,13 @@ public class CustomModelContextBindingFixture : IDisposable
         ]);
         contextJObject["singleProperty"] = "SinglePropertyData";
 
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(jObject!.ToJsonString(Serializer.GetOptions()))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -109,8 +81,7 @@ public class CustomModelContextBindingFixture : IDisposable
 
     public void Dispose()
     {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
+        // Don't dispose the factory - it's managed by the test framework when using IClassFixture
         GC.SuppressFinalize(this);
     }
 }
