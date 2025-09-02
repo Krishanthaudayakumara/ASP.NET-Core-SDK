@@ -64,6 +64,15 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
 
                                var mockOptions = Substitute.For<IOptionsSnapshot<HttpLayoutRequestHandlerOptions>>();
                                var handlerOptions = new HttpLayoutRequestHandlerOptions();
+
+                               // Add default request mapping to generate ?item= query parameter
+                               handlerOptions.RequestMap.Add((request, message) =>
+                               {
+                                   message.RequestUri = message.RequestUri != null
+                                       ? request.BuildDefaultSitecoreLayoutRequestUri(message.RequestUri)
+                                       : null;
+                               });
+
                                mockOptions.Get(Arg.Any<string>()).Returns(handlerOptions);
 
                                return new HttpLayoutRequestHandler(
@@ -148,7 +157,15 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                        else
                        {
                            app.UseRouting();
-                           app.UseSitecoreRenderingEngine();
+
+                           // TestBasicProgram now handles its own global middleware configuration
+                           // Only add global rendering engine middleware for programs that don't configure it themselves
+                           bool isBasicProgram = typeof(T).Name == "TestBasicProgram";
+                           if (!isBasicProgram)
+                           {
+                               app.UseSitecoreRenderingEngine();
+                           }
+
                            app.UseEndpoints(configure =>
                            {
                                configure.MapDefaultControllerRoute();
