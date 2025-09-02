@@ -1,65 +1,39 @@
 ﻿using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
-using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
-using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
-using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Logging;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.CustomRenderTypes;
 
-public class LoggingComponentRendererFixture : IDisposable
+public class LoggingComponentRendererFixture : IClassFixture<TestWebApplicationFactory<TestLoggingComponentRendererProgram>>, IDisposable
 {
-    private readonly TestServer _server;
-    private readonly MockHttpMessageHandler _mockClientHandler;
-    private readonly Uri _layoutServiceUri = new("http://layout.service");
+    private readonly TestWebApplicationFactory<TestLoggingComponentRendererProgram> _factory;
 
-    public LoggingComponentRendererFixture()
+    public LoggingComponentRendererFixture(TestWebApplicationFactory<TestLoggingComponentRendererProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
-        _mockClientHandler = new MockHttpMessageHandler();
+        _factory = factory;
 
-        testHostBuilder
-            .ConfigureServices(builder =>
-            {
-                builder.AddSingleton<ILoggerProvider>(new IntegrationTestLoggerProvider());
+        // Clear any previous state
+        _factory.MockClientHandler.Requests.Clear();
+        _factory.MockClientHandler.Responses.Clear();
 
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
-                    .AsDefaultHandler();
-                builder.AddSitecoreRenderingEngine(options =>
-                {
-                    options.AddDefaultComponentRenderer();
-                });
-            })
-            .Configure(app =>
-            {
-                app.UseRouting();
-                app.UseSitecoreRenderingEngine();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapDefaultControllerRoute();
-                });
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
+        // Clear previous log entries
+        InMemoryLog.Log.Clear();
     }
 
     [Fact]
     public async Task CustomRenderTypes_DefaultRendererWritesToLogWithoutRenderingHtml()
     {
         // Arrange
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -76,8 +50,7 @@ public class LoggingComponentRendererFixture : IDisposable
 
     public void Dispose()
     {
-        _mockClientHandler.Dispose();
-        _server.Dispose();
+        // Don't dispose the factory - it's managed by the test framework when using IClassFixture
         GC.SuppressFinalize(this);
     }
 }
