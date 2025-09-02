@@ -1,18 +1,12 @@
 ﻿using System.Net;
 using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
-using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
-using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
-using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.TestData;
-using Sitecore.AspNetCore.SDK.Tracking;
-using Sitecore.AspNetCore.SDK.Tracking.VisitorIdentification;
 using Xunit;
 
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Tracking;
 
-public class AttributeBasedTrackingFixture : IDisposable
+public class AttributeBasedTrackingFixture : IClassFixture<TestWebApplicationFactory<TestTrackingProgram>>, IDisposable
 {
     private static readonly string[] AspSessionId =
     [
@@ -24,52 +18,22 @@ public class AttributeBasedTrackingFixture : IDisposable
         "SC_ANALYTICS_GLOBAL_COOKIE=0f82f53555ce4304a1ee8ae99ab9f9a8|False; expires = Fri, 15 - Mar - 2030 13:15:08 GMT; path =/; HttpOnly"
     ];
 
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestTrackingProgram> _factory;
 
-    private readonly MockHttpMessageHandler _mockClientHandler;
-
-    private readonly Uri _layoutServiceUri = new("http://layout.service");
-
-    private readonly Uri _cmInstanceUri = new("http://layout.service");
-
-    public AttributeBasedTrackingFixture()
+    public AttributeBasedTrackingFixture(TestWebApplicationFactory<TestTrackingProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
-        _mockClientHandler = new MockHttpMessageHandler();
+        _factory = factory;
 
-        _ = testHostBuilder
-            .ConfigureServices(builder =>
-            {
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler)
-                    {
-                        BaseAddress = _layoutServiceUri
-                    })
-                    .AsDefaultHandler();
-
-                builder.AddSitecoreRenderingEngine(options =>
-                    {
-                        options
-                            .AddDefaultComponentRenderer();
-                    })
-                    .WithTracking();
-
-                builder.AddSitecoreVisitorIdentification(o => o.SitecoreInstanceUri = _cmInstanceUri);
-            })
-            .Configure(app =>
-            {
-                app.UseSitecoreVisitorIdentification();
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
+        // Clear any previous state
+        _factory.MockClientHandler.Requests.Clear();
+        _factory.MockClientHandler.Responses.Clear();
     }
 
     [Fact]
     public async Task SitecoreLayoutServiceResponseMetadata_ProxyCookies()
     {
         // Arrange
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithVisitorIdentificationLayoutPlaceholder)),
@@ -80,7 +44,7 @@ public class AttributeBasedTrackingFixture : IDisposable
             }
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         HttpResponseMessage response = await client.GetAsync(new Uri("/AttributeBased", UriKind.Relative));
@@ -94,20 +58,20 @@ public class AttributeBasedTrackingFixture : IDisposable
     public async Task SitecoreLayoutServer_ProxyCookiesFromRequest()
     {
         // Arrange
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithVisitorIdentificationLayoutPlaceholder)),
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         HttpRequestMessage request = new(HttpMethod.Get, new Uri("/AttributeBased", UriKind.Relative));
         request.Headers.Add("Cookie", ["ASP.NET_SessionId=rku2oxmotbrkwkfxe0cpfrvn; path=/; HttpOnly; SameSite=Lax", "SC_ANALYTICS_GLOBAL_COOKIE=0f82f53555ce4304a1ee8ae99ab9f9a8|False; expires = Fri, 15 - Mar - 2030 13:15:08 GMT; path =/; HttpOnly"]);
 
         // Act
         await client.SendAsync(request);
 
-        HttpRequestMessage lsRequest = _mockClientHandler.Requests.First();
+        HttpRequestMessage lsRequest = _factory.MockClientHandler.Requests.First();
 
         lsRequest.Headers.GetValues("Cookie").Should().HaveCount(2);
         lsRequest.Headers.GetValues("Cookie").Should().Contain(i => i.Contains("ASP.NET_SessionId=", StringComparison.OrdinalIgnoreCase));
@@ -118,13 +82,13 @@ public class AttributeBasedTrackingFixture : IDisposable
     public async Task SitecoreRequests_ToLayouts_MustIncludeVisitorIdentificationJs()
     {
         // Arrange
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithVisitorIdentificationLayoutPlaceholder)),
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         HttpRequestMessage request = new(HttpMethod.Get, new Uri("/AttributeBased", UriKind.Relative));
 
         // Act
@@ -138,8 +102,7 @@ public class AttributeBasedTrackingFixture : IDisposable
 
     public void Dispose()
     {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
+        // Don't dispose the factory - it's managed by the test framework when using IClassFixture
         GC.SuppressFinalize(this);
     }
 }
