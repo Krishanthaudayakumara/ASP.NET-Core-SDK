@@ -2,14 +2,14 @@ using Microsoft.AspNetCore.Hosting;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Interfaces;
-using Sitecore.AspNetCore.SDK.TestData;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Logging;
 
-namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
+namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.CustomRenderTypes;
 
 /// <summary>
-/// Test program class for model binding scenarios.
+/// Test program class for logging component renderer scenarios.
 /// </summary>
-public class TestModelBindingProgram : IStandardTestProgram
+public class TestLoggingComponentRendererProgram : IStandardTestProgram
 {
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
@@ -20,15 +20,15 @@ public class TestModelBindingProgram : IStandardTestProgram
                     services.AddRouting()
                             .AddMvc();
 
+                    services.AddSingleton<ILoggerProvider>(new IntegrationTestLoggerProvider());
+
                     services.AddSitecoreLayoutService()
                             .AddHttpHandler("mock", _ => new HttpClient() { BaseAddress = new Uri("http://layout.service") })
                             .AsDefaultHandler();
 
                     services.AddSitecoreRenderingEngine(options =>
                     {
-                        options
-                            .AddModelBoundView<ComponentModels.Component5>(name => name.Equals("Component-5", StringComparison.OrdinalIgnoreCase), "Component5")
-                            .AddDefaultComponentRenderer();
+                        options.AddDefaultComponentRenderer();
                     });
                 })
                 .Configure(app =>

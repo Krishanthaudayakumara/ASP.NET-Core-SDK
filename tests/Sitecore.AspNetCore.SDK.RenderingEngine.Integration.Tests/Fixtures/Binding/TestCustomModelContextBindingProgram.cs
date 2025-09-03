@@ -2,14 +2,13 @@ using Microsoft.AspNetCore.Hosting;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Interfaces;
-using Sitecore.AspNetCore.SDK.TestData;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
 /// <summary>
-/// Test program class for model binding scenarios.
+/// Test program class for custom model context binding scenarios.
 /// </summary>
-public class TestModelBindingProgram : IStandardTestProgram
+public class TestCustomModelContextBindingProgram : IStandardTestProgram
 {
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
@@ -27,7 +26,7 @@ public class TestModelBindingProgram : IStandardTestProgram
                     services.AddSitecoreRenderingEngine(options =>
                     {
                         options
-                            .AddModelBoundView<ComponentModels.Component5>(name => name.Equals("Component-5", StringComparison.OrdinalIgnoreCase), "Component5")
+                            .AddModelBoundView<ComponentModels.CustomModelContextComponent>(name => name.Equals("Custom-Model-Context-Component", StringComparison.OrdinalIgnoreCase), "CustomModelContextComponent")
                             .AddDefaultComponentRenderer();
                     });
                 })

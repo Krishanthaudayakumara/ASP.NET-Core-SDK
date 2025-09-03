@@ -1,83 +1,70 @@
 ﻿using System.Net;
 using AwesomeAssertions;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
-using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures;
 
-public class ControllerMiddlewareFixture : IDisposable
+public class ControllerMiddlewareFixture : IClassFixture<TestWebApplicationFactory<TestBasicProgram>>
 {
     private const string MiddlewareController = "ControllerMiddleware";
 
     private const string GlobalMiddlewareController = "GlobalMiddleware";
 
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestBasicProgram> _factory;
 
-    private readonly MockHttpMessageHandler _mockClientHandler;
-
-    private readonly Uri _layoutServiceUri = new("http://layout.service");
-
-    public ControllerMiddlewareFixture()
+    public ControllerMiddlewareFixture(TestWebApplicationFactory<TestBasicProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
-        _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
-            .ConfigureServices(builder =>
-            {
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler(
-                        "mock",
-                        _ => new HttpClient(_mockClientHandler)
-                        {
-                            BaseAddress = _layoutServiceUri
-                        })
-                    .AsDefaultHandler();
-            })
-            .Configure(_ => { });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
+        _factory = factory;
     }
 
     [Fact]
     public async Task HttpClient_IsInvoked()
     {
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        // Reset mock state before test
+        _factory.MockClientHandler.Requests.Clear();
+
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         await client.GetAsync(MiddlewareController);
 
-        _mockClientHandler.WasInvoked.Should().BeTrue();
+        _factory.MockClientHandler.WasInvoked.Should().BeTrue();
     }
 
     [Fact]
     public async Task HttpClient_IsNotInvoked()
     {
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        // Create a fresh client to avoid shared state from previous tests
+        // Clear any previous requests but keep the factory's handler
+        _factory.MockClientHandler.Requests.Clear();
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK
         });
 
-        HttpClient client = _server.CreateClient();
+        // Use a fresh client to avoid middleware state conflicts
+        HttpClient client = _factory.CreateClient();
         await client.GetAsync(GlobalMiddlewareController);
 
-        _mockClientHandler.WasInvoked.Should().BeFalse();
+        _factory.MockClientHandler.WasInvoked.Should().BeFalse();
     }
 
     [Fact]
     public async Task Controller_ReturnsCorrectContent()
     {
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        // Reset mock state before test
+        _factory.MockClientHandler.Requests.Clear();
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         string response = await client.GetStringAsync(GlobalMiddlewareController);
 
         response.Should().Be("\"success\"");
@@ -86,22 +73,17 @@ public class ControllerMiddlewareFixture : IDisposable
     [Fact]
     public async Task HttpClient_LayoutServiceUriMapped()
     {
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        // Reset mock state before test
+        _factory.MockClientHandler.Requests.Clear();
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         await client.GetAsync(MiddlewareController);
 
-        _mockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.Should()
-            .BeEquivalentTo($"{_layoutServiceUri.AbsoluteUri}?item=%2f{MiddlewareController}");
-    }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
+        _factory.MockClientHandler.Requests.Single().RequestUri!.AbsoluteUri.Should()
+            .BeEquivalentTo($"{_factory.LayoutServiceUri.AbsoluteUri}?item=%2f{MiddlewareController}");
     }
 }

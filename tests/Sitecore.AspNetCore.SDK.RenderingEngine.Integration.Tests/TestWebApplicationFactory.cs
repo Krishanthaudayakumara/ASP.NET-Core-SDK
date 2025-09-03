@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using System.Reflection;
 using GraphQL.Client.Abstractions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -15,8 +17,11 @@ using Sitecore.AspNetCore.SDK.Pages.Extensions;
 using Sitecore.AspNetCore.SDK.Pages.Request.Handlers.GraphQL;
 using Sitecore.AspNetCore.SDK.Pages.Services;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Mocks;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Interfaces;
 using Sitecore.AspNetCore.SDK.TestData;
+using Sitecore.AspNetCore.SDK.Tracking.VisitorIdentification;
+using ProxyKit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
 {
@@ -31,6 +36,19 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
         public MockHttpMessageHandler MockClientHandler { get; set; } = new();
 
         public Uri LayoutServiceUri { get; set; } = new("http://layout.service");
+
+        protected override IHostBuilder? CreateHostBuilder()
+        {
+            // Use reflection to call the test program's CreateHostBuilder method
+            var createHostBuilderMethod = typeof(T).GetMethod("CreateHostBuilder", BindingFlags.Public | BindingFlags.Static);
+            if (createHostBuilderMethod != null)
+            {
+                return createHostBuilderMethod.Invoke(null, new object[] { Array.Empty<string>() }) as IHostBuilder;
+            }
+
+            // Fall back to default behavior if no CreateHostBuilder method found
+            return base.CreateHostBuilder();
+        }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
@@ -50,6 +68,49 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
 
                                var mockOptions = Substitute.For<IOptionsSnapshot<HttpLayoutRequestHandlerOptions>>();
                                var handlerOptions = new HttpLayoutRequestHandlerOptions();
+
+                               var httpContextAccessor = serviceProvider.GetService<IHttpContextAccessor>();
+
+                               // Add default request mapping to generate ?item= query parameter and forward cookies
+                               handlerOptions.RequestMap.Add((request, message) =>
+                               {
+                                   message.RequestUri = message.RequestUri != null
+                                       ? request.BuildDefaultSitecoreLayoutRequestUri(message.RequestUri)
+                                       : null;
+
+                                   // Forward cookies from the current HttpContext if available
+                                   if (httpContextAccessor?.HttpContext?.Request.Headers.ContainsKey("Cookie") == true)
+                                   {
+                                       var cookieHeaders = httpContextAccessor.HttpContext.Request.Headers["Cookie"];
+                                       foreach (var cookieHeader in cookieHeaders)
+                                       {
+                                           if (!string.IsNullOrEmpty(cookieHeader))
+                                           {
+                                               message.Headers.Add("Cookie", cookieHeader);
+                                           }
+                                       }
+                                   }
+
+                                   // Forward X-Forwarded-For header if available (for IP address tracking)
+                                   if (httpContextAccessor?.HttpContext?.Request.Headers.ContainsKey("X-Forwarded-For") == true)
+                                   {
+                                       var forwardedForHeaders = httpContextAccessor.HttpContext.Request.Headers["X-Forwarded-For"];
+                                       foreach (var forwardedForHeader in forwardedForHeaders)
+                                       {
+                                           if (!string.IsNullOrEmpty(forwardedForHeader))
+                                           {
+                                               // Extract the last IP address from the comma-separated list
+                                               var ips = forwardedForHeader.Split(',');
+                                               var lastIp = ips.LastOrDefault()?.Trim();
+                                               if (!string.IsNullOrEmpty(lastIp))
+                                               {
+                                                   message.Headers.Add("X-Forwarded-For", lastIp);
+                                               }
+                                           }
+                                       }
+                                   }
+                               });
+
                                mockOptions.Get(Arg.Any<string>()).Returns(handlerOptions);
 
                                return new HttpLayoutRequestHandler(
@@ -78,6 +139,26 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                            }
                        });
 
+                       // Configure visitor identification options for tracking tests
+                       bool isTrackingProgram = typeof(T).Name == "TestTrackingProgram";
+                       if (isTrackingProgram)
+                       {
+                           services.PostConfigure<SitecoreVisitorIdentificationOptions>(options =>
+                           {
+                               options.SitecoreInstanceUri = LayoutServiceUri;
+                           });
+
+                           services.Replace(ServiceDescriptor.Singleton<IHttpClientFactory>(_ =>
+                           {
+                               return new CustomHttpClientFactory(() => new HttpClient(MockClientHandler));
+                           }));
+
+                           // Add MVC for TrackingController
+                           services.AddRouting()
+                                   .AddMvc();
+                           services.AddHttpContextAccessor();
+                       }
+
                        if (IsPagesTest)
                        {
                            services.AddRouting()
@@ -100,14 +181,9 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                        }
                        else
                        {
-                           services.AddRouting()
-                                   .AddMvc();
-
-                           services.AddSitecoreLayoutService()
-                                   .AddHttpHandler("mock", _ => new HttpClient() { BaseAddress = new Uri("http://layout.service") })
-                                   .AsDefaultHandler();
-
-                           services.AddSitecoreRenderingEngine();
+                           // For standard tests, let the test program handle its own configuration
+                           // Only add essential services that might be needed
+                           // Don't override the rendering engine configuration
                        }
                    })
                    .Configure(app =>
@@ -138,8 +214,76 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                        }
                        else
                        {
+                           // For tracking programs, add visitor identification middleware before routing
+                           bool isTrackingProgram = typeof(T).Name == "TestTrackingProgram";
+                           if (isTrackingProgram)
+                           {
+                               app.UseForwardedHeaders();
+
+                               // Custom visitor identification middleware for testing
+                               app.Use(async (HttpContext context, RequestDelegate next) =>
+                               {
+                                   // Check if this is a visitor identification request
+                                   if (context.Request.Path.StartsWithSegments("/layouts/System"))
+                                   {
+                                       // Get the configured HttpClient factory (which will be our mock)
+                                       var httpClientFactory = context.RequestServices.GetRequiredService<IHttpClientFactory>();
+                                       var httpClient = httpClientFactory.CreateClient();
+
+                                       // Create request to the configured Sitecore instance
+                                       var visitorIdOptions = context.RequestServices.GetRequiredService<IOptions<SitecoreVisitorIdentificationOptions>>();
+                                       if (visitorIdOptions.Value.SitecoreInstanceUri != null)
+                                       {
+                                           // Build the correct path
+                                           var fullPath = context.Request.Path + context.Request.QueryString;
+                                           var finalUrl = new Uri(visitorIdOptions.Value.SitecoreInstanceUri, fullPath);
+                                           var request = new HttpRequestMessage(HttpMethod.Get, finalUrl);
+
+                                           // Apply forwarded headers
+                                           var ip = context.Connection.RemoteIpAddress;
+                                           if (ip != null)
+                                           {
+                                               request.Headers.Add("X-Forwarded-For", ip.ToString());
+                                           }
+
+                                           request.Headers.Add("X-Forwarded-Host", context.Request.Host.ToString());
+                                           request.Headers.Add("X-Forwarded-Proto", context.Request.Scheme);
+
+                                           // Copy cookies
+                                           if (context.Request.Headers.ContainsKey("Cookie"))
+                                           {
+                                               request.Headers.Add("Cookie", context.Request.Headers["Cookie"].ToString());
+                                           }
+
+                                           // Send request and return response
+                                           var response = await httpClient.SendAsync(request);
+                                           context.Response.StatusCode = (int)response.StatusCode;
+
+                                           if (response.Content != null)
+                                           {
+                                               var content = await response.Content.ReadAsByteArrayAsync();
+                                               await context.Response.Body.WriteAsync(content, 0, content.Length);
+                                           }
+
+                                           return; // Don't call next middleware
+                                       }
+                                   }
+
+                                   // If not a visitor identification request, continue to next middleware
+                                   await next(context);
+                               });
+                           }
+
                            app.UseRouting();
-                           app.UseSitecoreRenderingEngine();
+
+                           // TestBasicProgram and TestTrackingProgram handle their own global middleware configuration
+                           // Only add global rendering engine middleware for programs that don't configure it themselves
+                           bool isBasicProgram = typeof(T).Name == "TestBasicProgram";
+                           if (!isBasicProgram && !isTrackingProgram)
+                           {
+                               app.UseSitecoreRenderingEngine();
+                           }
+
                            app.UseEndpoints(configure =>
                            {
                                configure.MapDefaultControllerRoute();

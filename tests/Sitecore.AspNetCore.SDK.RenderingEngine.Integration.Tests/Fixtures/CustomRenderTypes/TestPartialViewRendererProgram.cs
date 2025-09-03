@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Interfaces;
-using Sitecore.AspNetCore.SDK.TestData;
 
-namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
+namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.CustomRenderTypes;
 
 /// <summary>
-/// Test program class for model binding scenarios.
+/// Test program class for partial view renderer scenarios.
 /// </summary>
-public class TestModelBindingProgram : IStandardTestProgram
+public class TestPartialViewRendererProgram : IStandardTestProgram
 {
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
@@ -27,7 +28,7 @@ public class TestModelBindingProgram : IStandardTestProgram
                     services.AddSitecoreRenderingEngine(options =>
                     {
                         options
-                            .AddModelBoundView<ComponentModels.Component5>(name => name.Equals("Component-5", StringComparison.OrdinalIgnoreCase), "Component5")
+                            .AddPartialView(name => name.Equals("Component-6", StringComparison.OrdinalIgnoreCase), "_PartialView")
                             .AddDefaultComponentRenderer();
                     });
                 })
@@ -41,4 +42,9 @@ public class TestModelBindingProgram : IStandardTestProgram
                     });
                 });
             });
+
+    public static void Main(string[] args)
+    {
+        CreateHostBuilder(args).Build().Run();
+    }
 }

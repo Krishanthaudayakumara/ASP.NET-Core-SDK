@@ -7,10 +7,15 @@ using Sitecore.AspNetCore.SDK.TestData;
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
 /// <summary>
-/// Test program class for model binding scenarios.
+/// Test program class for complex model binding scenarios.
 /// </summary>
-public class TestModelBindingProgram : IStandardTestProgram
+public class TestComplexModelBindingProgram : IStandardTestProgram
 {
+    /// <summary>
+    /// Creates the host builder for the test application.
+    /// </summary>
+    /// <param name="args">Command line arguments.</param>
+    /// <returns>The configured host builder.</returns>
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
@@ -27,7 +32,7 @@ public class TestModelBindingProgram : IStandardTestProgram
                     services.AddSitecoreRenderingEngine(options =>
                     {
                         options
-                            .AddModelBoundView<ComponentModels.Component5>(name => name.Equals("Component-5", StringComparison.OrdinalIgnoreCase), "Component5")
+                            .AddModelBoundView<ComponentModels.ComplexComponent>(name => name.Equals("Complex-Component", StringComparison.OrdinalIgnoreCase), "ComplexComponent")
                             .AddDefaultComponentRenderer();
                     });
                 })

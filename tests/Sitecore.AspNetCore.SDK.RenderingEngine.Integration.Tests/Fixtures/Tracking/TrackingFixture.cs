@@ -1,7 +1,9 @@
 ﻿using System.Net;
 using AwesomeAssertions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -13,7 +15,7 @@ using Xunit;
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Tracking;
 
-public class TrackingFixture : IDisposable
+public class TrackingFixture : IClassFixture<TestWebApplicationFactory<TestSimpleTrackingProgram>>, IDisposable
 {
     private static readonly string[] AspSessionId =
     [
@@ -25,7 +27,7 @@ public class TrackingFixture : IDisposable
         "SC_ANALYTICS_GLOBAL_COOKIE=0f82f53555ce4304a1ee8ae99ab9f9a8|False; expires = Fri, 15 - Mar - 2030 13:15:08 GMT; path =/; HttpOnly"
     ];
 
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestSimpleTrackingProgram> _factory;
 
     private readonly MockHttpMessageHandler _mockClientHandler;
 
@@ -33,41 +35,17 @@ public class TrackingFixture : IDisposable
 
     private readonly Uri _cmInstanceUri = new("http://layout.service");
 
-    public TrackingFixture()
+    public TrackingFixture(TestWebApplicationFactory<TestSimpleTrackingProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
-        _mockClientHandler = new MockHttpMessageHandler();
+        _factory = factory;
+        _mockClientHandler = _factory.MockClientHandler;
 
-        _ = testHostBuilder
-            .ConfigureServices(builder =>
-            {
-                builder.Configure<ForwardedHeadersOptions>(options =>
-                {
-                    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor;
-                });
+        // Clear any previous state
+        _factory.MockClientHandler.Requests.Clear();
+        _factory.MockClientHandler.Responses.Clear();
 
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
-                    .AsDefaultHandler();
-
-                builder.AddSitecoreRenderingEngine(options =>
-                    {
-                        options
-                            .AddDefaultComponentRenderer();
-                    })
-                    .WithTracking();
-
-                builder.AddSitecoreVisitorIdentification(o => o.SitecoreInstanceUri = _cmInstanceUri);
-            })
-            .Configure(app =>
-            {
-                app.UseForwardedHeaders();
-                app.UseSitecoreVisitorIdentification();
-                app.UseSitecoreRenderingEngine();
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
+        // Set the URIs for this test
+        _factory.LayoutServiceUri = _layoutServiceUri;
     }
 
     [Fact]
@@ -80,7 +58,7 @@ public class TrackingFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithVisitorIdentificationLayoutPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         HttpRequestMessage request = new(HttpMethod.Get, new Uri("/", UriKind.Relative));
 
         // Act
@@ -108,7 +86,7 @@ public class TrackingFixture : IDisposable
             }
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         HttpRequestMessage browserRequest = new(HttpMethod.Get, new Uri("/", UriKind.Relative));
@@ -134,7 +112,7 @@ public class TrackingFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         HttpRequestMessage browserRequest = new(HttpMethod.Get, new Uri("/", UriKind.Relative));
         browserRequest.Headers.Add("Cookie", ["ASP.NET_SessionId=rku2oxmotbrkwkfxe0cpfrvn; path=/; HttpOnly; SameSite=Lax", "SC_ANALYTICS_GLOBAL_COOKIE=0f82f53555ce4304a1ee8ae99ab9f9a8|False; expires = Fri, 15 - Mar - 2030 13:15:08 GMT; path =/; HttpOnly"]);
 
@@ -159,7 +137,7 @@ public class TrackingFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
         HttpRequestMessage request = new(HttpMethod.Get, new Uri("/", UriKind.Relative));
         request.Headers.Add("X-Forwarded-For", "192.168.1.0, 172.217.16.14");
 
@@ -187,7 +165,7 @@ public class TrackingFixture : IDisposable
             }
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         HttpResponseMessage response = await client.GetAsync(new Uri("/", UriKind.Relative));
@@ -200,8 +178,7 @@ public class TrackingFixture : IDisposable
 
     public void Dispose()
     {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
+        // Don't dispose the factory - it's managed by the test framework when using IClassFixture
         GC.SuppressFinalize(this);
     }
 }

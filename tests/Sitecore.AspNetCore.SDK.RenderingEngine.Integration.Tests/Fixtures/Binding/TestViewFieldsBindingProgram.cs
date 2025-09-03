@@ -7,9 +7,9 @@ using Sitecore.AspNetCore.SDK.TestData;
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
 /// <summary>
-/// Test program class for model binding scenarios.
+/// Test program class for view fields binding scenarios.
 /// </summary>
-public class TestModelBindingProgram : IStandardTestProgram
+public class TestViewFieldsBindingProgram : IStandardTestProgram
 {
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)

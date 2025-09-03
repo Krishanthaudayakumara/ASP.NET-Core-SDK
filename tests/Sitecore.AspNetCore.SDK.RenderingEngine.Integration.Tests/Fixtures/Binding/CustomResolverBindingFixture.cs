@@ -1,52 +1,22 @@
 ﻿using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
-using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
-using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
-using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.ComponentModels;
 using Xunit;
 
 // ReSharper disable StringLiteralTypo
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
-public class CustomResolverBindingFixture : IDisposable
+public class CustomResolverBindingFixture : IClassFixture<TestWebApplicationFactory<TestCustomResolverBindingProgram>>
 {
-    private readonly TestServer _server;
-    private readonly MockHttpMessageHandler _mockClientHandler;
-    private readonly Uri _layoutServiceUri = new("http://layout.service");
+    private readonly TestWebApplicationFactory<TestCustomResolverBindingProgram> _factory;
 
-    public CustomResolverBindingFixture()
+    public CustomResolverBindingFixture(TestWebApplicationFactory<TestCustomResolverBindingProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
-        _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
-            .ConfigureServices(builder =>
-            {
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
-                    .AsDefaultHandler();
-                builder.AddSitecoreRenderingEngine(options =>
-                {
-                    options
-                        .AddModelBoundView<PartialDesignDynamicPlaceholder>("PartialDesignDynamicPlaceholder")
-                        .AddModelBoundView<CustomResolver>(name => name.Equals("Navigation", StringComparison.OrdinalIgnoreCase), "CustomResolver")
-                        .AddDefaultComponentRenderer();
-                });
-            })
-            .Configure(app =>
-            {
-                app.UseRouting();
-                app.UseSitecoreRenderingEngine();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapDefaultControllerRoute();
-                });
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
+        _factory = factory;
+        _factory.MockClientHandler.Requests.Clear();
+        _factory.MockClientHandler.Responses.Clear();
     }
 
     [Fact]
@@ -54,13 +24,13 @@ public class CustomResolverBindingFixture : IDisposable
     {
         // Arrange
         string json = await File.ReadAllTextAsync("./Json/headlessSxa.json");
-        _mockClientHandler.Responses.Push(new HttpResponseMessage
+        _factory.MockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(json)
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -76,12 +46,5 @@ public class CustomResolverBindingFixture : IDisposable
 
         sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes["ul"].ChildNodes.Count(c => c.Name.Equals("li")).Should().Be(1);
         sectionNode.ChildNodes["ul"].ChildNodes["li"].ChildNodes["ul"].ChildNodes["li"].ChildNodes["span"].InnerText.Should().Be("About");
-    }
-
-    public void Dispose()
-    {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
     }
 }

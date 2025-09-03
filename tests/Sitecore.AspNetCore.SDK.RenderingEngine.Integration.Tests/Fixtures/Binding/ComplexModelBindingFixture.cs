@@ -1,7 +1,9 @@
 ﻿using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
-using Microsoft.AspNetCore.TestHost;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -10,43 +12,36 @@ using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
 
-public class ComplexModelBindingFixture : IDisposable
+/// <summary>
+/// Fixture for testing complex model binding functionality.
+/// </summary>
+public class ComplexModelBindingFixture : IClassFixture<TestWebApplicationFactory<TestComplexModelBindingProgram>>, IDisposable
 {
-    private readonly TestServer _server;
+    private readonly TestWebApplicationFactory<TestComplexModelBindingProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
-    public ComplexModelBindingFixture()
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ComplexModelBindingFixture"/> class.
+    /// </summary>
+    /// <param name="factory">The test web application factory.</param>
+    public ComplexModelBindingFixture(TestWebApplicationFactory<TestComplexModelBindingProgram> factory)
     {
-        TestServerBuilder testHostBuilder = new();
-        _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
-            .ConfigureServices(builder =>
-            {
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
-                    .AsDefaultHandler();
-                builder.AddSitecoreRenderingEngine(options =>
-                {
-                    options
-                        .AddModelBoundView<ComponentModels.ComplexComponent>(name => name.Equals("Complex-Component", StringComparison.OrdinalIgnoreCase), "ComplexComponent")
-                        .AddDefaultComponentRenderer();
-                });
-            })
-            .Configure(app =>
-            {
-                app.UseRouting();
-                app.UseSitecoreRenderingEngine();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapDefaultControllerRoute();
-                });
-            });
+        _factory = factory;
+        _mockClientHandler = _factory.MockClientHandler;
 
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
+        // Clear any previous state
+        _factory.MockClientHandler.Requests.Clear();
+        _factory.MockClientHandler.Responses.Clear();
+
+        // Set the URIs for this test
+        _factory.LayoutServiceUri = _layoutServiceUri;
     }
 
+    /// <summary>
+    /// Tests that Sitecore layout model binders bind data correctly for complex components.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task SitecoreLayoutModelBinders_BindDataCorrectly()
     {
@@ -57,7 +52,7 @@ public class ComplexModelBindingFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -101,10 +96,12 @@ public class ComplexModelBindingFixture : IDisposable
             .Should().Be(TestConstants.TestParamNameValue);
     }
 
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
     public void Dispose()
     {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
+        // Don't dispose the factory - it's managed by the test framework when using IClassFixture
         GC.SuppressFinalize(this);
     }
 }
