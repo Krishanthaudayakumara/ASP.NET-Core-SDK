@@ -7,16 +7,11 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Configuration;
-using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Request.Handlers;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Serialization;
-using Sitecore.AspNetCore.SDK.Pages.Configuration;
-using Sitecore.AspNetCore.SDK.Pages.Extensions;
 using Sitecore.AspNetCore.SDK.Pages.Request.Handlers.GraphQL;
 using Sitecore.AspNetCore.SDK.Pages.Services;
-using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Interfaces;
-using Sitecore.AspNetCore.SDK.TestData;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
 {
@@ -24,19 +19,20 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
         : WebApplicationFactory<T>
         where T : class
     {
-        private bool IsPagesTest => typeof(IPagesTestProgram).IsAssignableFrom(typeof(T));
-
         public IGraphQLClient MockGraphQLClient { get; set; } = Substitute.For<IGraphQLClient>();
 
         public MockHttpMessageHandler MockClientHandler { get; set; } = new();
 
         public Uri LayoutServiceUri { get; set; } = new("http://layout.service");
 
+        private bool IsPagesTest => typeof(IPagesTestProgram).IsAssignableFrom(typeof(T));
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.UseContentRoot(Directory.GetCurrentDirectory())
                    .ConfigureTestServices(services =>
                    {
+                       // Replace GraphQL client with mock for testing
                        ServiceDescriptor descriptor = new(typeof(IGraphQLClient), MockGraphQLClient);
                        services.Replace(descriptor);
 
@@ -77,74 +73,6 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests
                                options.DefaultHandler = "mock";
                            }
                        });
-
-                       if (IsPagesTest)
-                       {
-                           services.AddRouting()
-                                   .AddMvc();
-
-                           services.AddSitecoreLayoutService()
-                                   .AddSitecorePagesHandler();
-
-                           services.AddSitecoreRenderingEngine(options =>
-                                   {
-                                       options.AddDefaultPartialView("_ComponentNotFound");
-                                   })
-                                   .WithSitecorePages(TestConstants.ContextId, options => { options.EditingSecret = TestConstants.JssEditingSecret; });
-
-                           // Configure PagesOptions for the middleware
-                           services.Configure<PagesOptions>(options =>
-                           {
-                               options.ConfigEndpoint = TestConstants.ConfigRoute;
-                           });
-                       }
-                       else
-                       {
-                           services.AddRouting()
-                                   .AddMvc();
-
-                           services.AddSitecoreLayoutService()
-                                   .AddHttpHandler("mock", _ => new HttpClient() { BaseAddress = new Uri("http://layout.service") })
-                                   .AsDefaultHandler();
-
-                           services.AddSitecoreRenderingEngine();
-                       }
-                   })
-                   .Configure(app =>
-                   {
-                       if (IsPagesTest)
-                       {
-                           app.UseMiddleware<Sitecore.AspNetCore.SDK.Pages.Middleware.PagesRenderMiddleware>();
-                           app.UseRouting();
-                           app.UseEndpoints(endpoints =>
-                           {
-                               // Map the config endpoint to PagesSetup controller
-                               endpoints.MapControllerRoute(
-                                   name: "pagesconfig",
-                                   pattern: "api/editing/config",
-                                   defaults: new { controller = "PagesSetup", action = "Config" });
-
-                               // Map the render endpoint to PagesSetup controller
-                               endpoints.MapControllerRoute(
-                                   name: "pagesrender",
-                                   pattern: "api/editing/render",
-                                   defaults: new { controller = "PagesSetup", action = "Render" });
-
-                               // Map the default route to Pages controller
-                               endpoints.MapControllerRoute(
-                                   name: "default",
-                                   pattern: "{controller=Pages}/{action=Index}");
-                           });
-                       }
-                       else
-                       {
-                           app.UseRouting();
-                           app.UseSitecoreRenderingEngine();
-                           app.UseEndpoints(configure =>
-                           {
-                               configure.MapDefaultControllerRoute();
-                           });
-                       }
                    });
         }
     }
