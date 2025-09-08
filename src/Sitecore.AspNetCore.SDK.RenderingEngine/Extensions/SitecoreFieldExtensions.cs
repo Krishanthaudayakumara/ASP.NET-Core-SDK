@@ -45,13 +45,14 @@ public static partial class SitecoreFieldExtensions
         ArgumentNullException.ThrowIfNull(imageField);
         string? urlStr = imageField.Value.Src;
 
-        if (urlStr == null)
+        string? result = null;
+        if (urlStr != null)
         {
-            return null;
+            Dictionary<string, object?> mergedParams = MergeParameters(imageParams, srcSetParams);
+            result = GetSitecoreMediaUriWithPreservation(urlStr, mergedParams);
         }
 
-        Dictionary<string, object?> mergedParams = MergeParameters(imageParams, srcSetParams);
-        return GetSitecoreMediaUriWithPreservation(urlStr, mergedParams);
+        return result;
     }
 
     /// <summary>
