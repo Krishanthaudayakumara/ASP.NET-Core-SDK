@@ -142,36 +142,39 @@ public static partial class SitecoreFieldExtensions
     {
         string? url;
 
-        if (urlStr == null)
+        if (string.IsNullOrEmpty(urlStr))
         {
-            url = null;
-        }
-        else if (string.IsNullOrEmpty(urlStr))
-        {
-            url = string.Empty;
+            url = urlStr;
         }
         else
         {
             // Parse existing query parameters and build merged parameters dictionary
             Dictionary<string, object?> mergedParams = new(StringComparer.OrdinalIgnoreCase);
-            Uri.TryCreate(urlStr, UriKind.RelativeOrAbsolute, out Uri? uri);
 
-            url = ParseUrlParams(uri, mergedParams);
-
-            // Add new parameters (these will override existing ones)
-            AddParametersToResult(mergedParams, parameters, skipNullValues: true);
-
-            // Add query parameters
-            foreach (KeyValuePair<string, object?> kvp in mergedParams)
+            if (!Uri.TryCreate(urlStr, UriKind.RelativeOrAbsolute, out Uri? uri))
             {
-                if (kvp.Value != null)
+                url = urlStr;
+            }
+            else
+            {
+                url = ParseUrlParams(uri, mergedParams);
+
+                // Add new parameters (these will override existing ones)
+                AddParametersToResult(mergedParams, parameters, skipNullValues: true);
+
+                // Add query parameters
+                foreach (KeyValuePair<string, object?> kvp in mergedParams)
                 {
-                    url = QueryHelpers.AddQueryString(url, kvp.Key, kvp.Value.ToString() ?? string.Empty);
+                    if (kvp.Value != null)
+                    {
+                        url = QueryHelpers.AddQueryString(url, kvp.Key, kvp.Value.ToString() ?? string.Empty);
+                    }
                 }
             }
         }
 
-        return url == null ? null : ApplyJssMediaUrlPrefix(url);
+        string? result = url == null ? null : ApplyJssMediaUrlPrefix(url);
+        return result;
     }
 
     /// <summary>
