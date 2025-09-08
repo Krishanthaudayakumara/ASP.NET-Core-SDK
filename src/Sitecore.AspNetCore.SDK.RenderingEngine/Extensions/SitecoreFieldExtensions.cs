@@ -45,13 +45,14 @@ public static partial class SitecoreFieldExtensions
         ArgumentNullException.ThrowIfNull(imageField);
         string? urlStr = imageField.Value.Src;
 
-        if (urlStr == null)
+        string? result = null;
+        if (urlStr != null)
         {
-            return null;
+            Dictionary<string, object?> mergedParams = MergeParameters(imageParams, srcSetParams);
+            result = GetSitecoreMediaUriWithPreservation(urlStr, mergedParams);
         }
 
-        Dictionary<string, object?> mergedParams = MergeParameters(imageParams, srcSetParams);
-        return GetSitecoreMediaUriWithPreservation(urlStr, mergedParams);
+        return result;
     }
 
     /// <summary>
@@ -137,36 +138,43 @@ public static partial class SitecoreFieldExtensions
     /// <param name="urlStr">The URL string.</param>
     /// <param name="parameters">Parameters to merge.</param>
     /// <returns>Modified URL string.</returns>
-    private static string GetSitecoreMediaUriWithPreservation(string urlStr, object? parameters)
+    private static string? GetSitecoreMediaUriWithPreservation(string? urlStr, object? parameters)
     {
+        string? url;
+
         if (string.IsNullOrEmpty(urlStr))
         {
-            return urlStr;
+            url = urlStr;
         }
-
-        // Parse existing query parameters and build merged parameters dictionary
-        Dictionary<string, object?> mergedParams = new(StringComparer.OrdinalIgnoreCase);
-        Uri? uri = null;
-        if (!string.IsNullOrEmpty(urlStr))
+        else
         {
-            Uri.TryCreate(urlStr, UriKind.RelativeOrAbsolute, out uri);
-        }
+            // Parse existing query parameters and build merged parameters dictionary
+            Dictionary<string, object?> mergedParams = new(StringComparer.OrdinalIgnoreCase);
 
-        string url = ParseUrlParams(uri, mergedParams);
-
-        // Add new parameters (these will override existing ones)
-        AddParametersToResult(mergedParams, parameters, skipNullValues: true);
-
-        // Add query parameters
-        foreach (KeyValuePair<string, object?> kvp in mergedParams)
-        {
-            if (kvp.Value != null)
+            if (!Uri.TryCreate(urlStr, UriKind.RelativeOrAbsolute, out Uri? uri))
             {
-                url = QueryHelpers.AddQueryString(url, kvp.Key, kvp.Value.ToString() ?? string.Empty);
+                url = urlStr;
+            }
+            else
+            {
+                url = ParseUrlParams(uri, mergedParams);
+
+                // Add new parameters (these will override existing ones)
+                AddParametersToResult(mergedParams, parameters, skipNullValues: true);
+
+                // Add query parameters
+                foreach (KeyValuePair<string, object?> kvp in mergedParams)
+                {
+                    if (kvp.Value != null)
+                    {
+                        url = QueryHelpers.AddQueryString(url, kvp.Key, kvp.Value.ToString() ?? string.Empty);
+                    }
+                }
             }
         }
 
-        return ApplyJssMediaUrlPrefix(url);
+        string? result = url == null ? null : ApplyJssMediaUrlPrefix(url);
+        return result;
     }
 
     /// <summary>
@@ -177,29 +185,45 @@ public static partial class SitecoreFieldExtensions
     /// <returns>The URL without query parameters.</returns>
     private static string ParseUrlParams(Uri? uri, Dictionary<string, object?> parameters)
     {
+        string result;
+
         if (uri == null)
         {
-            return string.Empty;
+            result = string.Empty;
         }
-
-        if (uri.IsAbsoluteUri)
+        else if (uri.IsAbsoluteUri)
         {
-            string url = $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}";
-            NameValueCollection queryParams = HttpUtility.ParseQueryString(uri.Query);
-            foreach (string? param in queryParams.AllKeys)
-            {
-                if (!string.IsNullOrEmpty(param))
-                {
-                    parameters[param] = queryParams[param];
-                }
-            }
-
-            return url;
+            result = ParseAbsoluteUriParams(uri, parameters);
+        }
+        else
+        {
+            result = ParseRelativeUriParams(uri, parameters);
         }
 
+        return result;
+    }
+
+    private static string ParseAbsoluteUriParams(Uri uri, Dictionary<string, object?> parameters)
+    {
+        string url = $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}";
+        NameValueCollection queryParams = HttpUtility.ParseQueryString(uri.Query);
+        foreach (string? param in queryParams.AllKeys)
+        {
+            if (!string.IsNullOrEmpty(param))
+            {
+                parameters[param] = queryParams[param];
+            }
+        }
+
+        return url;
+    }
+
+    private static string ParseRelativeUriParams(Uri uri, Dictionary<string, object?> parameters)
+    {
         // For relative URIs, accessing Uri.Query throws InvalidOperationException, so we use string manipulation
         string original = uri.OriginalString;
         int queryIndex = original.IndexOf('?');
+        string result;
 
         if (queryIndex >= 0)
         {
@@ -210,10 +234,14 @@ public static partial class SitecoreFieldExtensions
                 parameters[kvp.Key] = kvp.Value.Count > 0 ? kvp.Value[0] : null;
             }
 
-            return original[..queryIndex];
+            result = original[..queryIndex];
+        }
+        else
+        {
+            result = original;
         }
 
-        return original;
+        return result;
     }
 
     /// <summary>
