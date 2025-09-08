@@ -138,11 +138,15 @@ public static partial class SitecoreFieldExtensions
     /// <param name="urlStr">The URL string.</param>
     /// <param name="parameters">Parameters to merge.</param>
     /// <returns>Modified URL string.</returns>
-    private static string GetSitecoreMediaUriWithPreservation(string urlStr, object? parameters)
+    private static string? GetSitecoreMediaUriWithPreservation(string? urlStr, object? parameters)
     {
-        string url;
+        string? url;
 
-        if (string.IsNullOrEmpty(urlStr))
+        if (urlStr == null)
+        {
+            url = null;
+        }
+        else if (string.IsNullOrEmpty(urlStr))
         {
             url = string.Empty;
         }
@@ -167,7 +171,7 @@ public static partial class SitecoreFieldExtensions
             }
         }
 
-        return ApplyJssMediaUrlPrefix(url);
+        return url == null ? null : ApplyJssMediaUrlPrefix(url);
     }
 
     /// <summary>
