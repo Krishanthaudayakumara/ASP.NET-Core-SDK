@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Net;
 using System.Text.Encodings.Web;
-using FluentAssertions;
+using AwesomeAssertions;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
