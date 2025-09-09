@@ -9,8 +9,6 @@ using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.TestData;
 using Xunit;
 
-
-
 public class ModelBindingFixture : IClassFixture<WebApplicationFactory<TestBindingProgram>>
 {
     private readonly WebApplicationFactory<TestBindingProgram> _factory;
