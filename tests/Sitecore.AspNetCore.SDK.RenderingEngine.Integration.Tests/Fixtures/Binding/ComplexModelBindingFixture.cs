@@ -1,7 +1,11 @@
 ﻿using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Configuration;
+using Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.TestBootstrapping;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -12,55 +16,54 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Bin
 
 public class ComplexModelBindingFixture : IDisposable
 {
-    private readonly TestServer _server;
+    private readonly Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory<TestPagesProgram> _factory;
     private readonly MockHttpMessageHandler _mockClientHandler;
     private readonly Uri _layoutServiceUri = new("http://layout.service");
 
     public ComplexModelBindingFixture()
     {
-        TestServerBuilder testHostBuilder = new();
         _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
-            .ConfigureServices(builder =>
+
+        // Use the existing TestWebApplicationFactory and register test-specific services via WithWebHostBuilder so we don't change the global factory behavior.
+        _factory = new TestWebApplicationFactory<TestPagesProgram>()
+            .WithWebHostBuilder(builder =>
             {
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
-                    .AsDefaultHandler();
-                builder.AddSitecoreRenderingEngine(options =>
+                builder.ConfigureTestServices(services =>
                 {
-                    options
-                        .AddModelBoundView<ComponentModels.ComplexComponent>(name => name.Equals("Complex-Component", StringComparison.OrdinalIgnoreCase), "ComplexComponent")
-                        .AddDefaultComponentRenderer();
-                });
-            })
-            .Configure(app =>
-            {
-                app.UseRouting();
-                app.UseSitecoreRenderingEngine();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapDefaultControllerRoute();
+                    services
+                        .AddSitecoreLayoutService()
+                        .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
+                        .AsDefaultHandler();
+
+                    // Register a bootstrapper instance which TestPagesProgram will discover and execute at startup. The bootstrapper will configure rendering engine options for this fixture.
+                    var bootstrapper = new BindingTestBootstrapper(
+                        configureOptions: options =>
+                        {
+                            options.RendererRegistry.Clear();
+                            options
+                                .AddModelBoundView<ComponentModels.ComplexComponent>(name => name.Equals("Complex-Component", StringComparison.OrdinalIgnoreCase), "ComplexComponent")
+                                .AddDefaultComponentRenderer()
+                                .AddDefaultPartialView("_ComponentNotFound");
+                        });
+
+                    services.AddSingleton<ITestBootstrapper>(bootstrapper);
                 });
             });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
     }
 
     [Fact]
     public async Task SitecoreLayoutModelBinders_BindDataCorrectly()
     {
-        // Arrange
         _mockClientHandler.Responses.Push(new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = _factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("http://localhost") });
 
-        // Act
-        string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
+        // Request the Home controller so the NestedPlaceholderPageLayout is returned.
+        string response = await client.GetStringAsync(new Uri("/Home", UriKind.Relative));
 
         HtmlDocument doc = new();
         doc.LoadHtml(response);
@@ -103,8 +106,8 @@ public class ComplexModelBindingFixture : IDisposable
 
     public void Dispose()
     {
-        _server.Dispose();
-        _mockClientHandler.Dispose();
-        GC.SuppressFinalize(this);
+    _factory.Dispose();
+    _mockClientHandler.Dispose();
+    GC.SuppressFinalize(this);
     }
 }
