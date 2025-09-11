@@ -4,31 +4,32 @@ using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.TestData;
 
-namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding;
-
-public class TestBindingProgram
+namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Binding
 {
-    public static void Main(string[] args)
+    public class TestBindingProgram
     {
-        var builder = WebApplication.CreateBuilder(args);
+        public static void ConfigureServices(WebApplicationBuilder builder)
+        {
+            builder.Services.AddRouting()
+                            .AddMvc();
 
-        builder.Services.AddRouting()
-                        .AddMvc();
+            builder.Services.AddSitecoreLayoutService()
+                            .AddHttpHandler("mock", _ => new HttpClient { BaseAddress = new Uri("http://layout.service") })
+                            .AsDefaultHandler();
 
-        builder.Services.AddSitecoreLayoutService()
-                        .AddHttpHandler("mock", _ => new HttpClient { BaseAddress = new Uri("http://layout.service") })
-                        .AsDefaultHandler();
+            builder.Services.AddSitecoreRenderingEngine();
+        }
 
-        builder.Services.AddSitecoreRenderingEngine();
+        public static void ConfigureApp(WebApplication app)
+        {
+            app.UseSitecoreRenderingEngine();
+            app.UseRouting();
 
-        var app = builder.Build();
-        app.UseSitecoreRenderingEngine();
-        app.UseRouting();
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Pages}/{action=Index}");
+        }
 
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Pages}/{action=Index}");
-
-        app.Run();
+    // Main intentionally omitted so this file can be consumed by WebApplicationFactory in tests.
     }
 }
