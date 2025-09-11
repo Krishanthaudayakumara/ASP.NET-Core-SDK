@@ -2,43 +2,46 @@
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
 using Sitecore.AspNetCore.SDK.Pages.Configuration;
 using Sitecore.AspNetCore.SDK.Pages.Extensions;
+using Sitecore.AspNetCore.SDK.GraphQL.Extensions;
+using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
+using Sitecore.AspNetCore.SDK.Pages.Configuration;
+using Sitecore.AspNetCore.SDK.Pages.Extensions;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
 using Sitecore.AspNetCore.SDK.TestData;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Pages;
 
-builder.Services.AddRouting()
-                .AddMvc();
-
-builder.Services.AddGraphQLClient(configuration =>
+public class TestPagesProgram
 {
-    configuration.ContextId = TestConstants.ContextId;
-});
+    public static void ConfigureServices(WebApplicationBuilder builder)
+    {
+        builder.Services.AddRouting()
+                        .AddMvc();
 
-builder.Services.AddSitecoreLayoutService()
-                .AddSitecorePagesHandler()
-                .AddGraphQLWithContextHandler("default", TestConstants.ContextId!, siteName: TestConstants.SiteName!)
-                .AsDefaultHandler();
+        builder.Services.AddGraphQLClient(configuration =>
+        {
+            configuration.ContextId = TestConstants.ContextId;
+        });
 
-builder.Services.AddSitecoreRenderingEngine(options =>
-                {
-                    options.AddDefaultPartialView("_ComponentNotFound");
-                })
-                .WithSitecorePages(TestConstants.ContextId, options => { options.EditingSecret = TestConstants.JssEditingSecret; });
+        builder.Services.AddSitecoreLayoutService()
+                        .AddSitecorePagesHandler()
+                        .AddGraphQLWithContextHandler("default", TestConstants.ContextId!, siteName: TestConstants.SiteName!)
+                        .AsDefaultHandler();
 
-WebApplication app = builder.Build();
-app.UseSitecorePages(new PagesOptions { ConfigEndpoint = TestConstants.ConfigRoute });
-app.UseRouting();
+        builder.Services.AddSitecoreRenderingEngine(options =>
+                        {
+                            options.AddDefaultPartialView("_ComponentNotFound");
+                        })
+                        .WithSitecorePages(TestConstants.ContextId, options => { options.EditingSecret = TestConstants.JssEditingSecret; });
+    }
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Pages}/{action=Index}");
+    public static void ConfigureApp(WebApplication app)
+    {
+        app.UseSitecorePages(new PagesOptions { ConfigEndpoint = TestConstants.ConfigRoute });
+        app.UseRouting();
 
-app.Run();
-
-/// <summary>
-/// Partial class allowing this TestProgram to be created by a WebApplicationFactory for integration testing.
-/// </summary>
-public partial class TestPagesProgram
-{
+        app.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Pages}/{action=Index}");
+    }
 }

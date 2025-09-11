@@ -8,10 +8,8 @@ namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.Bin
 
 public class TestBindingProgram
 {
-    public static void Main(string[] args)
+    public static void ConfigureServices(WebApplicationBuilder builder)
     {
-        var builder = WebApplication.CreateBuilder(args);
-
         builder.Services.AddRouting()
                         .AddMvc();
 
@@ -20,15 +18,15 @@ public class TestBindingProgram
                         .AsDefaultHandler();
 
         builder.Services.AddSitecoreRenderingEngine();
+    }
 
-        var app = builder.Build();
+    public static void ConfigureApp(WebApplication app)
+    {
         app.UseSitecoreRenderingEngine();
         app.UseRouting();
 
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Pages}/{action=Index}");
-
-        app.Run();
     }
 }
