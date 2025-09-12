@@ -25,7 +25,7 @@ public class ModelBindingFixture(TestWebApplicationFactory<TestWebApplicationPro
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-    HttpClient client = BuildBindingWebApplicationFactory().CreateClient();
+        HttpClient client = BuildBindingWebApplicationFactory().CreateClient();
         string response = await client.GetStringAsync("WithBoundSitecoreRoute");
 
         // assert that the SitecoreRouteProperty attribute binding worked
@@ -47,7 +47,7 @@ public class ModelBindingFixture(TestWebApplicationFactory<TestWebApplicationPro
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-    HttpClient client = BuildBindingWebApplicationFactory().CreateClient();
+        HttpClient client = BuildBindingWebApplicationFactory().CreateClient();
         string response = await client.GetStringAsync("WithBoundSitecoreContext");
 
         // assert that the SitecoreContextProperty attribute binding worked
@@ -67,7 +67,7 @@ public class ModelBindingFixture(TestWebApplicationFactory<TestWebApplicationPro
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-    HttpClient client = BuildBindingWebApplicationFactory().CreateClient();
+        HttpClient client = BuildBindingWebApplicationFactory().CreateClient();
         string response = await client.GetStringAsync("WithBoundSitecoreResponse");
 
         // assert that the SitecoreLayoutResponse attribute binding worked
