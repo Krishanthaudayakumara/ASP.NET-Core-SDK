@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using FluentAssertions;
+using AwesomeAssertions;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
