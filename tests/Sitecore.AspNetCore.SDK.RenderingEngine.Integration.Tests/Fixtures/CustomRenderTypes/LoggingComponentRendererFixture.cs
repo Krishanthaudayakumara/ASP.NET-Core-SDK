@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -11,43 +12,10 @@ using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.CustomRenderTypes;
 
-public class LoggingComponentRendererFixture : IDisposable
+public class LoggingComponentRendererFixture(TestWebApplicationFactory<TestWebApplicationProgram> factory) : IClassFixture<TestWebApplicationFactory<TestWebApplicationProgram>>, IDisposable
 {
-    private readonly TestServer _server;
-    private readonly MockHttpMessageHandler _mockClientHandler;
+    private readonly MockHttpMessageHandler _mockClientHandler = new();
     private readonly Uri _layoutServiceUri = new("http://layout.service");
-
-    public LoggingComponentRendererFixture()
-    {
-        TestServerBuilder testHostBuilder = new();
-        _mockClientHandler = new MockHttpMessageHandler();
-
-        testHostBuilder
-            .ConfigureServices(builder =>
-            {
-                builder.AddSingleton<ILoggerProvider>(new IntegrationTestLoggerProvider());
-
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
-                    .AsDefaultHandler();
-                builder.AddSitecoreRenderingEngine(options =>
-                {
-                    options.AddDefaultComponentRenderer();
-                });
-            })
-            .Configure(app =>
-            {
-                app.UseRouting();
-                app.UseSitecoreRenderingEngine();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapDefaultControllerRoute();
-                });
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
 
     [Fact]
     public async Task CustomRenderTypes_DefaultRendererWritesToLogWithoutRenderingHtml()
@@ -59,7 +27,7 @@ public class LoggingComponentRendererFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = BuildBindingWebApplicationFactory().CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -77,7 +45,37 @@ public class LoggingComponentRendererFixture : IDisposable
     public void Dispose()
     {
         _mockClientHandler.Dispose();
-        _server.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    private WebApplicationFactory<TestWebApplicationProgram> BuildBindingWebApplicationFactory()
+    {
+        return factory
+            .WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddSingleton<ILoggerProvider>(new IntegrationTestLoggerProvider());
+
+                    services
+                        .AddSitecoreLayoutService()
+                        .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
+                        .AsDefaultHandler();
+                    services.AddSitecoreRenderingEngine(options =>
+                    {
+                        options.AddDefaultComponentRenderer();
+                    });
+                });
+
+                builder.Configure(app =>
+                {
+                    app.UseRouting();
+                    app.UseSitecoreRenderingEngine();
+                    app.UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapDefaultControllerRoute();
+                    });
+                });
+            });
     }
 }

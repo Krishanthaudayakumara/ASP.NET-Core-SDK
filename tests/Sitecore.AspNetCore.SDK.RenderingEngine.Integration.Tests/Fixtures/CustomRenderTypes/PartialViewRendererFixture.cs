@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using AwesomeAssertions;
 using HtmlAgilityPack;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Sitecore.AspNetCore.SDK.AutoFixture.Mocks;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Extensions;
@@ -10,42 +11,10 @@ using Xunit;
 
 namespace Sitecore.AspNetCore.SDK.RenderingEngine.Integration.Tests.Fixtures.CustomRenderTypes;
 
-public class PartialViewRendererFixture : IDisposable
+public class PartialViewRendererFixture(TestWebApplicationFactory<TestWebApplicationProgram> factory) : IClassFixture<TestWebApplicationFactory<TestWebApplicationProgram>>, IDisposable
 {
-    private readonly TestServer _server;
-    private readonly MockHttpMessageHandler _mockClientHandler;
+    private readonly MockHttpMessageHandler _mockClientHandler = new();
     private readonly Uri _layoutServiceUri = new("http://layout.service");
-
-    public PartialViewRendererFixture()
-    {
-        TestServerBuilder testHostBuilder = new();
-        _mockClientHandler = new MockHttpMessageHandler();
-        testHostBuilder
-            .ConfigureServices(builder =>
-            {
-                builder
-                    .AddSitecoreLayoutService()
-                    .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
-                    .AsDefaultHandler();
-                builder.AddSitecoreRenderingEngine(options =>
-                {
-                    options
-                        .AddPartialView(name => name.Equals("Component-6", StringComparison.OrdinalIgnoreCase), "_PartialView")
-                        .AddDefaultComponentRenderer();
-                });
-            })
-            .Configure(app =>
-            {
-                app.UseRouting();
-                app.UseSitecoreRenderingEngine();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapDefaultControllerRoute();
-                });
-            });
-
-        _server = testHostBuilder.BuildServer(new Uri("http://localhost"));
-    }
 
     [Fact]
     public async Task CustomRenderTypes_PartialViewRendersCorrectly()
@@ -57,7 +26,7 @@ public class PartialViewRendererFixture : IDisposable
             Content = new StringContent(Serializer.Serialize(CannedResponses.WithNestedPlaceholder))
         });
 
-        HttpClient client = _server.CreateClient();
+        HttpClient client = BuildPartialViewWebApplicationFactory().CreateClient();
 
         // Act
         string response = await client.GetStringAsync(new Uri("/", UriKind.Relative));
@@ -74,7 +43,38 @@ public class PartialViewRendererFixture : IDisposable
     public void Dispose()
     {
         _mockClientHandler.Dispose();
-        _server.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    private WebApplicationFactory<TestWebApplicationProgram> BuildPartialViewWebApplicationFactory()
+    {
+        return factory
+            .WithWebHostBuilder(builder =>
+            {
+                builder.ConfigureTestServices(services =>
+                {
+                    services
+                        .AddSitecoreLayoutService()
+                        .AddHttpHandler("mock", _ => new HttpClient(_mockClientHandler) { BaseAddress = _layoutServiceUri })
+                        .AsDefaultHandler();
+
+                    services.AddSitecoreRenderingEngine(options =>
+                    {
+                        options
+                            .AddPartialView(name => name.Equals("Component-6", StringComparison.OrdinalIgnoreCase), "_PartialView")
+                            .AddDefaultComponentRenderer();
+                    });
+                });
+
+                builder.Configure(app =>
+                {
+                    app.UseRouting();
+                    app.UseSitecoreRenderingEngine();
+                    app.UseEndpoints(endpoints =>
+                    {
+                        endpoints.MapDefaultControllerRoute();
+                    });
+                });
+            });
     }
 }
