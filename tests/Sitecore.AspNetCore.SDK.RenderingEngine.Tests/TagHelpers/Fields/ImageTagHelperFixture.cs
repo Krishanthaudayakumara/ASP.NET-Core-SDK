@@ -739,6 +739,391 @@ public class ImageTagHelperFixture
         chromeRenderer.Received().Render(closingChrome);
     }
 
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_ScImgTagWithSrcSet_GeneratesSrcSetAttribute(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        tagHelperOutput.TagName = RenderingEngineConstants.SitecoreTagHelpers.ImageHtmlTag;
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.SrcSet = new object[] { new { w = 400 }, new { w = 200 } };
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert - <sc-img> generates HTML content, not attributes
+        string content = tagHelperOutput.Content.GetContent();
+        content.Should().Contain("srcset=");
+        content.Should().Contain("400w");
+        content.Should().Contain("200w");
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithContentSDKBehavior_MatchesExpectedOutput(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        tagHelperOutput.TagName = "img";
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.ImageParams = new { h = 1000 }; // Base parameters
+        sut.SrcSet = new object[] { new { h = 1000, w = 1000 }, new { mh = 250, mw = 250 } };
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        tagHelperOutput.Attributes.Should().ContainSingle(a => a.Name == "srcset");
+        string srcSetValue = tagHelperOutput.Attributes["srcset"].Value.ToString()!;
+
+        // Should contain "1000w" (from w parameter taking priority over h)
+        srcSetValue.Should().Contain("1000w");
+
+        // Should contain "250w" (from mw parameter)
+        srcSetValue.Should().Contain("250w");
+
+        // Verify it contains the expected format: "url 1000w, url 250w"
+        string[] entries = srcSetValue.Split(", ");
+        entries.Should().HaveCount(2);
+        entries[0].Should().EndWith("1000w");
+        entries[1].Should().EndWith("250w");
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithoutValidWidth_FiltersEntries(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        tagHelperOutput.TagName = "img";
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.SrcSet = new object[] { new { h = 1000 }, new { mw = 250 }, new { quality = 80 } };
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        tagHelperOutput.Attributes.Should().ContainSingle(a => a.Name == "srcset");
+        string srcSetValue = tagHelperOutput.Attributes["srcset"].Value.ToString()!;
+
+        // Should only contain the entry with mw parameter
+        srcSetValue.Should().Contain("250w");
+
+        // Should not contain entries without width parameters
+        string[] entries = srcSetValue.Split(", ");
+        entries.Should().HaveCount(1);
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_EditableImageWithSrcSet_MergesSrcSetIntoEditableMarkup(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        Image image = new() { Src = "http://styleguide/-/media/img/sc_logo.png", Alt = "Sitecore Logo" };
+        ImageField imageField = new(image)
+        {
+            EditableMarkup = "<img src=\"/sitecore/shell/-/jssmedia/img/sc_logo.png\" alt=\"Sitecore Logo\" />"
+        };
+
+        tagHelperOutput.TagName = RenderingEngineConstants.SitecoreTagHelpers.ImageHtmlTag;
+        sut.For = GetModelExpression(imageField);
+        sut.SrcSet = new object[] { new { mw = 600 }, new { mw = 300 } };
+        sut.Sizes = "(min-width: 768px) 600px, 300px";
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        string content = tagHelperOutput.Content.GetContent();
+        content.Should().Contain("srcset=");
+        content.Should().Contain("600w");
+        content.Should().Contain("300w");
+        content.Should().Contain("sizes=\"(min-width: 768px) 600px, 300px\"");
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithJsonString_GeneratesSrcSetAttribute(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        tagHelperOutput.TagName = "img";
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.SrcSet = "[{\"mw\": 500}, {\"mw\": 250}]";
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        tagHelperOutput.Attributes.Should().ContainSingle(a => a.Name == "srcset");
+        string srcSetValue = tagHelperOutput.Attributes["srcset"].Value.ToString()!;
+        srcSetValue.Should().Contain("500w");
+        srcSetValue.Should().Contain("250w");
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithMixedParameterTypes_GeneratesSrcSetAttribute(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        tagHelperOutput.TagName = RenderingEngineConstants.SitecoreTagHelpers.ImageHtmlTag;
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.SrcSet = new object[]
+        {
+            // Only w and mw are supported by Content SDK for srcSet
+            new { w = 800 },  // Anonymous object with 'w'
+            new { mw = 400 }, // Anonymous object with 'mw'
+        };
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        string content = tagHelperOutput.Content.GetContent();
+        content.Should().Contain("srcset=");
+        content.Should().Contain("800w");
+        content.Should().Contain("400w");
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithInvalidJsonString_FallsBackGracefully(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        tagHelperOutput.TagName = "img";
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.SrcSet = "invalid json string";
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        // Should not throw and should not add srcset attribute
+        tagHelperOutput.Attributes.Should().NotContain(a => a.Name == "srcset");
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithImageOptimization_GeneratesOptimizedUrls(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        tagHelperOutput.TagName = "img";
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.UseImageOptimization = true; // Enable optimization
+        sut.SrcSet = new object[]
+        {
+            new { w = 320, quality = 75 },   // Mobile with compression
+            new { w = 640, quality = 80 },   // Tablet with better quality
+            new { w = 1024, quality = 85 },  // Desktop with high quality
+            new { w = 1920, quality = 90 } // Large desktop with premium quality
+        };
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        tagHelperOutput.Attributes.Should().ContainSingle(a => a.Name == "srcset");
+        string srcSetValue = tagHelperOutput.Attributes["srcset"].Value.ToString()!;
+
+        // Should contain optimization URLs
+        srcSetValue.Should().Contain("/_sitecore/image?url=");
+        srcSetValue.Should().Contain("&w=320&q=75");
+        srcSetValue.Should().Contain("&w=640&q=80");
+        srcSetValue.Should().Contain("&w=1024&q=85");
+        srcSetValue.Should().Contain("&w=1920&q=90");
+
+        // Should contain width descriptors
+        srcSetValue.Should().Contain("320w");
+        srcSetValue.Should().Contain("640w");
+        srcSetValue.Should().Contain("1024w");
+        srcSetValue.Should().Contain("1920w");
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithNextJsStyleOptimization_MatchesNextJsBehavior(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        tagHelperOutput.TagName = "img";
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.UseImageOptimization = true; // Enable optimization
+        sut.SrcSet = new object[]
+        {
+            new { w = 16, quality = 75 },
+            new { w = 32, quality = 75 },
+            new { w = 48, quality = 75 },
+            new { w = 64, quality = 75 },
+            new { w = 96, quality = 75 },
+            new { w = 128, quality = 75 },
+            new { w = 256, quality = 75 },
+            new { w = 384, quality = 75 },
+            new { w = 640, quality = 80 },
+            new { w = 750, quality = 80 },
+            new { w = 828, quality = 80 },
+            new { w = 1080, quality = 85 },
+            new { w = 1200, quality = 85 },
+            new { w = 1920, quality = 90 },
+            new { w = 2048, quality = 90 },
+            new { w = 3840, quality = 95 }
+        };
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        tagHelperOutput.Attributes.Should().ContainSingle(a => a.Name == "srcset");
+        string srcSetValue = tagHelperOutput.Attributes["srcset"].Value.ToString()!;
+
+        // Should have 16 entries like Next.js
+        string[] entries = srcSetValue.Split(", ");
+        entries.Should().HaveCount(16);
+
+        // Should contain optimization URLs with different quality levels
+        srcSetValue.Should().Contain("/_sitecore/image?url=");
+        srcSetValue.Should().Contain("&w=16&q=75");
+        srcSetValue.Should().Contain("&w=3840&q=95");
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithWebPOptimization_GeneratesWebPUrls(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange
+        tagHelperOutput.TagName = "img";
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.SrcSet = new object[]
+        {
+            new { w = 320, quality = 75, format = "webp" },
+            new { w = 640, quality = 80, format = "webp" },
+            new { w = 1024, quality = 85, format = "webp" }
+        };
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        tagHelperOutput.Attributes.Should().ContainSingle(a => a.Name == "srcset");
+        string srcSetValue = tagHelperOutput.Attributes["srcset"].Value.ToString()!;
+
+        // Should contain format parameter
+        srcSetValue.Should().Contain("&format=webp");
+        srcSetValue.Should().Contain("320w");
+        srcSetValue.Should().Contain("640w");
+        srcSetValue.Should().Contain("1024w");
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithComprehensiveBreakpoints_GeneratesResponsiveImages(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange - More comprehensive breakpoints like Next.js
+        tagHelperOutput.TagName = "img";
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.SrcSet = new object[]
+        {
+            new { w = 200 },   // Mobile small
+            new { w = 400 },   // Mobile medium
+            new { w = 640 },   // Mobile large/tablet small
+            new { w = 768 },   // Tablet medium
+            new { w = 1024 },  // Tablet large/desktop small
+            new { w = 1280 },  // Desktop medium
+            new { w = 1536 },  // Desktop large
+            new { w = 1920 } // Desktop XL
+        };
+        sut.Sizes = "(min-width: 1536px) 1536px, (min-width: 1280px) 1280px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, (min-width: 640px) 640px, (min-width: 400px) 400px, 200px";
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        tagHelperOutput.Attributes.Should().ContainSingle(a => a.Name == "srcset");
+        string srcSetValue = tagHelperOutput.Attributes["srcset"].Value.ToString()!;
+
+        // Should contain all breakpoints
+        srcSetValue.Should().Contain("200w");
+        srcSetValue.Should().Contain("400w");
+        srcSetValue.Should().Contain("640w");
+        srcSetValue.Should().Contain("768w");
+        srcSetValue.Should().Contain("1024w");
+        srcSetValue.Should().Contain("1280w");
+        srcSetValue.Should().Contain("1536w");
+        srcSetValue.Should().Contain("1920w");
+
+        // Should have 8 entries
+        string[] entries = srcSetValue.Split(", ");
+        entries.Should().HaveCount(8);
+    }
+
+    [Theory]
+    [AutoNSubstituteData]
+    public void Process_SrcSetWithPracticalBreakpoints_GeneratesUsableResponsiveImages(
+        ImageTagHelper sut,
+        TagHelperContext tagHelperContext,
+        TagHelperOutput tagHelperOutput)
+    {
+        // Arrange - More practical breakpoints for real-world usage
+        tagHelperOutput.TagName = RenderingEngineConstants.SitecoreTagHelpers.ImageHtmlTag;
+        sut.For = GetModelExpression(new ImageField(_image));
+        sut.SrcSet = new object[]
+        {
+            new { w = 320 },   // Mobile portrait
+            new { w = 480 },   // Mobile landscape
+            new { w = 640 },   // Small tablet
+            new { w = 768 },   // Medium tablet
+            new { w = 1024 },  // Large tablet/small desktop
+            new { w = 1280 },  // Medium desktop
+            new { w = 1600 },  // Large desktop
+            new { w = 1920 } // Full HD
+        };
+        sut.Sizes = "(min-width: 1600px) 1600px, (min-width: 1280px) 1280px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, (min-width: 640px) 640px, (min-width: 480px) 480px, (min-width: 320px) 320px, 100vw";
+
+        // Act
+        sut.Process(tagHelperContext, tagHelperOutput);
+
+        // Assert
+        string content = tagHelperOutput.Content.GetContent();
+        content.Should().Contain("srcset=");
+        content.Should().Contain("320w");
+        content.Should().Contain("480w");
+        content.Should().Contain("640w");
+        content.Should().Contain("768w");
+        content.Should().Contain("1024w");
+        content.Should().Contain("1280w");
+        content.Should().Contain("1600w");
+        content.Should().Contain("1920w");
+        content.Should().Contain("sizes=\"(min-width: 1600px) 1600px, (min-width: 1280px) 1280px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, (min-width: 640px) 640px, (min-width: 480px) 480px, (min-width: 320px) 320px, 100vw\"");
+    }
+
     private static ModelExpression GetModelExpression(Field model)
     {
         DefaultModelMetadata? modelMetadata = Substitute.For<DefaultModelMetadata>(
