@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.AspNetCore.Routing;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Fields;
 using Sitecore.AspNetCore.SDK.LayoutService.Client.Response.Model.Properties;
 using Sitecore.AspNetCore.SDK.RenderingEngine.Extensions;
@@ -29,7 +30,135 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
     private const string VSpaceAttribute = "vspace";
     private const string TitleAttribute = "title";
     private const string BorderAttribute = "border";
+    private const string SrcSetAttribute = "srcset";
+    private const string SizesAttribute = "sizes";
     private readonly IEditableChromeRenderer _chromeRenderer = chromeRenderer ?? throw new ArgumentNullException(nameof(chromeRenderer));
+
+    private static string GetWidthDescriptor(object parameters)
+    {
+        string? width = null;
+
+        // Handle Dictionary<string, object>
+        if (parameters is Dictionary<string, object> dictionary)
+        {
+            // Priority: w > mw > width > maxWidth (matching Content SDK behavior and supporting legacy parameters)
+            if (dictionary.TryGetValue("w", out object? wValue) && wValue != null)
+            {
+                width = wValue.ToString();
+            }
+            else if (dictionary.TryGetValue("mw", out object? mwValue) && mwValue != null)
+            {
+                width = mwValue.ToString();
+            }
+            else if (dictionary.TryGetValue("width", out object? widthValue) && widthValue != null)
+            {
+                width = widthValue.ToString();
+            }
+            else if (dictionary.TryGetValue("maxWidth", out object? maxWidthValue) && maxWidthValue != null)
+            {
+                width = maxWidthValue.ToString();
+            }
+        }
+        else
+        {
+            // Handle anonymous objects via reflection
+            var type = parameters.GetType();
+
+            // Priority: w > mw > width > maxWidth (matching Content SDK behavior and supporting legacy parameters)
+            var wProperty = type.GetProperty("w");
+            if (wProperty != null)
+            {
+                width = wProperty.GetValue(parameters)?.ToString();
+            }
+            else
+            {
+                var mwProperty = type.GetProperty("mw");
+                if (mwProperty != null)
+                {
+                    width = mwProperty.GetValue(parameters)?.ToString();
+                }
+                else
+                {
+                    var widthProperty = type.GetProperty("width");
+                    if (widthProperty != null)
+                    {
+                        width = widthProperty.GetValue(parameters)?.ToString();
+                    }
+                    else
+                    {
+                        var maxWidthProperty = type.GetProperty("maxWidth");
+                        if (maxWidthProperty != null)
+                        {
+                            width = maxWidthProperty.GetValue(parameters)?.ToString();
+                        }
+                    }
+                }
+            }
+        }
+
+        return !string.IsNullOrEmpty(width) ? $"{width}w" : string.Empty;
+    }
+
+    private static object MergeParameters(object? imageParams, object srcSetParams)
+    {
+        var mergedDict = new Dictionary<string, object?>();
+
+        // Add base imageParams first
+        if (imageParams != null)
+        {
+            var baseParams = new RouteValueDictionary(imageParams);
+            foreach (var kvp in baseParams)
+            {
+                if (kvp.Value != null)
+                {
+                    mergedDict[kvp.Key] = kvp.Value;
+                }
+            }
+        }
+
+        // Add srcSet parameters (these take precedence)
+        var srcParams = new RouteValueDictionary(srcSetParams);
+        foreach (var kvp in srcParams)
+        {
+            if (kvp.Value != null)
+            {
+                mergedDict[kvp.Key] = kvp.Value;
+            }
+        }
+
+        return mergedDict;
+    }
+
+    private static object[]? ParseSrcSet(object? srcSet)
+    {
+        if (srcSet == null)
+        {
+            return null;
+        }
+
+        // Handle object array (most common case)
+        if (srcSet is object[] objectArray)
+        {
+            return objectArray;
+        }
+
+        // Handle JSON string
+        if (srcSet is string jsonString)
+        {
+            try
+            {
+                var parsed = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>[]>(jsonString);
+                return parsed?.Cast<object>().ToArray();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // Handle single object
+        return new[] { srcSet };
+    }
 
     /// <summary>
     /// Gets or sets the model value.
@@ -52,6 +181,19 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
     /// Gets or sets parameters that are passed to Sitecore to perform server-side resizing of the image.
     /// </summary>
     public object? ImageParams { get; set; }
+
+    /// <summary>
+    /// Gets or sets the srcset configurations for responsive images.
+    /// Supports: object[] (anonymous objects), Dictionary arrays, or JSON string.
+    /// Each item should contain width parameters like { mw = 300 }, { w = 100 }.
+    /// </summary>
+    public object? SrcSet { get; set; }
+
+    /// <summary>
+    /// Gets or sets the sizes attribute for responsive images.
+    /// Example: "(min-width: 960px) 300px, 100px".
+    /// </summary>
+    public string? Sizes { get; set; }
 
     /// <inheritdoc/>
     public override void Process(TagHelperContext context, TagHelperOutput output)
@@ -97,6 +239,22 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
             else
             {
                 output.Attributes.Add(ScrAttribute, field.GetMediaLink(ImageParams));
+
+                // Add srcset if configured
+                if (SrcSet != null)
+                {
+                    string srcSetValue = GenerateSrcSetAttribute(field);
+                    if (!string.IsNullOrEmpty(srcSetValue))
+                    {
+                        output.Attributes.Add(SrcSetAttribute, srcSetValue);
+                    }
+                }
+
+                // Add sizes if provided
+                if (!string.IsNullOrEmpty(Sizes))
+                {
+                    output.Attributes.Add(SizesAttribute, Sizes);
+                }
 
                 if (!string.IsNullOrWhiteSpace(field.Value.Alt))
                 {
@@ -152,6 +310,22 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
         if (!string.IsNullOrWhiteSpace(image.Src))
         {
             tagBuilder.Attributes.Add(ScrAttribute, imageField.GetMediaLink(ImageParams));
+
+            // Add srcset if configured
+            if (SrcSet != null)
+            {
+                string srcSetValue = GenerateSrcSetAttribute(imageField);
+                if (!string.IsNullOrEmpty(srcSetValue))
+                {
+                    tagBuilder.Attributes.Add(SrcSetAttribute, srcSetValue);
+                }
+            }
+
+            // Add sizes if provided
+            if (!string.IsNullOrEmpty(Sizes))
+            {
+                tagBuilder.Attributes.Add(SizesAttribute, Sizes);
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(image.Alt))
@@ -230,8 +404,56 @@ public class ImageTagHelper(IEditableChromeRenderer chromeRenderer) : TagHelper
             }
 
             imageNode.SetAttributeValue(ScrAttribute, imageField.GetMediaLink(ImageParams));
+
+            // Add srcset for editable content
+            if (SrcSet != null)
+            {
+                string srcSetValue = GenerateSrcSetAttribute(imageField);
+                if (!string.IsNullOrEmpty(srcSetValue))
+                {
+                    imageNode.SetAttributeValue(SrcSetAttribute, srcSetValue);
+                }
+            }
+
+            // Add sizes for editable content
+            if (!string.IsNullOrEmpty(Sizes))
+            {
+                imageNode.SetAttributeValue(SizesAttribute, Sizes);
+            }
         }
 
         return new HtmlString(doc.DocumentNode.OuterHtml);
+    }
+
+    private string GenerateSrcSetAttribute(ImageField imageField)
+    {
+        object[]? parsedSrcSet = ParseSrcSet(SrcSet);
+        if (parsedSrcSet == null || parsedSrcSet.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        List<string> srcSetEntries = new();
+
+        foreach (object srcSetItem in parsedSrcSet)
+        {
+            // Merge ImageParams with srcSet parameters (Content SDK behavior)
+            var mergedParams = MergeParameters(ImageParams, srcSetItem);
+
+            // Get the width descriptor from the original srcSet item (not merged params)
+            string descriptor = GetWidthDescriptor(srcSetItem);
+
+            // Only include entries that have a valid width descriptor
+            if (!string.IsNullOrEmpty(descriptor))
+            {
+                string? mediaUrl = imageField.GetMediaLink(mergedParams);
+                if (!string.IsNullOrEmpty(mediaUrl))
+                {
+                    srcSetEntries.Add($"{mediaUrl} {descriptor}");
+                }
+            }
+        }
+
+        return string.Join(", ", srcSetEntries);
     }
 }
